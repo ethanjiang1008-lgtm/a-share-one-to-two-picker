@@ -197,7 +197,7 @@ def main():
     if not rows:
         payload={'status':'no_first_board','model_version':model.get('version'),'date':None,
                  'data_source':'Sina','universe':'沪深主板','first_board_count':0,'failed':failed,
-                 'market_context':context,'rows':[]}
+                 'market_context':context,'two_plus_codes':sorted(two_plus),'rows':[]}
         WEB_DATA_PATH.parent.mkdir(parents=True,exist_ok=True)
         WEB_DATA_PATH.write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
         print(json.dumps(payload,ensure_ascii=False,indent=2))
@@ -248,7 +248,7 @@ def main():
       'status':'ok','model_version':model.get('version'),'reference_test_top1_precision':model.get('reference_test_top1_precision'),
       'trained_through':model.get('trained_through'),'analysis_date':analysis_date,'prediction_date':prediction_date,'date':analysis_date,'information_cutoff':cutoff_iso,'data_source':'Sina',
       'universe':'沪深主板','first_board_count':len(scored),'two_plus_count':len(two_plus),'failed':failed,
-      'market_context':context,'rows':web_rows
+      'market_context':context,'two_plus_codes':sorted(two_plus),'rows':web_rows
     }
     WEB_DATA_PATH.parent.mkdir(parents=True,exist_ok=True)
     WEB_DATA_PATH.write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
