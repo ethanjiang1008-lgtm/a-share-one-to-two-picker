@@ -13,7 +13,7 @@ import ssl
 import urllib.parse
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124 Safari/537.36"
 HEADERS = {"User-Agent": UA, "Referer": "https://www.cninfo.com.cn/"}
@@ -64,7 +64,16 @@ def _clean(s: object) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 def _date_only(s: object) -> str:
-    m = re.search(r"(20\d{2}-\d{1,2}-\d{1,2})", str(s or ""))
+    if isinstance(s, (int, float)) and s:
+        try:
+            ts=float(s)
+            if ts > 100000000000:
+                ts /= 1000
+            return datetime.fromtimestamp(ts, tz=timezone(timedelta(hours=8))).strftime("%Y-%m-%d")
+        except Exception:
+            pass
+    raw=str(s or "")
+    m = re.search(r"(20\d{2}-\d{1,2}-\d{1,2})", raw)
     if m:
         return m.group(1)
     m = re.search(r"(20\d{2}/\d{1,2}/\d{1,2})", str(s or ""))
@@ -171,7 +180,7 @@ def _cls_global(size: int = 120) -> list[dict]:
         ctime=x.get("ctime")
         if ctime:
             try:
-                d=datetime.fromtimestamp(int(ctime)).strftime("%Y-%m-%d %H:%M:%S")
+                d=datetime.fromtimestamp(int(ctime), tz=timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
             except Exception:
                 d=""
         if title:
@@ -180,6 +189,27 @@ def _cls_global(size: int = 120) -> list[dict]:
                          "verified_date":False})
     return rows
 
+def _ths_hot_reason(trade_date: str) -> dict[str, dict]:
+    """同花顺当日强势股题材归因标签；仅作为市场题材线索，不作为公告证据。"""
+    url=(
+        "http://zx.10jqka.com.cn/event/api/getharden/"
+        f"date/{trade_date}/orderby/date/orderway/desc/charset/GBK/"
+    )
+    try:
+        raw=_get(url, headers={"Referer":"http://zx.10jqka.com.cn/"}, timeout=10)
+        data=json.loads(raw)
+        if data.get("errocode", 0) not in (0, "0", None):
+            return {}
+        out={}
+        for x in data.get("data") or []:
+            code=str(x.get("code","")).strip()
+            reason=_clean(x.get("reason"))
+            if code and reason:
+                out[code]={"reason":reason,"source":"同花顺热点","type":"题材归因"}
+        return out
+    except Exception:
+        return {}
+
 def collect_event_evidence(candidates: list[dict], trade_date: str, workers: int = 8) -> dict[str, dict]:
     """对首板候选逐只收集公告/个股新闻，并用全市场快讯补充交叉证据。"""
     global_news=[]
@@ -187,11 +217,12 @@ def collect_event_evidence(candidates: list[dict], trade_date: str, workers: int
         global_news=_cls_global(120)
     except Exception:
         global_news=[]
+    ths_reasons=_ths_hot_reason(trade_date)
 
     out={str(x.get("code")): {
         "status":"no_verified_event","confidence":"低","summary":"暂未找到可验证的当日公告/新闻催化",
         "detail":"事件证据层未找到与当日涨停直接匹配的公告或新闻；系统不把概念标签、技术形态或主观猜测当成涨停原因。",
-        "verified_evidence":[],"related_evidence":[],"categories":[],"sustainability":"未知","sources":[],
+        "verified_evidence":[],"related_evidence":[],"categories":[],"theme_tags":"","theme_categories":[],"sustainability":"未知","sources":[],
     } for x in candidates}
 
     def worker(meta):
@@ -216,6 +247,9 @@ def collect_event_evidence(candidates: list[dict], trade_date: str, workers: int
                     evidence.append(x)
                 else:
                     related.append(x)
+
+        theme=(ths_reasons.get(code) or {}).get("reason","")
+        theme_categories=_categories(theme)
 
         # 去重，并给“直接事件”更高优先级。
         uniq={}
@@ -243,12 +277,15 @@ def collect_event_evidence(candidates: list[dict], trade_date: str, workers: int
             direct_titles="；".join(x["title"] for x in evidence[:4])
             direct_cats="、".join(cats[:5]) if cats else "一般事件"
             summary=f"当日发现 {len(evidence)} 条直接相关证据，核心涉及：{direct_cats}。"
+            if theme:
+                summary += f" 同花顺当日题材归因：{theme}。"
             detail=(f"与 {name}（{code}）当日涨停直接相关的证据包括：{direct_titles}。"
                     f"其中优先级更高的是上市公司公告，其次是个股新闻与快讯；若多个独立来源指向同一事件，可信度提高。")
             sustain="高" if any(cat in alltext for cat in SUSTAINABILITY["高"]) else "中" if any(cat in alltext for cat in SUSTAINABILITY["中"]) else "低"
             return code, {
                 "status":"verified","confidence":conf,"summary":summary,"detail":detail,
                 "verified_evidence":evidence[:8],"related_evidence":related[:6],"categories":cats,
+                "theme_tags":theme,"theme_categories":theme_categories,
                 "sustainability":sustain,
                 "sources":[x.get("url") for x in evidence if x.get("url")]
             }
@@ -259,7 +296,17 @@ def collect_event_evidence(candidates: list[dict], trade_date: str, workers: int
             return code, {
                 "status":"background_only","confidence":"低","summary":"只有近期背景信息，没有当日直接催化证据",
                 "detail":detail,"verified_evidence":[],"related_evidence":related[:6],"categories":cats,
+                "theme_tags":theme,"theme_categories":theme_categories,
                 "sustainability":"未知","sources":[x.get("url") for x in related if x.get("url")]
+            }
+        if theme:
+            return code, {
+                "status":"theme_only","confidence":"低",
+                "summary":f"同花顺当日题材归因：{theme}，但未找到可验证的直接公告/新闻催化。",
+                "detail":f"题材归因标签只能说明当日市场将 {name}（{code}）归入“{theme}”这一交易线索，不能单独证明涨停的直接原因。需要结合公告、新闻或公司披露进一步确认。",
+                "verified_evidence":[],"related_evidence":[],"categories":theme_categories,
+                "theme_tags":theme,"theme_categories":theme_categories,
+                "sustainability":"未知","sources":[]
             }
         return code,out[code]
 
