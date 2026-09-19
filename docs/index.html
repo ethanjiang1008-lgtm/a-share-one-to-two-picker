@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>A股首板一进二 · 每日预测</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">A-SHARE · ONE TO TWO</div>
+        <h1>A股首板一进二</h1>
+        <p class="sub">只分析沪深主板首板股，目标是判断次日晋级二板的概率。</p>
+      </div>
+      <div class="model-badge" id="modelBadge">V1 · 冻结模型</div>
+    </header>
+
+    <section class="status-card" id="statusCard">
+      <div>
+        <span class="label">最近运行</span>
+        <strong id="runDate">—</strong>
+      </div>
+      <div>
+        <span class="label">数据源</span>
+        <strong id="dataSource">新浪财经</strong>
+      </div>
+      <div>
+        <span class="label">分析范围</span>
+        <strong>沪深主板</strong>
+      </div>
+      <div>
+        <span class="label">V1参考 Top1</span>
+        <strong>41.18%</strong>
+      </div>
+    </section>
+
+    <div id="emptyState" class="empty hidden">
+      <h2>等待首次运行结果</h2>
+      <p>运行每日扫描后，这个页面会自动同步最新的首板分析结果。</p>
+    </div>
+
+    <main id="content" class="hidden">
+      <section class="stats-grid">
+        <article class="stat"><span>今日涨停</span><strong id="ztCount">—</strong></article>
+        <article class="stat"><span>今日首板</span><strong id="firstCount">—</strong></article>
+        <article class="stat"><span>2板及以上</span><strong id="twoPlusCount">—</strong></article>
+        <article class="stat"><span>首板扫描失败</span><strong id="failedCount">—</strong></article>
+      </section>
+
+      <section class="section-head">
+        <div>
+          <div class="eyebrow">TOP PICKS</div>
+          <h2>重点观察</h2>
+        </div>
+        <div class="hint">概率来自冻结 V1 模型；原因解释与模型依据分开显示。</div>
+      </section>
+      <section id="topList" class="cards"></section>
+
+      <section class="section-head">
+        <div>
+          <div class="eyebrow">DETAIL</div>
+          <h2>首板全量分析</h2>
+        </div>
+        <input id="searchBox" class="search" type="search" placeholder="搜索股票名称 / 代码" />
+      </section>
+      <section class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>排名</th>
+              <th>股票</th>
+              <th>价格</th>
+              <th>明日连板概率</th>
+              <th>涨停原因</th>
+              <th>原因可信度</th>
+              <th>核心判断</th>
+              <th>主要风险</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </section>
+
+      <section class="section-head market-head">
+        <div>
+          <div class="eyebrow">MARKET CONTEXT</div>
+          <h2>当日市场环境</h2>
+        </div>
+      </section>
+      <section class="market-grid" id="marketGrid"></section>
+
+      <footer>
+        <span id="footerModel">模型：one-to-two-v1-daily-proxy</span>
+        <span>数据：新浪财经公开行情；事件/公告证据需与行情层分离校验。</span>
+      </footer>
+    </main>
+  </div>
+  <script src="./app.js"></script>
+</body>
+</html>
