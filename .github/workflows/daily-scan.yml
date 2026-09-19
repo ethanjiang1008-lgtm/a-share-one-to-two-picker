@@ -1,4 +1,4 @@
-name: A股首板一进二 V1 每日预测
+name: A股首板一进二 V1 每日预测与网页发布
 
 on:
   workflow_dispatch:
@@ -7,26 +7,51 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 concurrency:
   group: one-to-two-v1-daily-scan
   cancel-in-progress: true
 
 jobs:
-  scan:
+  scan_and_deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
       - name: Run V1 daily scan
         run: python scripts/live_scan.py
-      - name: Commit prediction and state
+
+      - name: Build web data
+        run: python scripts/build_web.py
+
+      - name: Commit prediction, state and latest web data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f reports/daily data/state/market_state.json
-          git diff --cached --quiet || git commit -m "data: daily one-to-two V1 scan"
+          git add -f reports/daily data/state/market_state.json docs/data/latest.json
+          git diff --cached --quiet || git commit -m "data: daily one-to-two V1 scan and web result"
           git push
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: "./docs"
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
