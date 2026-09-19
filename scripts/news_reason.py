@@ -43,6 +43,8 @@ def _get(url: str, data: bytes | None = None, headers: dict | None = None, timeo
     h = dict(HEADERS)
     if headers:
         h.update(headers)
+    if data and "Content-Type" not in h:
+        h["Content-Type"]="application/x-www-form-urlencoded; charset=UTF-8"
     req = urllib.request.Request(url, data=data, headers=h, method="POST" if data else "GET")
     last = None
     for _ in range(2):
@@ -73,7 +75,15 @@ def _date_only(s: object) -> str:
             return datetime.fromtimestamp(ts, tz=timezone(timedelta(hours=8))).strftime("%Y-%m-%d")
         except Exception:
             pass
-    raw=str(s or "")
+    raw=str(s or "").strip()
+    if re.fullmatch(r"\d{10,13}(?:\.0+)?", raw):
+        try:
+            ts=float(raw)
+            if ts > 100000000000:
+                ts /= 1000
+            return datetime.fromtimestamp(ts, tz=timezone(timedelta(hours=8))).strftime("%Y-%m-%d")
+        except Exception:
+            pass
     m = re.search(r"(20\d{2}-\d{1,2}-\d{1,2})", raw)
     if m:
         return m.group(1)
