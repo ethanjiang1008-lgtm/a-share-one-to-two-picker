@@ -18,6 +18,6 @@ jobs:
           python-version: "3.11"
       - name: Validate Python and model
         run: |
-          python -m py_compile scripts/market_data_sina.py scripts/live_scan.py scripts/news_reason.py scripts/build_web.py scripts/trading_calendar.py
+          python -m py_compile scripts/market_data_sina.py scripts/live_scan.py scripts/news_reason.py scripts/build_web.py scripts/build_excel.py scripts/evaluate_topk.py scripts/trading_calendar.py
           python -c "import json; [json.load(open(p, encoding='utf-8')) for p in ['config/model_v1.json','config/trading_calendar.json']]; print('config json ok')"
           python scripts/smoke_test.py
