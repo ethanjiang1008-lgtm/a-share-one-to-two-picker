@@ -42,3 +42,24 @@ V1 采用收盘后快速预测：获取当天主板行情快照 -> 找出涨停�
 V1 -> 数据质量确认 -> 真实 5 分钟封板结构 -> 严格样本外验证 -> V1.1 / V1.2。
 
 任何新增特征必须先通过时间序列样本外回测。
+
+## 网页结果
+
+每日扫描完成后，GitHub Actions 会在同一次任务中生成最新网页数据并部署到 GitHub Pages。
+
+页面展示：
+- 当日沪深主板涨停总数、首板数、2板及以上数量
+- 首板股票按“明日连板概率”排序
+- 每只股票的详细“当日涨停原因/证据状态”
+- 基于 V1 实际入模因子的“为什么这么判断”
+- 主要风险
+- 当日市场环境
+
+网页数据文件：`docs/data/latest.json`。
+
+首次启用需要在仓库 Settings → Pages → Build and deployment → Source 选择 **GitHub Actions**。GitHub 官方文档确认可以使用自定义 Actions 工作流部署 Pages，部署工作流需要 `pages: write` 和 `id-token: write` 权限。citeturn210730search0turn210730search2
+
+预计网页地址：
+`https://ethanjiang1008-lgtm.github.io/a-share-one-to-two-picker/`
+
+注意：当前 V1 行情层只接入新浪公开行情，因此“具体新闻/公告导致涨停”的事件证据不会被模型自行编造。网页会明确标记事件证据是否可用；后续接入公告/新闻证据层时，不改变 V1 概率模型本身。
