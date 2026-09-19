@@ -143,7 +143,7 @@ def _cninfo(code: str, start_date: str, end_date: str | None = None, size: int =
         if not title:
             continue
         rows.append({
-            "type":"公告","title":title,"summary":title,"date":d or trade_date,
+            "type":"公告","title":title,"summary":title,"date":d or start_date,
             "source":"巨潮资讯","url":urljoin("https://www.cninfo.com.cn/", x.get("adjunctUrl") or x.get("announcementUrl") or ""),
             "categories":_categories(title),"verified_date":d == trade_date
         })
@@ -240,7 +240,8 @@ def collect_event_evidence(candidates: list[dict], trade_date: str, cutoff_iso: 
         code=str(meta.get("code","")); name=str(meta.get("name",""))
         evidence=[]; related=[]
         try:
-            for x in _cninfo(code, trade_date):
+            cutoff_date=cutoff_iso[:10]
+            for x in _cninfo(code, trade_date, cutoff_date):
                 evidence.append(x)
         except Exception:
             pass
