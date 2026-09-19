@@ -238,6 +238,9 @@ def main():
     WEB_DATA_PATH.write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
     out_json=REPORT_DIR/f'{analysis_date}_one_to_two_v1.json'
     out_json.write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
+    cutoff_key=cutoff_iso.replace("+08:00","").replace(":","").replace("-","").replace(".","")
+    snapshot_json=REPORT_DIR/f'{analysis_date}_one_to_two_v1_cutoff_{cutoff_key}.json'
+    snapshot_json.write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
 
     print(json.dumps({'version':model.get('version'),'analysis_date':analysis_date,'prediction_date':prediction_date,'universe':'沪深主板 only','first_board_count':len(scored),
       'two_plus_count':len(two_plus),'failed':failed,
