@@ -5,6 +5,8 @@ from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor,as_completed
 from market_data_sina import fetch_all_stocks,fetch_kline,is_main_board
 from news_reason import collect_event_evidence
+from trading_calendar import next_trading_day
+import datetime
 
 ROOT=Path(__file__).resolve().parents[1]
 MODEL_PATH=ROOT/'config/model_v1.json'
@@ -188,19 +190,20 @@ def main():
         print(json.dumps(payload,ensure_ascii=False,indent=2))
         return 0
 
-    today=max(str(x['_bars'][x['_idx']].get('date','')) for x in rows)
+    analysis_date=max(str(x['_bars'][x['_idx']].get('date','')) for x in rows)
+    prediction_date=next_trading_day(datetime.date.fromisoformat(analysis_date)).isoformat()
     scored=[]
     for item in rows:
         bs=item['_bars']; i=item['_idx']
-        row={'date':today,'code':str(item['code']),'name':str(item['name']),'price':f(item.get('price')),'change_pct':f(item.get('change_pct'))}
+        row={'date':analysis_date,'prediction_date':prediction_date,'code':str(item['code']),'name':str(item['name']),'price':f(item.get('price')),'change_pct':f(item.get('change_pct'))}
         row.update(base_features(bs,i)); row.update(structure_features(bs,i)); row.update(context)
         row['score']=score(row,model); scored.append(row)
     scored.sort(key=lambda x:x['score'],reverse=True)
-    event_map=collect_event_evidence(scored, today, workers=8)
+    event_map=collect_event_evidence(scored, analysis_date, workers=8)
 
     REPORT_DIR.mkdir(parents=True,exist_ok=True)
     fields=['rank','date','code','name','price','change_pct','score']+list(context.keys())+[x['name'] for x in model['features']]
-    out=REPORT_DIR/f'{today}_one_to_two_v1.csv'
+    out=REPORT_DIR/f'{analysis_date}_one_to_two_v1.csv'
     with out.open('w',encoding='utf-8-sig',newline='') as fh:
         w=csv.DictWriter(fh,fieldnames=fields); w.writeheader()
         for rank,row in enumerate(scored,1):
@@ -210,7 +213,7 @@ def main():
     for rank,row in enumerate(scored,1):
         row['rank']=rank
         web_rows.append({
-          'rank':rank,'date':today,'code':row['code'],'name':row['name'],'price':row['price'],
+          'rank':rank,'date':analysis_date,'prediction_date':prediction_date,'code':row['code'],'name':row['name'],'price':row['price'],
           'change_pct':row['change_pct'],'score':row['score'],
           'event_reason':event_map.get(row['code'],{
             'status':'no_verified_event','confidence':'低',
@@ -226,20 +229,20 @@ def main():
 
     payload={
       'status':'ok','model_version':model.get('version'),'reference_test_top1_precision':model.get('reference_test_top1_precision'),
-      'trained_through':model.get('trained_through'),'date':today,'data_source':'Sina',
+      'trained_through':model.get('trained_through'),'analysis_date':analysis_date,'prediction_date':prediction_date,'date':analysis_date,'data_source':'Sina',
       'universe':'沪深主板','first_board_count':len(scored),'two_plus_count':len(two_plus),'failed':failed,
       'market_context':context,'rows':web_rows
     }
     WEB_DATA_PATH.parent.mkdir(parents=True,exist_ok=True)
     WEB_DATA_PATH.write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
-    out_json=REPORT_DIR/f'{today}_one_to_two_v1.json'
+    out_json=REPORT_DIR/f'{analysis_date}_one_to_two_v1.json'
     out_json.write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
 
     print(json.dumps({'version':model.get('version'),'date':today,'universe':'沪深主板 only','first_board_count':len(scored),
       'two_plus_count':len(two_plus),'failed':failed,
       'top10':[{'rank':i+1,'code':r['code'],'name':r['name'],'score':round(r['score'],6)} for i,r in enumerate(scored[:10])]},ensure_ascii=False,indent=2))
 
-    save={'last_date':today,'first_board_codes':sorted(first_codes),'market':context}
+    save={'last_date':analysis_date,'prediction_date':prediction_date,'first_board_codes':sorted(first_codes),'market':context}
     STATE_PATH.parent.mkdir(parents=True,exist_ok=True); STATE_PATH.write_text(json.dumps(save,ensure_ascii=False,indent=2),encoding='utf-8')
     return 0
 
