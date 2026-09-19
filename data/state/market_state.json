@@ -1,0 +1,13 @@
+{
+  "last_date": null,
+  "first_board_codes": [],
+  "market": {
+    "market_first_count": 61.51393899639226,
+    "market_2plus_count": 12.789603148573303,
+    "market_zt_count": 74.30354214496556,
+    "prev_market_first_count": 54.58625778943916,
+    "prev_market_2plus_count": 12.092981305346015,
+    "prev_market_1to2_rate": 0.16185320352130533
+  },
+  "note": "首次运行使用模型训练集均值作为市场环境占位；完成首个交易日后由每日任务自动更新。"
+}
