@@ -33,9 +33,10 @@ function evidenceHtml(row) {
     const title = esc(x.title || "未命名证据");
     const date = esc(x.date || "");
     const src = esc(x.source || "");
+    const summary = x.summary ? '<div class="evidence-summary">'+esc(x.summary)+'</div>' : '';
     return '<div class="evidence"><span class="evidence-meta">'+src+' · '+date+'</span> ' +
       (url ? '<a href="'+esc(url)+'" target="_blank" rel="noopener">'+title+'</a>' : '<span>'+title+'</span>') +
-      '</div>';
+      summary + '</div>';
   }).join("");
 }
 
@@ -50,6 +51,7 @@ function renderTop(rows) {
       '<div class="progress"><div style="width:' + Math.min(100,Math.max(0,p)) + '%"></div></div>' +
       '<div class="block"><div class="block-title">当日涨停原因</div><div class="block-text">' + esc(reasonText(row)) + '</div></div>' +
       '<div class="block"><div class="block-title">市场题材归因</div><div class="block-text">' + esc(row.event_reason?.theme_tags || "暂无独立题材标签") + '</div></div>' +
+      '<div class="block"><div class="block-title">原因类型</div><div class="block-text">' + esc((row.event_reason?.categories || []).join("、") || "未识别") + '</div></div>' +
       '<div class="block"><div class="block-title">为什么这么判断</div><div class="block-text">' + esc(modelBasis(row)) + '</div></div>' +
       '<div class="block"><div class="block-title">事件证据</div>' + evidenceHtml(row) + '</div>' +
       '<div class="block"><div class="block-title">原因持续性</div><div class="block-text">' + esc(row.event_reason?.sustainability || "未知") + '</div></div>' +
