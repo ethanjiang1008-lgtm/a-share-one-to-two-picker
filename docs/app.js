@@ -55,6 +55,7 @@ function renderTop(rows) {
       '<div class="block"><div class="block-title">为什么这么判断</div><div class="block-text">' + esc(modelBasis(row)) + '</div></div>' +
       '<div class="block"><div class="block-title">事件证据</div>' + evidenceHtml(row) + '</div>' +
       '<div class="block"><div class="block-title">原因持续性</div><div class="block-text">' + esc(row.event_reason?.sustainability || "未知") + '</div></div>' +
+      '<div class="block"><div class="block-title">信息变化</div><div class="block-text">' + esc(row.event_reason?.information_impact || "未发现新增") + '</div></div>' +
       '<div class="block"><div class="block-title">最大风险</div><div class="block-text">' + esc(row.risk || "暂无") + '</div></div>' +
       '<div class="chips"><span class="chip">首板结构</span><span class="chip">市场环境</span><span class="chip">V1模型</span></div>' +
       '</article>';
@@ -107,6 +108,7 @@ async function boot() {
     document.getElementById("content").classList.remove("hidden");
     document.getElementById("runDate").textContent = data.analysis_date || data.date || "—";
     document.getElementById("predictionDate").textContent = data.prediction_date || "—";
+    document.getElementById("cutoffDate").textContent = data.information_cutoff || "—";
     document.getElementById("ztCount").textContent = data.market_context?.market_zt_count ?? "—";
     document.getElementById("firstCount").textContent = data.market_context?.market_first_count ?? "—";
     document.getElementById("twoPlusCount").textContent = data.market_context?.market_2plus_count ?? "—";
