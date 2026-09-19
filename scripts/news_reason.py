@@ -110,7 +110,7 @@ def _categories(text: str) -> list[str]:
             found.append(cat)
     return found
 
-def _cninfo(code: str, trade_date: str, size: int = 20) -> list[dict]:
+def _cninfo(code: str, start_date: str, end_date: str | None = None, size: int = 50) -> list[dict]:
     if code.startswith("6"):
         org_id = f"gssh0{code}"
     else:
@@ -123,7 +123,7 @@ def _cninfo(code: str, trade_date: str, size: int = 20) -> list[dict]:
         "column": "",
         "category": "",
         "plate": "",
-        "seDate": f"{trade_date}~{trade_date}",
+        "seDate": f"{start_date}~{end_date or start_date}",
         "searchkey": "",
         "secid": "",
         "sortName": "",
