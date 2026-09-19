@@ -1,0 +1,77 @@
+:root {
+  --bg: #0b1020;
+  --panel: #121a2b;
+  --panel2: #172238;
+  --line: #273553;
+  --text: #edf2ff;
+  --muted: #93a0b8;
+  --accent: #6ea8fe;
+  --good: #49d89b;
+  --warn: #f4bf5f;
+  --bad: #f07a8a;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  background: radial-gradient(circle at top, #13203a 0, var(--bg) 48%);
+  color: var(--text);
+}
+.shell { max-width: 1450px; margin: 0 auto; padding: 28px 24px 50px; }
+.topbar { display:flex; justify-content:space-between; gap:24px; align-items:flex-start; margin-bottom:24px; }
+.eyebrow { color:var(--accent); font-size:11px; letter-spacing:.16em; font-weight:800; }
+h1 { margin:7px 0 6px; font-size:34px; }
+h2 { margin:5px 0 0; font-size:22px; }
+.sub,.hint,footer,.label { color:var(--muted); }
+.sub { margin:0; }
+.model-badge { border:1px solid var(--line); background:rgba(23,34,56,.75); padding:9px 12px; border-radius:999px; font-size:12px; white-space:nowrap; }
+.status-card,.stat,.card,.market-item,.table-wrap,.empty { background:rgba(18,26,43,.88); border:1px solid var(--line); border-radius:16px; box-shadow:0 12px 35px rgba(0,0,0,.16); }
+.status-card { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; padding:18px; margin-bottom:18px; }
+.status-card strong { display:block; margin-top:5px; font-size:16px; }
+.stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:34px; }
+.stat { padding:17px 18px; }
+.stat span { color:var(--muted); font-size:13px; }
+.stat strong { display:block; margin-top:9px; font-size:28px; }
+.section-head { display:flex; justify-content:space-between; align-items:end; gap:18px; margin:22px 0 14px; }
+.cards { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+.card { padding:18px; }
+.card-top { display:flex; justify-content:space-between; gap:12px; }
+.rank { color:var(--accent); font-weight:800; }
+.stock { font-size:20px; font-weight:800; }
+.code { color:var(--muted); font-size:12px; margin-left:7px; }
+.prob { font-size:28px; font-weight:900; }
+.prob-label { font-size:11px; color:var(--muted); text-align:right; }
+.progress { height:7px; background:#24314b; border-radius:99px; overflow:hidden; margin:12px 0 15px; }
+.progress > div { height:100%; background:var(--good); }
+.block { margin-top:12px; }
+.block-title { font-size:12px; color:var(--muted); margin-bottom:5px; }
+.block-text { line-height:1.7; font-size:13px; }
+.chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:9px; }
+.chip { background:#1d2b46; border:1px solid #2a3c61; border-radius:999px; padding:5px 8px; font-size:11px; color:#cbd7ec; }
+.search { width:290px; max-width:45vw; background:#121a2b; color:var(--text); border:1px solid var(--line); padding:10px 12px; border-radius:10px; outline:none; }
+.table-wrap { overflow:auto; }
+table { width:100%; border-collapse:collapse; min-width:1120px; }
+th,td { padding:13px 14px; border-bottom:1px solid rgba(39,53,83,.7); text-align:left; vertical-align:top; font-size:12px; }
+th { color:var(--muted); font-weight:700; position:sticky; top:0; background:#121a2b; }
+td strong { font-size:13px; }
+.reason { max-width:300px; line-height:1.6; }
+.conf-high { color:var(--good); }
+.conf-mid { color:var(--warn); }
+.conf-low { color:var(--bad); }
+.market-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:12px; }
+.market-item { padding:15px; }
+.market-item .name { color:var(--muted); font-size:12px; }
+.market-item .value { margin-top:6px; font-size:20px; font-weight:800; }
+.empty { padding:60px 20px; text-align:center; }
+.hidden { display:none !important; }
+footer { display:flex; justify-content:space-between; gap:16px; margin-top:22px; font-size:11px; }
+@media (max-width: 980px) {
+  .cards,.market-grid { grid-template-columns:1fr 1fr; }
+  .status-card,.stats-grid { grid-template-columns:1fr 1fr; }
+}
+@media (max-width: 640px) {
+  .shell { padding:18px 12px 40px; }
+  .topbar,.section-head,footer { flex-direction:column; align-items:flex-start; }
+  .cards,.market-grid,.status-card,.stats-grid { grid-template-columns:1fr; }
+  .search { max-width:100%; width:100%; }
+}
