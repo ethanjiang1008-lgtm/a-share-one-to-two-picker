@@ -105,7 +105,8 @@ async function boot() {
     }
     state = data;
     document.getElementById("content").classList.remove("hidden");
-    document.getElementById("runDate").textContent = data.date;
+    document.getElementById("runDate").textContent = data.analysis_date || data.date || "—";
+    document.getElementById("predictionDate").textContent = data.prediction_date || "—";
     document.getElementById("ztCount").textContent = data.market_context?.market_zt_count ?? "—";
     document.getElementById("firstCount").textContent = data.market_context?.market_first_count ?? "—";
     document.getElementById("twoPlusCount").textContent = data.market_context?.market_2plus_count ?? "—";
