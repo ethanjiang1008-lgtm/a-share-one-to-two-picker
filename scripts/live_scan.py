@@ -217,7 +217,9 @@ def main():
     event_map=collect_event_evidence(scored, analysis_date, cutoff_iso, workers=8)
 
     REPORT_DIR.mkdir(parents=True,exist_ok=True)
-    fields=['rank','date','prediction_date','code','name','price','change_pct','score']+list(context.keys())+[x['name'] for x in model['features']]
+    model_fields=[x['name'] for x in model['features']]
+    extra_fields=[k for k in context.keys() if k not in model_fields]
+    fields=['rank','date','prediction_date','code','name','price','change_pct','score']+extra_fields+model_fields
     out=REPORT_DIR/f'{analysis_date}_one_to_two_v1.csv'
     with out.open('w',encoding='utf-8-sig',newline='') as fh:
         w=csv.DictWriter(fh,fieldnames=fields); w.writeheader()
