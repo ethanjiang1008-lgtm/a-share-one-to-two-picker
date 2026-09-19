@@ -181,6 +181,17 @@ def main():
              'prev_market_first_count':f(prev_market.get('market_first_count'),default_ctx['market_first_count']),
              'prev_market_2plus_count':f(prev_market.get('market_2plus_count'),default_ctx['market_2plus_count']),
              'prev_market_1to2_rate':prev_rate}
+
+    # 同一分析日重复运行时，冻结第一次成功生成的 V1 评分/市场上下文；
+    # 只有首板股票集合发生变化（例如修复过滤 Bug 后）才重新计算。
+    frozen = state.get('frozen_v1') or {}
+    same_date = state.get('last_date') == (str(rows[0]['_bars'][rows[0]['_idx']].get('date','')) if rows else None)
+    frozen_codes=set(frozen.get('codes',[]))
+    current_codes={str(r['code']) for r in rows}
+    use_frozen = bool(same_date and frozen_codes == current_codes and frozen.get('scores'))
+    if use_frozen:
+        context=frozen.get('market_context',context)
+
     if not rows:
         payload={'status':'no_first_board','model_version':model.get('version'),'date':None,
                  'data_source':'Sina','universe':'沪深主板','first_board_count':0,'failed':failed,
@@ -197,7 +208,8 @@ def main():
         bs=item['_bars']; i=item['_idx']
         row={'date':analysis_date,'prediction_date':prediction_date,'code':str(item['code']),'name':str(item['name']),'price':f(item.get('price')),'change_pct':f(item.get('change_pct'))}
         row.update(base_features(bs,i)); row.update(structure_features(bs,i)); row.update(context)
-        row['score']=score(row,model); scored.append(row)
+        row['score']=frozen.get('scores',{}).get(row['code'], score(row,model)) if use_frozen else score(row,model)
+        scored.append(row)
     scored.sort(key=lambda x:x['score'],reverse=True)
     cutoff_iso=datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).isoformat()
     event_map=collect_event_evidence(scored, analysis_date, cutoff_iso, workers=8)
@@ -246,7 +258,9 @@ def main():
       'two_plus_count':len(two_plus),'failed':failed,
       'top10':[{'rank':i+1,'code':r['code'],'name':r['name'],'score':round(r['score'],6)} for i,r in enumerate(scored[:10])]},ensure_ascii=False,indent=2))
 
-    save={'last_date':analysis_date,'prediction_date':prediction_date,'first_board_codes':sorted(first_codes),'market':context}
+    save={'last_date':analysis_date,'prediction_date':prediction_date,'first_board_codes':sorted(first_codes),'market':context,
+          'frozen_v1':{'codes':sorted(first_codes),'scores':{r['code']:r['score'] for r in scored},
+                        'market_context':context}}
     STATE_PATH.parent.mkdir(parents=True,exist_ok=True); STATE_PATH.write_text(json.dumps(save,ensure_ascii=False,indent=2),encoding='utf-8')
     return 0
 
