@@ -84,3 +84,6 @@ footer { display:flex; justify-content:space-between; gap:16px; margin-top:22px;
 
 
 .evidence-summary { color: #b9c5d9; margin-top: 4px; line-height: 1.55; font-size: 11px; }
+
+.excel-link { display:inline-block; margin-top:8px; color:var(--text); text-decoration:none; font-size:12px; border:1px solid var(--line); background:rgba(23,34,56,.75); padding:8px 10px; border-radius:9px; }
+.excel-link:hover { text-decoration:underline; }
