@@ -1,0 +1,8 @@
+{
+  "date": null,
+  "model_version": "one-to-two-v1-daily-proxy",
+  "rows": [],
+  "market_context": {},
+  "failed": 0,
+  "status": "waiting_for_first_run"
+}
