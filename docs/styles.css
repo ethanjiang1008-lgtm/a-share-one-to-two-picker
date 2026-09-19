@@ -75,3 +75,9 @@ footer { display:flex; justify-content:space-between; gap:16px; margin-top:22px;
   .cards,.market-grid,.status-card,.stats-grid { grid-template-columns:1fr; }
   .search { max-width:100%; width:100%; }
 }
+
+.muted { color: var(--muted); font-size: 11px; margin-top: 4px; }
+.evidence { line-height: 1.55; margin-top: 5px; }
+.evidence-meta { color: var(--muted); margin-right: 6px; font-size: 10px; }
+.evidence a { color: var(--text); text-decoration: none; }
+.evidence a:hover { text-decoration: underline; }
