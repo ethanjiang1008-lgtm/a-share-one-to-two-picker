@@ -199,7 +199,8 @@ def main():
         row.update(base_features(bs,i)); row.update(structure_features(bs,i)); row.update(context)
         row['score']=score(row,model); scored.append(row)
     scored.sort(key=lambda x:x['score'],reverse=True)
-    event_map=collect_event_evidence(scored, analysis_date, workers=8)
+    cutoff_iso=datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).isoformat()
+    event_map=collect_event_evidence(scored, analysis_date, cutoff_iso, workers=8)
 
     REPORT_DIR.mkdir(parents=True,exist_ok=True)
     fields=['rank','date','prediction_date','code','name','price','change_pct','score']+list(context.keys())+[x['name'] for x in model['features']]
@@ -229,7 +230,7 @@ def main():
 
     payload={
       'status':'ok','model_version':model.get('version'),'reference_test_top1_precision':model.get('reference_test_top1_precision'),
-      'trained_through':model.get('trained_through'),'analysis_date':analysis_date,'prediction_date':prediction_date,'date':analysis_date,'data_source':'Sina',
+      'trained_through':model.get('trained_through'),'analysis_date':analysis_date,'prediction_date':prediction_date,'date':analysis_date,'information_cutoff':cutoff_iso,'data_source':'Sina',
       'universe':'沪深主板','first_board_count':len(scored),'two_plus_count':len(two_plus),'failed':failed,
       'market_context':context,'rows':web_rows
     }
