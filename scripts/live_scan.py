@@ -174,9 +174,11 @@ def main():
                 failed+=1
 
     first_codes={str(r['code']) for r in rows}; current_zt=len(rows)+len(two_plus)
-    prev_codes=set(state.get('first_board_codes',[]))
-    prev_market=state.get('market',{}) or default_ctx
-    prev_rate=(sum(1 for c in prev_codes if c in set(two_plus))/len(prev_codes)) if prev_codes else f(prev_market.get('market_1to2_rate'),default_ctx['prev_market_1to2_rate'])
+    analysis_date_candidate=str(rows[0]['_bars'][rows[0]['_idx']].get('date','')) if rows else None
+    same_date_state=bool(analysis_date_candidate and state.get('last_date') == analysis_date_candidate)
+    prev_codes=set() if same_date_state else set(state.get('first_board_codes',[]))
+    prev_market={} if same_date_state else (state.get('market',{}) or default_ctx)
+    prev_rate=f(prev_market.get('market_1to2_rate'),default_ctx['prev_market_1to2_rate']) if same_date_state else ((sum(1 for c in prev_codes if c in set(two_plus))/len(prev_codes)) if prev_codes else f(prev_market.get('market_1to2_rate'),default_ctx['prev_market_1to2_rate']))
     context={'market_first_count':len(rows),'market_2plus_count':len(two_plus),'market_zt_count':current_zt,
              'prev_market_first_count':f(prev_market.get('market_first_count'),default_ctx['market_first_count']),
              'prev_market_2plus_count':f(prev_market.get('market_2plus_count'),default_ctx['market_2plus_count']),
