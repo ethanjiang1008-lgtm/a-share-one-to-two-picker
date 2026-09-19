@@ -119,6 +119,7 @@ async function boot() {
     document.getElementById("twoPlusCount").textContent = data.market_context?.market_2plus_count ?? "—";
     document.getElementById("failedCount").textContent = data.failed ?? "—";
     document.getElementById("footerModel").textContent = "模型：" + (data.model_version || "one-to-two-v1-daily-proxy");
+    if (data.excel_file) { const a=document.getElementById("excelLink"); a.href=data.excel_file; a.classList.remove("hidden"); }
     renderTop(data.rows);
     renderTable(data.rows);
     renderMarket(data);
