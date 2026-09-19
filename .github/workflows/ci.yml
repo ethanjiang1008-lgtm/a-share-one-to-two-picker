@@ -1,0 +1,22 @@
+name: V1 code validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/**"
+      - "config/**"
+      - ".github/workflows/**"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate Python and model
+        run: |
+          python -m py_compile scripts/market_data_sina.py scripts/live_scan.py
+          python -c "import json; json.load(open('config/model_v1.json', encoding='utf-8')); print('model json ok')"
