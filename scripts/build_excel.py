@@ -69,11 +69,13 @@ def main():
     EXCEL_DIR.mkdir(parents=True,exist_ok=True); DOWNLOAD_DIR.mkdir(parents=True,exist_ok=True)
     out=EXCEL_DIR/f"{d}_one_to_two_v1_cutoff_{cut}.xlsx"; rows=data["rows"]; mc=data.get("market_context") or {}
 
-    s1=[["A股首板一进二 V1 · 运行结果","","","","","","","","","","","",""],["分析日期",d,"预测日期",data.get("prediction_date"),"信息截止",data.get("information_cutoff"),"V1参考Top1",pct(data.get("reference_test_top1_precision",0))],["排名","代码","股票","价格","当日涨幅","明日连板概率","事件状态","涨停原因","题材标签","持续性","结构判断","主要风险","证据数"]]
+    s1=[["A股首板一进二 V1 · 运行结果","","","","","","","","","","","",""],["分析日期",d,"预测日期",data.get("prediction_date"),"信息截止",data.get("information_cutoff"),"V1参考Top1",pct(data.get("reference_test_top1_precision",0))],["排名","代码","股票","价格","当日涨幅","明日连板概率","事件状态","涨停原因","题材标签","持续性","结构判断","正向因子","负向因子","主要风险","证据数"]]
     for r in rows:
         er=r.get("event_reason") or {}; theme=er.get("theme_tags") or ""; theme="、".join(theme) if isinstance(theme,list) else str(theme)
         ev=(er.get("verified_evidence") or [])+(er.get("related_evidence") or [])+(er.get("post_close_evidence") or [])
-        s1.append([r.get("rank"),r.get("code"),r.get("name"),r.get("price"),pct((r.get("change_pct") or 0)/100),pct(r.get("score")),er.get("status",""),wrap(er.get("detail") or er.get("summary")),theme,er.get("sustainability","未知"),wrap(r.get("structure_reason")),wrap(r.get("risk")),len(ev)])
+        pos="；".join(x.get("label","")+":"+x.get("text","") for x in (r.get("model_explanation",{}).get("positive") or [])[:4])
+        neg="；".join(x.get("label","")+":"+x.get("text","") for x in (r.get("model_explanation",{}).get("negative") or [])[:3])
+        s1.append([r.get("rank"),r.get("code"),r.get("name"),r.get("price"),pct((r.get("change_pct") or 0)/100),pct(r.get("score")),er.get("status",""),wrap(er.get("detail") or er.get("summary")),theme,er.get("sustainability","未知"),wrap(r.get("structure_reason")),wrap(pos),wrap(neg),wrap(r.get("risk")),len(ev)])
 
     s2=[["复盘：预测后的实际结果","","","","","","","","",""],["排名","代码","股票","V1概率","次日竞价涨幅","次日开盘涨幅","是否二板","实际最高涨幅","实际收盘涨幅","复盘结论"]]
     for r in rows: s2.append([r.get("rank"),r.get("code"),r.get("name"),pct(r.get("score")),None,None,None,None,None,None])
@@ -93,7 +95,7 @@ def main():
         er=r.get("event_reason") or {}; ev=(er.get("verified_evidence") or [])+(er.get("related_evidence") or [])+(er.get("post_close_evidence") or [])
         for e in ev: s4.append([r.get("rank"),r.get("code"),r.get("name"),er.get("status",""),e.get("source",""),e.get("date",""),e.get("title",""),e.get("url","")])
 
-    sheets=[(s1,[8,12,14,10,10,13,12,42,20,10,42,28,8]),(s2,[8,12,14,13,14,14,12,14,14,22]),(s3,[18,12,12,12,12,24]),(s4,[8,12,14,14,16,12,42,55])]
+    sheets=[(s1,[8,12,14,10,10,13,12,42,20,10,42,36,36,28,8]),(s2,[8,12,14,13,14,14,12,14,14,22]),(s3,[18,12,12,12,12,24]),(s4,[8,12,14,14,16,12,42,55])]
     with zipfile.ZipFile(out,"w",zipfile.ZIP_DEFLATED) as z:
         z.writestr("[Content_Types].xml",types()); z.writestr("_rels/.rels",rels()); z.writestr("xl/workbook.xml",workbook()); z.writestr("xl/_rels/workbook.xml.rels",wb_rels()); z.writestr("xl/styles.xml",styles())
         for i,(rs,ws) in enumerate(sheets,1): z.writestr(f"xl/worksheets/sheet{i}.xml",sheet(rs,ws))
