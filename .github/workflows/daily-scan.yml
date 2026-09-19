@@ -33,6 +33,22 @@ jobs:
       - name: Run V1 daily scan
         run: python scripts/live_scan.py
 
+      - name: Validate daily result universe
+        run: |
+          python - <<'PY'
+          import csv
+          from pathlib import Path
+          files=sorted(Path("reports/daily").glob("*_one_to_two_v1.csv"))
+          if not files:
+              raise SystemExit("no daily CSV report produced")
+          latest=files[-1]
+          with latest.open(encoding="utf-8-sig", newline="") as f:
+              rows=list(csv.DictReader(f))
+          bad=[r for r in rows if str(r.get("name","")).strip().upper().startswith(("ST","*ST","S*ST","SST"))]
+          if bad:
+              raise SystemExit("ST variants found in daily result: "+", ".join(r["code"] for r in bad[:10]))
+          print(f"validated {len(rows)} main-board first-board rows from {latest}")
+
       - name: Build web data
         run: python scripts/build_web.py
 
