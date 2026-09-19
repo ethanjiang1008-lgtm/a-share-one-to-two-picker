@@ -52,11 +52,18 @@ jobs:
       - name: Build web data
         run: python scripts/build_web.py
 
-      - name: Commit prediction, state and latest web data
+      - name: Validate previous prediction TopK
+        run: python scripts/evaluate_topk.py
+
+      - name: Build Excel review workbook
+        run: python scripts/build_excel.py
+
+      - name: Commit prediction, state, evaluation and Excel
+
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f reports/daily data/state/market_state.json docs/data/latest.json
+          git add -f reports/daily reports/evaluation reports/excel data/state/market_state.json docs/data/latest.json docs/downloads/latest.xlsx
           git diff --cached --quiet || git commit -m "data: daily one-to-two V1 scan and web result"
           git push
 
