@@ -1,0 +1,32 @@
+name: A股首板一进二 V1 每日预测
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "10 7 * * 1-5"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: one-to-two-v1-daily-scan
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run V1 daily scan
+        run: python scripts/live_scan.py
+      - name: Commit prediction and state
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f reports/daily data/state/market_state.json
+          git diff --cached --quiet || git commit -m "data: daily one-to-two V1 scan"
+          git push
