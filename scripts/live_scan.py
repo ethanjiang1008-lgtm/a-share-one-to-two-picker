@@ -4,6 +4,7 @@ import csv,json,math,statistics
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor,as_completed
 from market_data_sina import fetch_all_stocks,fetch_kline,is_main_board
+from news_reason import collect_event_evidence
 
 ROOT=Path(__file__).resolve().parents[1]
 MODEL_PATH=ROOT/'config/model_v1.json'
@@ -195,6 +196,7 @@ def main():
         row.update(base_features(bs,i)); row.update(structure_features(bs,i)); row.update(context)
         row['score']=score(row,model); scored.append(row)
     scored.sort(key=lambda x:x['score'],reverse=True)
+    event_map=collect_event_evidence(scored, today, workers=8)
 
     REPORT_DIR.mkdir(parents=True,exist_ok=True)
     fields=['rank','date','code','name','price','change_pct','score']+list(context.keys())+[x['name'] for x in model['features']]
@@ -210,11 +212,12 @@ def main():
         web_rows.append({
           'rank':rank,'date':today,'code':row['code'],'name':row['name'],'price':row['price'],
           'change_pct':row['change_pct'],'score':row['score'],
-          'event_reason':{
-            'status':'unavailable','confidence':'低','summary':'未接入可验证的当日公告/新闻证据层',
-            'detail':'当前 V1 运行只使用新浪公开行情和冻结模型。网页不会把概念标签或资金猜测冒充为已验证的涨停原因；后续接入公告/新闻证据后再填充。',
-            'sources':[]
-          },
+          'event_reason':event_map.get(row['code'],{
+            'status':'no_verified_event','confidence':'低',
+            'summary':'未找到可验证的当日公告/新闻催化',
+            'detail':'本次运行没有找到可验证的直接事件证据。',
+            'verified_evidence':[],'related_evidence':[],'categories':[],'sustainability':'未知','sources':[]
+          }),
           'structure_reason':structure_reason(row,context),
           'model_explanation':model_explanation(row,model),
           'risk':risk_text(row),
