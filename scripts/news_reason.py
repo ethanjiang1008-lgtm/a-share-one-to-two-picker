@@ -221,7 +221,7 @@ def _ths_hot_reason(trade_date: str) -> dict[str, dict]:
     except Exception:
         return {}
 
-def collect_event_evidence(candidates: list[dict], trade_date: str, workers: int = 8) -> dict[str, dict]:
+def collect_event_evidence(candidates: list[dict], trade_date: str, cutoff_iso: str, workers: int = 8) -> dict[str, dict]:
     """对首板候选逐只收集公告/个股新闻，并用全市场快讯补充交叉证据。"""
     global_news=[]
     try:
@@ -233,7 +233,7 @@ def collect_event_evidence(candidates: list[dict], trade_date: str, workers: int
     out={str(x.get("code")): {
         "status":"no_verified_event","confidence":"低","summary":"暂未找到可验证的当日公告/新闻催化",
         "detail":"事件证据层未找到与当日涨停直接匹配的公告或新闻；系统不把概念标签、技术形态或主观猜测当成涨停原因。",
-        "verified_evidence":[],"related_evidence":[],"categories":[],"theme_tags":"","theme_categories":[],"sustainability":"未知","sources":[],
+        "verified_evidence":[],"related_evidence":[],"post_close_evidence":[],"categories":[],"theme_tags":"","theme_categories":[],"sustainability":"未知","information_impact":"未发现分析日收盘后的新增直接事件证据","information_cutoff":cutoff_iso,"sources":[],
     } for x in candidates}
 
     def worker(meta):
@@ -274,6 +274,16 @@ def collect_event_evidence(candidates: list[dict], trade_date: str, workers: int
             related_uniq[key]=x
         related=list(related_uniq.values())
 
+        post_close=[]
+        for x in evidence + related:
+            d=_date_only(x.get("date",""))
+            if d and d > trade_date:
+                post_close.append(x)
+        post_uniq={(x.get("source"),x.get("title")):x for x in post_close}
+        post_close=list(post_uniq.values())
+        info_impact=("未发现分析日收盘后的新增直接事件证据" if not post_close
+                     else f"发现 {len(post_close)} 条分析日之后的相关信息，需在下一交易日前继续核验")
+
         alltext=" ".join([x.get("title","")+" "+x.get("summary","") for x in evidence])
         cats=sorted(set(sum([x.get("categories",[]) for x in evidence],[])))
         score=0
@@ -295,9 +305,9 @@ def collect_event_evidence(candidates: list[dict], trade_date: str, workers: int
             sustain="高" if any(cat in cats for cat in SUSTAINABILITY["高"]) else "中" if any(cat in cats for cat in SUSTAINABILITY["中"]) else "低"
             return code, {
                 "status":"verified","confidence":conf,"summary":summary,"detail":detail,
-                "verified_evidence":evidence[:8],"related_evidence":related[:6],"categories":cats,
+                "verified_evidence":evidence[:8],"related_evidence":related[:6],"post_close_evidence":post_close[:8],"categories":cats,
                 "theme_tags":theme,"theme_categories":theme_categories,
-                "sustainability":sustain,
+                "sustainability":sustain,"information_impact":info_impact,"information_cutoff":cutoff_iso,
                 "sources":[x.get("url") for x in evidence if x.get("url")]
             }
         if related:
@@ -306,18 +316,18 @@ def collect_event_evidence(candidates: list[dict], trade_date: str, workers: int
                     f"这些信息可作为背景，不足以单独证明今天涨停的直接原因。")
             return code, {
                 "status":"background_only","confidence":"低","summary":"只有近期背景信息，没有当日直接催化证据",
-                "detail":detail,"verified_evidence":[],"related_evidence":related[:6],"categories":cats,
+                "detail":detail,"verified_evidence":[],"related_evidence":related[:6],"post_close_evidence":post_close[:8],"categories":cats,
                 "theme_tags":theme,"theme_categories":theme_categories,
-                "sustainability":"未知","sources":[x.get("url") for x in related if x.get("url")]
+                "sustainability":"未知","information_impact":info_impact,"information_cutoff":cutoff_iso,"sources":[x.get("url") for x in related if x.get("url")]
             }
         if theme:
             return code, {
                 "status":"theme_only","confidence":"低",
                 "summary":f"同花顺当日题材归因：{theme}，但未找到可验证的直接公告/新闻催化。",
                 "detail":f"题材归因标签只能说明当日市场将 {name}（{code}）归入“{theme}”这一交易线索，不能单独证明涨停的直接原因。需要结合公告、新闻或公司披露进一步确认。",
-                "verified_evidence":[],"related_evidence":[],"categories":theme_categories,
+                "verified_evidence":[],"related_evidence":[],"post_close_evidence":post_close[:8],"categories":theme_categories,
                 "theme_tags":theme,"theme_categories":theme_categories,
-                "sustainability":"未知","sources":[]
+                "sustainability":"未知","information_impact":info_impact,"information_cutoff":cutoff_iso,"sources":[]
             }
         return code,out[code]
 
@@ -331,5 +341,4 @@ def collect_event_evidence(candidates: list[dict], trade_date: str, workers: int
     return out
 
 if __name__ == "__main__":
-    print(json.dumps(collect_event_evidence([{"code":"000001","name":"平安银行"}],
-                                            datetime.now().strftime("%Y-%m-%d")),ensure_ascii=False,indent=2))
+    print(json.dumps(collect_event_evidence([{"code":"000001","name":"平安银行"}], datetime.now().strftime("%Y-%m-%d"), datetime.now(timezone(timedelta(hours=8))).isoformat()),ensure_ascii=False,indent=2))
