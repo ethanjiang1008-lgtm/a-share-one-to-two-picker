@@ -20,8 +20,12 @@ def _fetch_url(url:str, timeout:int=DEFAULT_TIMEOUT, label:str="")->str:
     raise RuntimeError(f"Sina request failed after {RETRIES} attempts: {label}") from last
 
 def is_main_board(code:str,name:str="")->bool:
-    name=name or ""
-    if not code or name.upper().startswith("ST") or "退" in name: return False
+    name=(name or "").strip().upper()
+    if not code:
+        return False
+    # 明确排除 ST / *ST / S*ST / SST、退市股。
+    if name.startswith(("ST","*ST","S*ST","SST")) or "退" in name:
+        return False
     return code.startswith(("600","601","603","605","000","001","002","003"))
 
 def _norm(item):
