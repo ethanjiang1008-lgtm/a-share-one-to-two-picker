@@ -17,12 +17,26 @@ function reasonText(row) {
 }
 
 function modelBasis(row) {
-  const positive = (row.model_explanation?.positive || []).slice(0,3).map(x => x.label + "：" + x.text);
-  const negative = (row.model_explanation?.negative || []).slice(0,2).map(x => x.label + "：" + x.text);
+  const positive = (row.model_explanation?.positive || []).slice(0,4).map(x => x.label + "：" + x.text);
+  const negative = (row.model_explanation?.negative || []).slice(0,3).map(x => x.label + "：" + x.text);
   const bits = [];
   if (positive.length) bits.push("正向："+positive.join("；"));
   if (negative.length) bits.push("拖累："+negative.join("；"));
   return bits.join(" ") || "暂无可解释因子数据";
+}
+
+function evidenceHtml(row) {
+  const ev = (row.event_reason?.verified_evidence || []).slice(0,4);
+  if (!ev.length) return '<div class="block-text muted">暂无当日直接事件证据；系统只把近期背景作为辅助，不冒充直接原因。</div>';
+  return ev.map(x => {
+    const url = x.url ? String(x.url) : "";
+    const title = esc(x.title || "未命名证据");
+    const date = esc(x.date || "");
+    const src = esc(x.source || "");
+    return '<div class="evidence"><span class="evidence-meta">'+src+' · '+date+'</span> ' +
+      (url ? '<a href="'+esc(url)+'" target="_blank" rel="noopener">'+title+'</a>' : '<span>'+title+'</span>') +
+      '</div>';
+  }).join("");
 }
 
 function renderTop(rows) {
@@ -36,6 +50,8 @@ function renderTop(rows) {
       '<div class="progress"><div style="width:' + Math.min(100,Math.max(0,p)) + '%"></div></div>' +
       '<div class="block"><div class="block-title">当日涨停原因</div><div class="block-text">' + esc(reasonText(row)) + '</div></div>' +
       '<div class="block"><div class="block-title">为什么这么判断</div><div class="block-text">' + esc(modelBasis(row)) + '</div></div>' +
+      '<div class="block"><div class="block-title">事件证据</div>' + evidenceHtml(row) + '</div>' +
+      '<div class="block"><div class="block-title">原因持续性</div><div class="block-text">' + esc(row.event_reason?.sustainability || "未知") + '</div></div>' +
       '<div class="block"><div class="block-title">最大风险</div><div class="block-text">' + esc(row.risk || "暂无") + '</div></div>' +
       '<div class="chips"><span class="chip">首板结构</span><span class="chip">市场环境</span><span class="chip">V1模型</span></div>' +
       '</article>';
@@ -52,7 +68,7 @@ function renderTable(rows) {
       '<td><strong>' + esc(row.name) + '</strong><div class="code">' + esc(row.code) + '</div></td>' +
       '<td>' + Number(row.price || 0).toFixed(2) + '</td>' +
       '<td><strong>' + fmtPct(row.score) + '</strong></td>' +
-      '<td class="reason">' + esc(reasonText(row)) + '</td>' +
+      '<td class="reason">' + esc((row.event_reason?.summary || "暂无")) + '<div class="muted">'+esc((row.event_reason?.categories || []).join("、"))+'</div></td>' +
       '<td class="' + confidenceClass(conf) + '">' + esc(conf) + '</td>' +
       '<td class="reason">' + esc(modelBasis(row)) + '</td>' +
       '<td class="reason">' + esc(row.risk || "暂无") + '</td>' +
