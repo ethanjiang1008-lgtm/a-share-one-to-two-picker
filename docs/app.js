@@ -13,7 +13,7 @@ function reasonText(row) {
     return row.event_reason.detail || row.event_reason.summary || "基于市场联动推断";
   }
   const structure = row.structure_reason || "暂无行情层结构说明。";
-  return "事件证据：本次运行未接入可验证的公告/新闻事件层，系统不会编造具体催化。\n行情层观察：" + structure;
+  return "事件证据：本次运行未找到可验证的直接公告/新闻催化，系统不会编造具体原因。\n行情层观察：" + structure;
 }
 
 function modelBasis(row) {
