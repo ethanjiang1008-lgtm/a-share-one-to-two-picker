@@ -12,6 +12,7 @@ import re
 import ssl
 import urllib.parse
 import urllib.request
+from urllib.parse import urljoin
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta, timezone
 
@@ -133,7 +134,7 @@ def _cninfo(code: str, trade_date: str, size: int = 20) -> list[dict]:
             continue
         rows.append({
             "type":"公告","title":title,"summary":title,"date":d or trade_date,
-            "source":"巨潮资讯","url":x.get("adjunctUrl") or x.get("announcementUrl") or "",
+            "source":"巨潮资讯","url":urljoin("https://www.cninfo.com.cn/", x.get("adjunctUrl") or x.get("announcementUrl") or ""),
             "categories":_categories(title),"verified_date":d == trade_date
         })
     return rows
@@ -281,7 +282,7 @@ def collect_event_evidence(candidates: list[dict], trade_date: str, workers: int
                 summary += f" 同花顺当日题材归因：{theme}。"
             detail=(f"与 {name}（{code}）当日涨停直接相关的证据包括：{direct_titles}。"
                     f"其中优先级更高的是上市公司公告，其次是个股新闻与快讯；若多个独立来源指向同一事件，可信度提高。")
-            sustain="高" if any(cat in alltext for cat in SUSTAINABILITY["高"]) else "中" if any(cat in alltext for cat in SUSTAINABILITY["中"]) else "低"
+            sustain="高" if any(cat in cats for cat in SUSTAINABILITY["高"]) else "中" if any(cat in cats for cat in SUSTAINABILITY["中"]) else "低"
             return code, {
                 "status":"verified","confidence":conf,"summary":summary,"detail":detail,
                 "verified_evidence":evidence[:8],"related_evidence":related[:6],"categories":cats,
