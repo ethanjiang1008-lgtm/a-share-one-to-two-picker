@@ -9,7 +9,25 @@ ROOT=Path(__file__).resolve().parents[1]
 MODEL_PATH=ROOT/'config/model_v1.json'
 STATE_PATH=ROOT/'data/state/market_state.json'
 REPORT_DIR=ROOT/'reports/daily'
+WEB_DATA_PATH=ROOT/'docs'/'data'/'latest.json'
 LIMIT_UP=0.095; MIN_HISTORY=60; WORKERS=10
+
+FEATURE_LABELS={
+  'ret_1d':'当日涨幅','ret_3d':'近3日涨幅','ret_5d':'近5日涨幅','ret_10d':'近10日涨幅','ret_20d':'近20日涨幅',
+  'volume_5_vs_20':'近5日成交量/20日均量','close_above_ma20':'收盘是否站上20日均线',
+  'ma5_gt_ma10':'5日均线是否强于10日均线','ma10_gt_ma20':'10日均线是否强于20日均线',
+  'near_high20_pct':'相对20日高点位置','above_low20_pct':'相对20日低点位置','up_days_5':'近5日上涨天数',
+  'volatility_10d':'近10日波动率','amplitude_1d':'当日振幅','market_first_count':'当日首板数量',
+  'market_2plus_count':'当日2板及以上数量','market_zt_count':'当日涨停总数',
+  'prev_market_first_count':'前日首板数量','prev_market_2plus_count':'前日2板及以上数量',
+  'prev_market_1to2_rate':'前日首板晋级率','open_gap_pct':'今日开盘涨幅',
+  'open_gap_band_high':'今日高开8.5%以上','open_gap_band_mid':'今日高开5%~8.5%',
+  'open_gap_band_low':'今日高开不足5%','open_to_close_pct':'今日开盘至收盘涨幅',
+  'lower_wick_ratio':'下影线占比','intraday_pullback_pct':'盘中相对开盘回撤',
+  'open_position_in_day':'开盘在当日振幅中的位置','amplitude_vs_20d':'振幅/20日平均振幅',
+  'volume_vs_20d':'当日成交量/20日均量','near_limit_open':'今日开盘即接近涨停',
+  'close_near_high':'收盘接近日内最高价'
+}
 
 def f(x,d=0.0):
     try:
@@ -64,6 +82,67 @@ def score(row,model):
         z += item['coef']*((x-item['mean'])/sd)
     return 1/(1+math.exp(max(-35,min(35,-z))))
 
+def model_explanation(row, model):
+    positive=[]; negative=[]
+    for item in model.get('features',[]):
+        name=item.get('name')
+        sd=f(item.get('std'),1e-9)
+        mean=f(item.get('mean'))
+        coef=f(item.get('coef'))
+        x=f(row.get(name))
+        z=(x-mean)/sd
+        contribution=coef*z
+        if abs(contribution)<0.025:
+            continue
+        label=FEATURE_LABELS.get(name,name)
+        direction='正向' if contribution>0 else '负向'
+        text=(f"{label}当前为 {x:.2f}，训练均值为 {mean:.2f}，"
+              f"标准化偏离 {z:+.2f}，对模型评分产生{direction}贡献 {contribution:+.3f}")
+        item_data={'name':name,'label':label,'value':x,'train_mean':mean,'z':z,
+                   'contribution':contribution,'text':text}
+        (positive if contribution>0 else negative).append(item_data)
+    positive.sort(key=lambda x:x['contribution'], reverse=True)
+    negative.sort(key=lambda x:x['contribution'])
+    return {'positive':positive[:5],'negative':negative[:5]}
+
+def structure_reason(row, context):
+    bits=[]
+    if f(row.get('close_near_high'))>=1:
+        bits.append('收盘贴近日内最高价，说明涨停日尾盘价格维持强势。')
+    if f(row.get('near_limit_open'))>=1:
+        bits.append(f"今日开盘已接近涨停价，开盘强度较高（开盘涨幅 {f(row.get('open_gap_pct')):.1f}%）。")
+    vol20=f(row.get('volume_vs_20d'),1)
+    if vol20>=1.8:
+        bits.append(f"当日成交量约为20日均量的 {vol20:.1f} 倍，资金参与度显著放大。")
+    elif vol20>=1.2:
+        bits.append(f"当日成交量约为20日均量的 {vol20:.1f} 倍，存在明显放量。")
+    else:
+        bits.append(f"当日成交量约为20日均量的 {vol20:.1f} 倍，量能未出现极端放大。")
+    if f(row.get('ma5_gt_ma10')) and f(row.get('ma10_gt_ma20')):
+        bits.append('短中期均线保持多头排列，价格结构与趋势方向一致。')
+    elif f(row.get('ma5_gt_ma10')):
+        bits.append('5日均线仍高于10日均线，但中期趋势强度一般。')
+    else:
+        bits.append('短期均线未形成明显多头排列，趋势确认度相对有限。')
+    bits.append(f"今日市场共有 {int(f(context.get('market_zt_count')))} 家涨停，其中首板 {int(f(context.get('market_first_count')))} 家、2板及以上 {int(f(context.get('market_2plus_count')))} 家。")
+    return ''.join(bits)
+
+def risk_text(row):
+    risks=[]
+    if f(row.get('volume_vs_20d'))>=2.2:
+        risks.append('当日成交量明显放大，筹码交换较充分')
+    if f(row.get('amplitude_1d'))>=11:
+        risks.append('当日振幅较大')
+    if f(row.get('ret_5d'))>=35:
+        risks.append('近5日涨幅偏高，短线获利盘压力更大')
+    if f(row.get('ret_10d'))>=55:
+        risks.append('近10日涨幅偏高')
+    if f(row.get('market_2plus_count'))<5:
+        risks.append('市场高阶连板数量偏少')
+    if not risks:
+        risks.append('主要风险来自次日板块分歧与个股承接强弱')
+    return '；'.join(risks)
+
 def main():
     model=load_json(MODEL_PATH,{})
     default_ctx={'market_first_count':61.51393899639226,'market_2plus_count':12.789603148573303,'market_zt_count':74.30354214496556,
@@ -100,7 +179,12 @@ def main():
              'prev_market_2plus_count':f(prev_market.get('market_2plus_count'),default_ctx['market_2plus_count']),
              'prev_market_1to2_rate':prev_rate}
     if not rows:
-        print(json.dumps({'version':model.get('version'),'first_board_count':0,'two_plus_count':len(two_plus),'failed':failed,'market_context':context},ensure_ascii=False,indent=2))
+        payload={'status':'no_first_board','model_version':model.get('version'),'date':None,
+                 'data_source':'Sina','universe':'沪深主板','first_board_count':0,'failed':failed,
+                 'market_context':context,'rows':[]}
+        WEB_DATA_PATH.parent.mkdir(parents=True,exist_ok=True)
+        WEB_DATA_PATH.write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
+        print(json.dumps(payload,ensure_ascii=False,indent=2))
         return 0
 
     today=max(str(x['_bars'][x['_idx']].get('date','')) for x in rows)
@@ -120,8 +204,36 @@ def main():
         for rank,row in enumerate(scored,1):
             x={k:row.get(k,0) for k in fields}; x['rank']=rank; w.writerow(x)
 
+    web_rows=[]
+    for rank,row in enumerate(scored,1):
+        row['rank']=rank
+        web_rows.append({
+          'rank':rank,'date':today,'code':row['code'],'name':row['name'],'price':row['price'],
+          'change_pct':row['change_pct'],'score':row['score'],
+          'event_reason':{
+            'status':'unavailable','confidence':'低','summary':'未接入可验证的当日公告/新闻证据层',
+            'detail':'当前 V1 运行只使用新浪公开行情和冻结模型。网页不会把概念标签或资金猜测冒充为已验证的涨停原因；后续接入公告/新闻证据后再填充。',
+            'sources':[]
+          },
+          'structure_reason':structure_reason(row,context),
+          'model_explanation':model_explanation(row,model),
+          'risk':risk_text(row),
+          'factor_snapshot':{k:row.get(k) for k in [x['name'] for x in model.get('features',[])]}
+        })
+
+    payload={
+      'status':'ok','model_version':model.get('version'),'reference_test_top1_precision':model.get('reference_test_top1_precision'),
+      'trained_through':model.get('trained_through'),'date':today,'data_source':'Sina',
+      'universe':'沪深主板','first_board_count':len(scored),'two_plus_count':len(two_plus),'failed':failed,
+      'market_context':context,'rows':web_rows
+    }
+    WEB_DATA_PATH.parent.mkdir(parents=True,exist_ok=True)
+    WEB_DATA_PATH.write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
+    out_json=REPORT_DIR/f'{today}_one_to_two_v1.json'
+    out_json.write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
+
     print(json.dumps({'version':model.get('version'),'date':today,'universe':'沪深主板 only','first_board_count':len(scored),
-      'two_plus_count':len(two_plus),'failed':failed,'market_context':context,
+      'two_plus_count':len(two_plus),'failed':failed,
       'top10':[{'rank':i+1,'code':r['code'],'name':r['name'],'score':round(r['score'],6)} for i,r in enumerate(scored[:10])]},ensure_ascii=False,indent=2))
 
     save={'last_date':today,'first_board_codes':sorted(first_codes),'market':context}
