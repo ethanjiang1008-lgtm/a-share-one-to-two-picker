@@ -202,7 +202,7 @@ def main():
     event_map=collect_event_evidence(scored, analysis_date, workers=8)
 
     REPORT_DIR.mkdir(parents=True,exist_ok=True)
-    fields=['rank','date','code','name','price','change_pct','score']+list(context.keys())+[x['name'] for x in model['features']]
+    fields=['rank','date','prediction_date','code','name','price','change_pct','score']+list(context.keys())+[x['name'] for x in model['features']]
     out=REPORT_DIR/f'{analysis_date}_one_to_two_v1.csv'
     with out.open('w',encoding='utf-8-sig',newline='') as fh:
         w=csv.DictWriter(fh,fieldnames=fields); w.writeheader()
@@ -238,7 +238,7 @@ def main():
     out_json=REPORT_DIR/f'{analysis_date}_one_to_two_v1.json'
     out_json.write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
 
-    print(json.dumps({'version':model.get('version'),'date':today,'universe':'沪深主板 only','first_board_count':len(scored),
+    print(json.dumps({'version':model.get('version'),'analysis_date':analysis_date,'prediction_date':prediction_date,'universe':'沪深主板 only','first_board_count':len(scored),
       'two_plus_count':len(two_plus),'failed':failed,
       'top10':[{'rank':i+1,'code':r['code'],'name':r['name'],'score':round(r['score'],6)} for i,r in enumerate(scored[:10])]},ensure_ascii=False,indent=2))
 
