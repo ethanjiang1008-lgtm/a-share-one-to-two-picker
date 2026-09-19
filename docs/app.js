@@ -27,8 +27,8 @@ function modelBasis(row) {
 
 function evidenceHtml(row) {
   const ev = (row.event_reason?.verified_evidence || []).slice(0,4);
-  if (!ev.length) return '<div class="block-text muted">暂无当日直接事件证据；系统只把近期背景作为辅助，不冒充直接原因。</div>';
-  return ev.map(x => {
+  const post = (row.event_reason?.post_close_evidence || []).slice(0,4);
+  const render = x => {
     const url = x.url ? String(x.url) : "";
     const title = esc(x.title || "未命名证据");
     const date = esc(x.date || "");
@@ -37,7 +37,12 @@ function evidenceHtml(row) {
     return '<div class="evidence"><span class="evidence-meta">'+src+' · '+date+'</span> ' +
       (url ? '<a href="'+esc(url)+'" target="_blank" rel="noopener">'+title+'</a>' : '<span>'+title+'</span>') +
       summary + '</div>';
-  }).join("");
+  };
+  let html = ev.length ? ev.map(render).join("") : '<div class="block-text muted">暂无当日直接事件证据。</div>';
+  if (post.length) {
+    html += '<div class="block-title post-title">分析日收盘后新增</div>' + post.map(render).join("");
+  }
+  return html;
 }
 
 function renderTop(rows) {
