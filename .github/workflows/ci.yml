@@ -18,5 +18,5 @@ jobs:
           python-version: "3.11"
       - name: Validate Python and model
         run: |
-          python -m py_compile scripts/market_data_sina.py scripts/live_scan.py
+          python -m py_compile scripts/market_data_sina.py scripts/live_scan.py scripts/news_reason.py scripts/build_web.py
           python -c "import json; json.load(open('config/model_v1.json', encoding='utf-8')); print('model json ok')"
