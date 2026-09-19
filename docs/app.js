@@ -12,7 +12,8 @@ function reasonText(row) {
   if (row.event_reason && row.event_reason.status === "inferred") {
     return row.event_reason.detail || row.event_reason.summary || "基于市场联动推断";
   }
-  return "本次运行未接入可验证的公告/新闻事件证据；不编造涨停原因，先展示行情与模型依据。";
+  const structure = row.structure_reason || "暂无行情层结构说明。";
+  return "事件证据：本次运行未接入可验证的公告/新闻事件层，系统不会编造具体催化。\n行情层观察：" + structure;
 }
 
 function modelBasis(row) {
@@ -35,6 +36,7 @@ function renderTop(rows) {
       '<div class="progress"><div style="width:' + Math.min(100,Math.max(0,p)) + '%"></div></div>' +
       '<div class="block"><div class="block-title">当日涨停原因</div><div class="block-text">' + esc(reasonText(row)) + '</div></div>' +
       '<div class="block"><div class="block-title">为什么这么判断</div><div class="block-text">' + esc(modelBasis(row)) + '</div></div>' +
+      '<div class="block"><div class="block-title">最大风险</div><div class="block-text">' + esc(row.risk || "暂无") + '</div></div>' +
       '<div class="chips"><span class="chip">首板结构</span><span class="chip">市场环境</span><span class="chip">V1模型</span></div>' +
       '</article>';
   }).join("");
