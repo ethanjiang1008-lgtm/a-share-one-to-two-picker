@@ -2,6 +2,12 @@ name: V1 recent six-month historical backtest
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/backtest_recent_six_months.py"
+      - ".github/workflows/recent-six-month-backtest.yml"
+      - "config/model_v1.json"
 
 permissions:
   contents: write
