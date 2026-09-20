@@ -5,7 +5,7 @@ from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor,as_completed
 from market_data_sina import fetch_all_stocks,fetch_kline,is_main_board
 from news_reason import collect_event_evidence
-from trading_calendar import next_trading_day
+from trading_calendar import next_trading_day,previous_trading_day
 import datetime
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -146,6 +146,43 @@ def risk_text(row):
         risks.append('主要风险来自次日板块分歧与个股承接强弱')
     return '；'.join(risks)
 
+def resolve_market_context(state, analysis_date, current_two_plus, default_ctx):
+    """Resolve previous-trading-day context with safe bootstrap behavior."""
+    analysis_day=datetime.date.fromisoformat(analysis_date)
+    expected_prev=previous_trading_day(analysis_day).isoformat()
+    state_date=str(state.get('last_date') or '')
+    state_market=state.get('market') or {}
+    current_two_plus_set={str(x) for x in current_two_plus}
+
+    if state_date == analysis_date:
+        return {
+            'prev_market_first_count':f(state_market.get('market_first_count'),default_ctx['prev_market_first_count']),
+            'prev_market_2plus_count':f(state_market.get('market_2plus_count'),default_ctx['prev_market_2plus_count']),
+            'prev_market_1to2_rate':f(state_market.get('prev_market_1to2_rate'),default_ctx['prev_market_1to2_rate']),
+            'context_source':'same_date_frozen'
+        }
+
+    if state_date == expected_prev:
+        prev_codes={str(x) for x in (state.get('first_board_codes') or [])}
+        rate=(sum(1 for code in prev_codes if code in current_two_plus_set)/len(prev_codes)
+              if prev_codes else default_ctx['prev_market_1to2_rate'])
+        return {
+            'prev_market_first_count':f(state_market.get('market_first_count'),default_ctx['prev_market_first_count']),
+            'prev_market_2plus_count':f(state_market.get('market_2plus_count'),default_ctx['prev_market_2plus_count']),
+            'prev_market_1to2_rate':rate,
+            'context_source':'previous_trading_day_state'
+        }
+
+    return {
+        'prev_market_first_count':default_ctx['prev_market_first_count'],
+        'prev_market_2plus_count':default_ctx['prev_market_2plus_count'],
+        'prev_market_1to2_rate':default_ctx['prev_market_1to2_rate'],
+        'context_source':'training_bootstrap',
+        'state_last_date':state_date or None,
+        'expected_previous_trading_day':expected_prev
+    }
+
+
 def main():
     model=load_json(MODEL_PATH,{})
     default_ctx={'market_first_count':61.51393899639226,'market_2plus_count':12.789603148573303,'market_zt_count':74.30354214496556,
@@ -175,14 +212,17 @@ def main():
 
     first_codes={str(r['code']) for r in rows}; current_zt=len(rows)+len(two_plus)
     analysis_date_candidate=str(rows[0]['_bars'][rows[0]['_idx']].get('date','')) if rows else None
-    same_date_state=bool(analysis_date_candidate and state.get('last_date') == analysis_date_candidate)
-    prev_codes=set() if same_date_state else set(state.get('first_board_codes',[]))
-    prev_market={} if same_date_state else (state.get('market',{}) or default_ctx)
-    prev_rate=f(prev_market.get('market_1to2_rate'),default_ctx['prev_market_1to2_rate']) if same_date_state else ((sum(1 for c in prev_codes if c in set(two_plus))/len(prev_codes)) if prev_codes else f(prev_market.get('market_1to2_rate'),default_ctx['prev_market_1to2_rate']))
+    resolved_prev=resolve_market_context(state,analysis_date_candidate,two_plus,default_ctx) if analysis_date_candidate else {
+        'prev_market_first_count':default_ctx['prev_market_first_count'],
+        'prev_market_2plus_count':default_ctx['prev_market_2plus_count'],
+        'prev_market_1to2_rate':default_ctx['prev_market_1to2_rate'],
+        'context_source':'training_bootstrap'
+    }
     context={'market_first_count':len(rows),'market_2plus_count':len(two_plus),'market_zt_count':current_zt,
-             'prev_market_first_count':f(prev_market.get('market_first_count'),default_ctx['market_first_count']),
-             'prev_market_2plus_count':f(prev_market.get('market_2plus_count'),default_ctx['market_2plus_count']),
-             'prev_market_1to2_rate':prev_rate}
+             'prev_market_first_count':f(resolved_prev.get('prev_market_first_count'),default_ctx['prev_market_first_count']),
+             'prev_market_2plus_count':f(resolved_prev.get('prev_market_2plus_count'),default_ctx['prev_market_2plus_count']),
+             'prev_market_1to2_rate':f(resolved_prev.get('prev_market_1to2_rate'),default_ctx['prev_market_1to2_rate']),
+             'context_source':resolved_prev.get('context_source','training_bootstrap')}
 
     # 同一分析日重复运行时，冻结第一次成功生成的 V1 评分/市场上下文；
     # 只有首板股票集合发生变化（例如修复过滤 Bug 后）才重新计算。
@@ -197,7 +237,7 @@ def main():
     if not rows:
         payload={'status':'no_first_board','model_version':model.get('version'),'date':None,
                  'data_source':'Sina','universe':'沪深主板','first_board_count':0,'failed':failed,
-                 'market_context':context,'two_plus_codes':sorted(two_plus),'rows':[]}
+                 'market_context':context,'market_context_source':context.get('context_source'),'two_plus_codes':sorted(two_plus),'rows':[]}
         WEB_DATA_PATH.parent.mkdir(parents=True,exist_ok=True)
         WEB_DATA_PATH.write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
         print(json.dumps(payload,ensure_ascii=False,indent=2))
@@ -248,7 +288,7 @@ def main():
       'status':'ok','model_version':model.get('version'),'reference_test_top1_precision':model.get('reference_test_top1_precision'),
       'trained_through':model.get('trained_through'),'analysis_date':analysis_date,'prediction_date':prediction_date,'date':analysis_date,'information_cutoff':cutoff_iso,'data_source':'Sina',
       'universe':'沪深主板','first_board_count':len(scored),'two_plus_count':len(two_plus),'failed':failed,
-      'market_context':context,'two_plus_codes':sorted(two_plus),'rows':web_rows
+      'market_context':context,'market_context_source':context.get('context_source'),'two_plus_codes':sorted(two_plus),'rows':web_rows
     }
     WEB_DATA_PATH.parent.mkdir(parents=True,exist_ok=True)
     WEB_DATA_PATH.write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
@@ -262,9 +302,12 @@ def main():
       'two_plus_count':len(two_plus),'failed':failed,
       'top10':[{'rank':i+1,'code':r['code'],'name':r['name'],'score':round(r['score'],6)} for i,r in enumerate(scored[:10])]},ensure_ascii=False,indent=2))
 
-    save={'last_date':analysis_date,'prediction_date':prediction_date,'first_board_codes':sorted(first_codes),'market':context,
+    save={'schema_version':2,'last_date':analysis_date,'prediction_date':prediction_date,
+          'first_board_codes':sorted(first_codes),'market':context,
+          'context_source':context.get('context_source'),
           'frozen_v1':{'codes':sorted(first_codes),'scores':{r['code']:r['score'] for r in scored},
-                        'market_context':context}}
+                        'market_context':context,
+                        'context_source':context.get('context_source')}}
     STATE_PATH.parent.mkdir(parents=True,exist_ok=True); STATE_PATH.write_text(json.dumps(save,ensure_ascii=False,indent=2),encoding='utf-8')
     return 0
 
