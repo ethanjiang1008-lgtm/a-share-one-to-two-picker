@@ -1,0 +1,120 @@
+{
+  "model_version": "one-to-two-v1-daily-proxy",
+  "model_trained_through": "2026-07-08",
+  "data_source": "Sina daily K-line",
+  "universe": "current main-board universe only; exclude ST/STAR/ChiNext/Beijing",
+  "event_rule": "close return >= 9.5%; first board = today's limit-up and previous trading day not limit-up",
+  "outcome_rule": "next actual trading day's limit-up continuation = second board",
+  "note": "The recent-six-month window overlaps the model's training period. Use strict_oos for a clean post-training estimate. Historical universe follows the current live-scan universe, so delisted/name-status changes can introduce survivorship bias.",
+  "failed_kline_fetches": 7,
+  "windows": {
+    "recent_6_months": {
+      "days": 125,
+      "first_board_events": 6731,
+      "successful_first_board_events": 1014,
+      "baseline_one_to_two_rate": 0.15064626355667807,
+      "top1": {
+        "selected": 125,
+        "hits": 60,
+        "precision": 0.48,
+        "lift_vs_all_first": 3.186272189349112,
+        "day_hit_days": 60,
+        "day_hit_rate": 0.48
+      },
+      "top2": {
+        "selected": 250,
+        "hits": 91,
+        "precision": 0.364,
+        "lift_vs_all_first": 2.41625641025641,
+        "day_hit_days": 76,
+        "day_hit_rate": 0.608
+      },
+      "top3": {
+        "selected": 375,
+        "hits": 117,
+        "precision": 0.312,
+        "lift_vs_all_first": 2.071076923076923,
+        "day_hit_days": 86,
+        "day_hit_rate": 0.688
+      },
+      "top4": {
+        "selected": 500,
+        "hits": 142,
+        "precision": 0.284,
+        "lift_vs_all_first": 1.8852110453648911,
+        "day_hit_days": 95,
+        "day_hit_rate": 0.76
+      },
+      "top5": {
+        "selected": 625,
+        "hits": 158,
+        "precision": 0.2528,
+        "lift_vs_all_first": 1.6781033530571992,
+        "day_hit_days": 100,
+        "day_hit_rate": 0.8
+      },
+      "top6": {
+        "selected": 750,
+        "hits": 176,
+        "precision": 0.23466666666666666,
+        "lift_vs_all_first": 1.5577330703484549,
+        "day_hit_days": 105,
+        "day_hit_rate": 0.84
+      }
+    },
+    "strict_oos": {
+      "days": 51,
+      "first_board_events": 2560,
+      "successful_first_board_events": 404,
+      "baseline_one_to_two_rate": 0.1578125,
+      "top1": {
+        "selected": 51,
+        "hits": 21,
+        "precision": 0.4117647058823529,
+        "lift_vs_all_first": 2.609202096680256,
+        "day_hit_days": 21,
+        "day_hit_rate": 0.4117647058823529
+      },
+      "top2": {
+        "selected": 102,
+        "hits": 34,
+        "precision": 0.3333333333333333,
+        "lift_vs_all_first": 2.112211221122112,
+        "day_hit_days": 29,
+        "day_hit_rate": 0.5686274509803921
+      },
+      "top3": {
+        "selected": 153,
+        "hits": 41,
+        "precision": 0.2679738562091503,
+        "lift_vs_all_first": 1.6980521581569923,
+        "day_hit_days": 32,
+        "day_hit_rate": 0.6274509803921569
+      },
+      "top4": {
+        "selected": 204,
+        "hits": 49,
+        "precision": 0.24019607843137256,
+        "lift_vs_all_first": 1.5220345563968163,
+        "day_hit_days": 36,
+        "day_hit_rate": 0.7058823529411765
+      },
+      "top5": {
+        "selected": 255,
+        "hits": 56,
+        "precision": 0.2196078431372549,
+        "lift_vs_all_first": 1.3915744515628035,
+        "day_hit_days": 40,
+        "day_hit_rate": 0.7843137254901961
+      },
+      "top6": {
+        "selected": 306,
+        "hits": 62,
+        "precision": 0.20261437908496732,
+        "lift_vs_all_first": 1.2838930951918721,
+        "day_hit_days": 42,
+        "day_hit_rate": 0.8235294117647058
+      }
+    }
+  }
+}
