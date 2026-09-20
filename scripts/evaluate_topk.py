@@ -122,6 +122,20 @@ def main():
 
     by_date=defaultdict(list)
     for r in rows: by_date[r["prediction_date"]].append(r)
+
+    # Build the true same-day baseline from the full prior prediction universe.
+    # This is independent of TopK selection and therefore provides the correct
+    # denominator for lift calculations.
+    baseline_by_date={}
+    for pred in candidates:
+        pdate=pred.get("prediction_date","")
+        all_rows=pred.get("rows",[])
+        if not pdate or not all_rows:
+            continue
+        baseline_by_date[pdate]={
+            "selected":len(all_rows),
+            "hits":sum(1 for item in all_rows if str(item.get("code","")) in actual_2plus)
+        }
     metrics={}
     for k in TOPKS:
         selected=hits=days=day_hits=0
@@ -133,9 +147,15 @@ def main():
             h=sum(int(x["is_2board"]) for x in top)
             hits+=h
             day_hits+=int(h>0)
+        baseline_selected=sum(v["selected"] for v in baseline_by_date.values())
+        baseline_hits=sum(v["hits"] for v in baseline_by_date.values())
+        baseline_rate=baseline_hits/baseline_selected if baseline_selected else None
+        precision=hits/selected if selected else None
         metrics[str(k)]={
             "k":k,"days":days,"selected":selected,"hits":hits,
-            "precision":hits/selected if selected else None,
+            "precision":precision,
+            "baseline_rate":baseline_rate,
+            "lift":(precision/baseline_rate) if precision is not None and baseline_rate else None,
             "day_hit_days":day_hits,"day_hit_rate":day_hits/days if days else None
         }
 
