@@ -132,11 +132,15 @@ def main():
     metrics={}
     if SUMMARY.exists():
         data=load_json(SUMMARY) or {}; metrics=data.get("metrics") or {}
-    s3=[[title("TopK · 历史基准与滚动实测")]+[""]*6,
-        [header(x) for x in ["口径","已验证天数","选股数","晋级数","股票级晋级率","至少命中1只天数","至少命中1只比例"]]]
+    s3=[[title("TopK · 历史基准与滚动实测")]+[""]*8,
+        [header(x) for x in ["口径","已验证天数","选股数","晋级数","股票级晋级率","全量首板基准率","相对基准提升","至少命中1只天数","至少命中1只比例"]]]
     for k in (1,3,6,10):
         m=metrics.get(str(k),{})
-        s3.append([f"Top{k}",m.get("days",0),m.get("selected",0),m.get("hits",0),pct(f(m.get("precision",0))) if m.get("precision") is not None else None,m.get("day_hit_days",0),
+        s3.append([f"Top{k}",m.get("days",0),m.get("selected",0),m.get("hits",0),
+                    pct(f(m.get("precision",0))) if m.get("precision") is not None else None,
+                    pct(f(m.get("baseline_rate",0))) if m.get("baseline_rate") is not None else None,
+                    f(m.get("lift"),0) if m.get("lift") is not None else None,
+                    m.get("day_hit_days",0),
                     pct(f(m.get("day_hit_rate",0))) if m.get("day_hit_rate") is not None else None])
     ref=latest.get("reference_test_top1_precision")
     s3.append(["历史参考Top1","—","—","—",pct(f(ref)) if ref is not None else None,"—","V1已验证参考值；不是Top6比例"])
@@ -149,7 +153,7 @@ def main():
             for e in ev:
                 s4.append([d.get("analysis_date"),r.get("code"),r.get("name"),er.get("status",""),e.get("source",""),e.get("date",""),e.get("title",""),e.get("url","")])
 
-    sheets=[(s1,[13,13,7,12,14,10,11,14,12,44,42,28]),(s2,[13,13,7,12,14,13,14,14,14,10,30,12,13]),(s3,[18,12,12,12,16,18,18]),(s4,[13,12,14,14,16,12,44,55])]
+    sheets=[(s1,[13,13,7,12,14,10,11,14,12,44,42,28]),(s2,[13,13,7,12,14,13,14,14,14,10,30,12,13]),(s3,[18,12,12,12,16,16,16,18,18]),(s4,[13,12,14,14,16,12,44,55])]
     with zipfile.ZipFile(OUTPUT,"w",zipfile.ZIP_DEFLATED) as z:
         z.writestr("[Content_Types].xml",types()); z.writestr("_rels/.rels",rels()); z.writestr("xl/workbook.xml",workbook_xml()); z.writestr("xl/_rels/workbook.xml.rels",wb_rels()); z.writestr("xl/styles.xml",styles())
         for i,(rows,widths) in enumerate(sheets,1):
