@@ -195,7 +195,7 @@ def resolve_market_context(state, analysis_date, current_two_plus, default_ctx):
             'prev_market_first_count':f(state_market.get('market_first_count'),default_ctx['prev_market_first_count']),
             'prev_market_2plus_count':f(state_market.get('market_2plus_count'),default_ctx['prev_market_2plus_count']),
             'prev_market_1to2_rate':f(state_market.get('prev_market_1to2_rate'),default_ctx['prev_market_1to2_rate']),
-            'context_source':'same_date_frozen'
+            'context_source':'same_date_previous_context'
         }
 
     if state_date == expected_prev:
