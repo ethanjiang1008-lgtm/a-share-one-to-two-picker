@@ -13,7 +13,7 @@ permissions:
 
 concurrency:
   group: v2-strict-run-v2
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   backtest:
