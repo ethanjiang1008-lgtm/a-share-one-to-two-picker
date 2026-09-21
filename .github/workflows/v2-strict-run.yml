@@ -1,0 +1,39 @@
+name: V2 strict Top1 Top2 evaluation
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [v2-top12-20260921]
+    paths:
+      - ".github/workflows/v2-strict-run.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v2-strict-run
+  cancel-in-progress: false
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: v2-top12-20260921
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install research dependency
+        run: python -m pip install --upgrade pip numpy
+      - name: Run V2 strict historical backtest
+        run: python scripts/v2_backtest_top12.py
+      - name: Upload V2 strict results
+        uses: actions/upload-artifact@v4
+        with:
+          name: v2-strict-top12-results
+          path: |
+            reports/v2_top12_backtest.json
+            reports/v2_top12_backtest.csv
+            config/model_v2.json
