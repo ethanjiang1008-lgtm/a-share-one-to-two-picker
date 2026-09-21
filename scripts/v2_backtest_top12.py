@@ -467,10 +467,10 @@ def main():
     X_fit0 = matrix(fit_rows, fit_means, fit_stds)
     y_fit0 = np.array([int(r["is_2board"]) for r in fit_rows], dtype=float)
 
+    oos_count = sum(1 for r in rows if OOS_START <= dt.date.fromisoformat(r["date"]) <= END)
     print(
         f"Fit rows: {len(fit_rows)}; positives: {int(y_fit0.sum())}; "
-        f"Dev rows: {len(dev_rows)}; OOS rows: "
-        f"{sum(1 for r in rows if OOS_START <= dt.date.fromisoformat(r["date"]) <= END)}"
+        f"Dev rows: {len(dev_rows)}; OOS rows: {oos_count}"
     )
 
     configs = [
