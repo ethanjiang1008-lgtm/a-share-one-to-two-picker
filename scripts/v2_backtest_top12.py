@@ -618,7 +618,7 @@ def main():
         "sample_counts": {
             "stocks": len(stock_data),
             "first_board_events": len(rows),
-            "train_rows": len(train_rows),
+            "fit_rows": len(fit_rows),
             "dev_rows": len(dev_rows),
         },
         "top12_focus": {
