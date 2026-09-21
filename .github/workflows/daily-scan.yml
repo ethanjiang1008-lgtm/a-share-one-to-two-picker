@@ -30,21 +30,6 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Check market-close window
-        id: market_close
-        run: |
-          python - <<'PY'
-          from datetime import datetime, time
-          from zoneinfo import ZoneInfo
-
-          now = datetime.now(ZoneInfo("Asia/Shanghai"))
-          ready = (now.weekday() >= 5) or (now.time() >= time(15, 5))
-          print(f"Beijing time: {now.isoformat()}")
-          print(f"daily scan ready: {ready}")
-          with open("$GITHUB_OUTPUT", "a", encoding="utf-8") as f:
-              f.write(f"ready={'true' if ready else 'false'}\n")
-          PY
-
       - name: Run V1 daily scan
         run: python scripts/live_scan.py
 
