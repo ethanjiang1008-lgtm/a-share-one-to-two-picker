@@ -1,0 +1,46 @@
+name: V1.1 feature research
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/research_v1_1.py"
+      - ".github/workflows/v1-1-feature-research.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: a-share-one-to-two-data-writer
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install research dependencies
+        run: pip install --disable-pip-version-check scikit-learn
+      - name: Run V1.1 feature experiments
+        run: python scripts/research_v1_1.py
+      - name: Upload research results
+        uses: actions/upload-artifact@v4
+        with:
+          name: v1-1-feature-research
+          path: |
+            reports/research/v1_1_feature_experiment.json
+            reports/research/v1_1_feature_experiment.csv
+            reports/research/v1_1_training_events.csv
+      - name: Save research results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f reports/research/v1_1_feature_experiment.json reports/research/v1_1_feature_experiment.csv reports/research/v1_1_training_events.csv
+          git diff --cached --quiet || git commit -m "research: evaluate V1.1 feature candidates"
+          git pull --rebase origin main
+          git push
