@@ -429,45 +429,64 @@ def main():
         "volume_price_confirm", "v1_score"
     ]
 
-    # Development training data: strictly before the OOS period.
-    train_rows = [
+    # Strict three-way design:
+    #   1) fit period: 2026-03-20 .. 2026-05-31
+    #   2) development validation: 2026-06-01 .. 2026-07-08
+    #   3) strict OOS: 2026-07-09 .. 2026-09-18
+    # No parameter is selected using strict OOS.
+    fit_end = DEV_START - dt.timedelta(days=1)
+    fit_rows = [
         r for r in rows
-        if FULL_START <= dt.date.fromisoformat(r["date"]) <= TRAIN_END
+        if FULL_START <= dt.date.fromisoformat(r["date"]) <= fit_end
     ]
     dev_rows = [
         r for r in rows
         if DEV_START <= dt.date.fromisoformat(r["date"]) <= TRAIN_END
     ]
+    pre_oos_rows = [
+        r for r in rows
+        if FULL_START <= dt.date.fromisoformat(r["date"]) <= TRAIN_END
+    ]
 
-    means, stds = {}, {}
-    for name in feature_names:
-        vals = np.array([f(r.get(name)) for r in train_rows], dtype=float)
-        means[name] = float(np.mean(vals))
-        std = float(np.std(vals))
-        stds[name] = max(std, 1e-6)
+    def standardize_params(rs):
+        mu, sd = {}, {}
+        for name in feature_names:
+            vals = np.array([f(r.get(name)) for r in rs], dtype=float)
+            mu[name] = float(np.mean(vals))
+            std = float(np.std(vals))
+            sd[name] = max(std, 1e-6)
+        return mu, sd
 
-    def matrix(rs):
+    def matrix(rs, mu, sd):
         return np.array(
-            [[zscore_clip(np.array([f(r.get(name))]), means[name], stds[name])[0] for name in feature_names] for r in rs],
+            [[zscore_clip(np.array([f(r.get(name))]), mu[name], sd[name])[0] for name in feature_names] for r in rs],
             dtype=float,
         )
 
-    X_train = matrix(train_rows)
-    y_train = np.array([int(r["is_2board"]) for r in train_rows], dtype=float)
+    fit_means, fit_stds = standardize_params(fit_rows)
+    X_fit0 = matrix(fit_rows, fit_means, fit_stds)
+    y_fit0 = np.array([int(r["is_2board"]) for r in fit_rows], dtype=float)
 
-    print(f"Train rows: {len(train_rows)}; positives: {int(y_train.sum())}")
+    print(
+        f"Fit rows: {len(fit_rows)}; positives: {int(y_fit0.sum())}; "
+        f"Dev rows: {len(dev_rows)}; OOS rows: "
+        f"{sum(1 for r in rows if OOS_START <= dt.date.fromisoformat(r["date"]) <= END)}"
+    )
 
-    # Hyperparameter search is confined to development data.
-    configs = []
-    for l2 in (0.25, 0.5, 1.0, 2.0):
-        for pos_weight in (1.0, 1.5, 2.0):
-            configs.append((l2, pos_weight))
+    configs = [
+        (l2, pos_weight)
+        for l2 in (0.25, 0.5, 1.0, 2.0)
+        for pos_weight in (1.0, 1.5, 2.0)
+    ]
 
     candidates = []
+    # Each candidate is fitted ONLY on the pre-dev fit period.
     for l2, pos_weight in configs:
-        w, b = fit_logistic(X_train, y_train, l2=l2, pos_weight=pos_weight)
+        w, b = fit_logistic(X_fit0, y_fit0, l2=l2, pos_weight=pos_weight)
         for alpha in (0.0, 0.25, 0.5, 0.75, 1.0):
-            dev_daily = attach_scores(daily, w, b, feature_names, means, stds, alpha)
+            dev_daily = attach_scores(
+                daily, w, b, feature_names, fit_means, fit_stds, alpha
+            )
             mm = metrics(dev_daily, DEV_START, TRAIN_END)
             candidates.append({
                 "l2": l2,
@@ -477,21 +496,30 @@ def main():
                 "dev_metrics": mm,
             })
 
-    candidates.sort(key=lambda x: (-x["objective"], -((x["dev_metrics"]["1"]["precision"] or 0.0)), x["alpha_v2"]))
+    candidates.sort(
+        key=lambda x: (
+            -x["objective"],
+            -((x["dev_metrics"]["1"]["precision"] or 0.0)),
+            -((x["dev_metrics"]["2"]["precision"] or 0.0)),
+            x["alpha_v2"],
+        )
+    )
     best = candidates[0]
     print("Best development configuration:", json.dumps(best, ensure_ascii=False, indent=2))
 
-    # Refit only once using the selected hyperparameters on all pre-OOS rows.
-    X_fit = X_train
-    y_fit = y_train
+    # Final V2 model: refit using ALL data available before strict OOS starts.
+    final_means, final_stds = standardize_params(pre_oos_rows)
+    X_final = matrix(pre_oos_rows, final_means, final_stds)
+    y_final = np.array([int(r["is_2board"]) for r in pre_oos_rows], dtype=float)
     best_w, best_b = fit_logistic(
-        X_fit, y_fit,
+        X_final,
+        y_final,
         l2=best["l2"],
-        pos_weight=best["pos_weight"]
+        pos_weight=best["pos_weight"],
     )
 
     all_scored = attach_scores(
-        daily, best_w, best_b, feature_names, means, stds, best["alpha_v2"]
+        daily, best_w, best_b, feature_names, final_means, final_stds, best["alpha_v2"]
     )
     full_m = metrics(all_scored, FULL_START, END)
     strict_m = metrics(all_scored, OOS_START, END)
@@ -532,7 +560,7 @@ def main():
         "trained_through": TRAIN_END.isoformat(),
         "feature_count": len(feature_names),
         "features": [
-            {"name": name, "mean": means[name], "std": stds[name], "coef": float(best_w[i])}
+            {"name": name, "mean": final_means[name], "std": final_stds[name], "coef": float(best_w[i])}
             for i, name in enumerate(feature_names)
         ],
         "intercept": float(best_b),
@@ -553,7 +581,7 @@ def main():
             "Main-board only: excludes STAR, ChiNext, Beijing, ST, *ST and delisting names.",
             "Uses daily Sina K-line data, same as V1.",
             "The ranking is optimized for daily Top1/Top2 precision rather than probability calibration.",
-            "Hyperparameter selection uses only 2026-06-01 through 2026-07-08; strict OOS starts 2026-07-09.",
+            "Hyperparameter selection is fitted on 2026-03-20 through 2026-05-31 and validated on 2026-06-01 through 2026-07-08; final refit then uses all pre-OOS data through 2026-07-08. Strict OOS starts 2026-07-09.",
             "Historical universe is based on currently retrievable main-board securities; survivorship bias remains possible.",
         ],
     }
@@ -566,8 +594,10 @@ def main():
         "universe": "沪深主板",
         "window": {"full_start": FULL_START.isoformat(), "end": END.isoformat()},
         "development": {
-            "train_start": FULL_START.isoformat(),
-            "train_end": TRAIN_END.isoformat(),
+            "fit_start": FULL_START.isoformat(),
+            "fit_end": fit_end.isoformat(),
+            "refit_start": FULL_START.isoformat(),
+            "refit_end": TRAIN_END.isoformat(),
             "validation_start": DEV_START.isoformat(),
             "validation_end": TRAIN_END.isoformat(),
             "best_config": best,
