@@ -280,8 +280,11 @@ def main():
                     bars=prior+[current]
                 else:
                     current=next((b for b in raw_bars if str(b.get('date',''))==analysis_date),None)
+                    # 收盘后新浪日K可能存在短暂延迟：实时行情已经包含最终/接近最终的
+                    # 开高低、最新价、成交量等信息。此时使用实时行情合成当日K，
+                    # 避免15:10左右因日K尚未落库而把整天误判成“无首板”。
                     if current is None:
-                        continue
+                        current=synthesize_intraday_bar(meta,analysis_date)
                     prior=[b for b in raw_bars if str(b.get('date','')) < analysis_date]
                     if len(prior)<MIN_HISTORY:
                         continue
