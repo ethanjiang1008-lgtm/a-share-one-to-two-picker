@@ -1,0 +1,51 @@
+{
+  "model_version": "one-to-two-v1-daily-proxy",
+  "source": "rolling_live_validation",
+  "notes": "只使用已经发生的下一交易日结果；不修改V1模型参数。",
+  "metrics": {
+    "1": {
+      "k": 1,
+      "days": 1,
+      "selected": 1,
+      "hits": 1,
+      "precision": 1.0,
+      "baseline_rate": 0.20967741935483872,
+      "lift": 4.769230769230769,
+      "day_hit_days": 1,
+      "day_hit_rate": 1.0
+    },
+    "3": {
+      "k": 3,
+      "days": 1,
+      "selected": 3,
+      "hits": 2,
+      "precision": 0.6666666666666666,
+      "baseline_rate": 0.20967741935483872,
+      "lift": 3.1794871794871793,
+      "day_hit_days": 1,
+      "day_hit_rate": 1.0
+    },
+    "6": {
+      "k": 6,
+      "days": 1,
+      "selected": 6,
+      "hits": 3,
+      "precision": 0.5,
+      "baseline_rate": 0.20967741935483872,
+      "lift": 2.3846153846153846,
+      "day_hit_days": 1,
+      "day_hit_rate": 1.0
+    },
+    "10": {
+      "k": 10,
+      "days": 1,
+      "selected": 10,
+      "hits": 4,
+      "precision": 0.4,
+      "baseline_rate": 0.20967741935483872,
+      "lift": 1.9076923076923078,
+      "day_hit_days": 1,
+      "day_hit_rate": 1.0
+    }
+  }
+}
