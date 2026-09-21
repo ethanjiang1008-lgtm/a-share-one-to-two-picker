@@ -114,6 +114,8 @@ async function boot() {
     document.getElementById("runDate").textContent = data.analysis_date || data.date || "—";
     document.getElementById("predictionDate").textContent = data.prediction_date || "—";
     document.getElementById("cutoffDate").textContent = data.information_cutoff || "—";
+    const modeLabels = {intraday:"盘中实时快照", daily_close:"收盘完整日K", pre_open:"开盘前", non_trading:"非交易日重跑"};
+    document.getElementById("runMode").textContent = modeLabels[data.market_data_mode] || data.market_data_mode || "—";
     document.getElementById("ztCount").textContent = data.market_context?.market_zt_count ?? "—";
     document.getElementById("firstCount").textContent = data.market_context?.market_first_count ?? "—";
     document.getElementById("twoPlusCount").textContent = data.market_context?.market_2plus_count ?? "—";
