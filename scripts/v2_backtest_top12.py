@@ -55,7 +55,7 @@ def limit_up(bar, prev):
 
 def zscore_clip(arr, mean, std):
     sd = max(float(std), 1e-9)
-    return float(np.clip((arr - mean) / sd, -8.0, 8.0))
+    return float(np.clip((float(arr[0]) - mean) / sd, -8.0, 8.0))
 
 
 def stable_sigmoid(z):
