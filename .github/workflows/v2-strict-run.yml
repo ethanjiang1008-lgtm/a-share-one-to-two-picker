@@ -6,6 +6,7 @@ on:
     branches: [v2-top12-20260921]
     paths:
       - ".github/workflows/v2-strict-run.yml"
+      - "scripts/v2_backtest_top12.py"
 
 permissions:
   contents: read
