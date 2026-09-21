@@ -83,11 +83,16 @@ jobs:
       - name: Validate daily result universe
         run: |
           python - <<'PY'
-          import csv
+          import csv, json
           from pathlib import Path
+          latest_json=Path("docs/data/latest.json")
+          data=json.loads(latest_json.read_text(encoding="utf-8"))
+          if data.get("status") in ("pre_open","no_first_board"):
+              print(f"no current first-board rows to validate: status={data.get('status')}, mode={data.get('market_data_mode')}")
+              raise SystemExit(0)
           files=sorted(Path("reports/daily").glob("*_one_to_two_v1.csv"))
           if not files:
-              raise SystemExit("no daily CSV report produced")
+              raise SystemExit("no daily CSV report produced for a successful scan")
           latest=files[-1]
           with latest.open(encoding="utf-8-sig", newline="") as f:
               rows=list(csv.DictReader(f))
