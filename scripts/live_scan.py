@@ -5,8 +5,9 @@ from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor,as_completed
 from market_data_sina import fetch_all_stocks,fetch_kline,is_main_board
 from news_reason import collect_event_evidence
-from trading_calendar import next_trading_day,previous_trading_day
+from trading_calendar import next_trading_day,previous_trading_day,is_trading_day
 import datetime
+from zoneinfo import ZoneInfo
 
 ROOT=Path(__file__).resolve().parents[1]
 MODEL_PATH=ROOT/'config/model_v1.json'
@@ -108,26 +109,29 @@ def model_explanation(row, model):
     negative.sort(key=lambda x:x['contribution'])
     return {'positive':positive[:5],'negative':negative[:5]}
 
-def structure_reason(row, context):
+def structure_reason(row, context, market_data_mode):
     bits=[]
     if f(row.get('close_near_high'))>=1:
-        bits.append('收盘贴近日内最高价，说明涨停日尾盘价格维持强势。')
+        if market_data_mode == 'intraday':
+            bits.append('截至运行时当前价格贴近日内最高价，盘中价格维持强势。')
+        else:
+            bits.append('收盘贴近日内最高价，说明涨停日尾盘价格维持强势。')
     if f(row.get('near_limit_open'))>=1:
         bits.append(f"今日开盘已接近涨停价，开盘强度较高（开盘涨幅 {f(row.get('open_gap_pct')):.1f}%）。")
     vol20=f(row.get('volume_vs_20d'),1)
     if vol20>=1.8:
-        bits.append(f"当日成交量约为20日均量的 {vol20:.1f} 倍，资金参与度显著放大。")
+        bits.append(f"截至运行时成交量约为20日均量的 {vol20:.1f} 倍，资金参与度显著放大。")
     elif vol20>=1.2:
-        bits.append(f"当日成交量约为20日均量的 {vol20:.1f} 倍，存在明显放量。")
+        bits.append(f"截至运行时成交量约为20日均量的 {vol20:.1f} 倍，存在明显放量。")
     else:
-        bits.append(f"当日成交量约为20日均量的 {vol20:.1f} 倍，量能未出现极端放大。")
+        bits.append(f"截至运行时成交量约为20日均量的 {vol20:.1f} 倍，量能未出现极端放大。")
     if f(row.get('ma5_gt_ma10')) and f(row.get('ma10_gt_ma20')):
         bits.append('短中期均线保持多头排列，价格结构与趋势方向一致。')
     elif f(row.get('ma5_gt_ma10')):
         bits.append('5日均线仍高于10日均线，但中期趋势强度一般。')
     else:
         bits.append('短期均线未形成明显多头排列，趋势确认度相对有限。')
-    bits.append(f"今日市场共有 {int(f(context.get('market_zt_count')))} 家涨停，其中首板 {int(f(context.get('market_first_count')))} 家、2板及以上 {int(f(context.get('market_2plus_count')))} 家。")
+    bits.append(f"截至本次运行，市场共有 {int(f(context.get('market_zt_count')))} 家涨停，其中首板 {int(f(context.get('market_first_count')))} 家、2板及以上 {int(f(context.get('market_2plus_count')))} 家。")
     return ''.join(bits)
 
 def risk_text(row):
@@ -145,6 +149,38 @@ def risk_text(row):
     if not risks:
         risks.append('主要风险来自次日板块分歧与个股承接强弱')
     return '；'.join(risks)
+
+def runtime_context():
+    """Determine the market-data semantics strictly from the actual runtime moment."""
+    now=datetime.datetime.now(ZoneInfo("Asia/Shanghai"))
+    today=now.date()
+    if is_trading_day(today):
+        if now.time() < datetime.time(9,25):
+            mode='pre_open'
+            analysis_date=previous_trading_day(today).isoformat()
+        elif now.time() < datetime.time(15,5):
+            mode='intraday'
+            analysis_date=today.isoformat()
+        else:
+            mode='daily_close'
+            analysis_date=today.isoformat()
+    else:
+        mode='non_trading'
+        analysis_date=previous_trading_day(today).isoformat()
+    return {'now':now,'market_data_mode':mode,'analysis_date':analysis_date}
+
+def synthesize_intraday_bar(quote, analysis_date):
+    """Build an as-of-now daily bar from the realtime quote for the current trading day."""
+    return {
+        'date':analysis_date,
+        'open':f(quote.get('open')),
+        'close':f(quote.get('price')),
+        'high':f(quote.get('high')),
+        'low':f(quote.get('low')),
+        'volume':f(quote.get('volume')),
+        'turnover':f(quote.get('turnover_rate')),
+        'amount':f(quote.get('amount')),
+    }
 
 def resolve_market_context(state, analysis_date, current_two_plus, default_ctx):
     """Resolve previous-trading-day context with safe bootstrap behavior."""
@@ -188,9 +224,44 @@ def main():
     default_ctx={'market_first_count':61.51393899639226,'market_2plus_count':12.789603148573303,'market_zt_count':74.30354214496556,
                  'prev_market_first_count':54.58625778943916,'prev_market_2plus_count':12.092981305346015,'prev_market_1to2_rate':0.16185320352130533}
     state=load_json(STATE_PATH,{'last_date':None,'first_board_codes':[],'market':default_ctx})
+
+    run=runtime_context()
+    market_data_mode=run['market_data_mode']
+    analysis_date=run['analysis_date']
+    prediction_date=next_trading_day(datetime.date.fromisoformat(analysis_date)).isoformat()
+    cutoff_iso=run['now'].isoformat()
+
     quotes=[r for r in fetch_all_stocks() if is_main_board(str(r.get('code','')),str(r.get('name','')))]
     candidates=[r for r in quotes if f(r.get('change_pct'))>=9.5 and f(r.get('price'))>0]
-    print(f'主板股票数: {len(quotes)}; 当前涨停候选: {len(candidates)}')
+
+    # 开盘前没有“今天首板”可分析：不把前一交易日结果伪装成今天盘中结果。
+    if market_data_mode == 'pre_open':
+        payload={
+            'status':'pre_open',
+            'model_version':model.get('version'),
+            'reference_test_top1_precision':model.get('reference_test_top1_precision'),
+            'trained_through':model.get('trained_through'),
+            'analysis_date':analysis_date,
+            'prediction_date':prediction_date,
+            'date':analysis_date,
+            'information_cutoff':cutoff_iso,
+            'market_data_mode':market_data_mode,
+            'data_source':'Sina',
+            'universe':'沪深主板',
+            'first_board_count':0,
+            'two_plus_count':0,
+            'failed':0,
+            'market_context':default_ctx,
+            'market_context_source':'pre_open',
+            'two_plus_codes':[],
+            'rows':[]
+        }
+        WEB_DATA_PATH.parent.mkdir(parents=True,exist_ok=True)
+        WEB_DATA_PATH.write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
+        print(json.dumps(payload,ensure_ascii=False,indent=2))
+        return 0
+
+    print(f'运行模式: {market_data_mode}; 分析日期: {analysis_date}; 主板股票数: {len(quotes)}; 当前涨停候选: {len(candidates)}')
 
     rows=[]; two_plus=[]; failed=0
     with ThreadPoolExecutor(max_workers=WORKERS) as ex:
@@ -198,63 +269,100 @@ def main():
         for fut in as_completed(fs):
             meta=fs[fut]
             try:
-                bars=sorted(fut.result(),key=lambda x:str(x.get('date','')))
-                if len(bars)<MIN_HISTORY+1: continue
-                i=len(bars)-1; today=bars[i]; prev=bars[i-1]
-                if not limit_up(today,prev): continue
-                was_two= i>=2 and limit_up(prev,bars[i-2])
+                raw_bars=sorted(fut.result(),key=lambda x:str(x.get('date','')))
+                prior=[b for b in raw_bars if str(b.get('date','')) < analysis_date]
+
+                if market_data_mode == 'intraday':
+                    if len(prior)<MIN_HISTORY:
+                        continue
+                    prev=prior[-1]
+                    current=synthesize_intraday_bar(meta,analysis_date)
+                    bars=prior+[current]
+                else:
+                    current=next((b for b in raw_bars if str(b.get('date',''))==analysis_date),None)
+                    if current is None:
+                        continue
+                    prior=[b for b in raw_bars if str(b.get('date','')) < analysis_date]
+                    if len(prior)<MIN_HISTORY:
+                        continue
+                    prev=prior[-1]
+                    bars=prior+[current]
+
+                if not limit_up(current,prev):
+                    continue
+                was_two=len(prior)>=2 and limit_up(prev,prior[-2])
                 if was_two:
                     two_plus.append(str(meta['code']))
                     continue
-                r=dict(meta); r['_bars']=bars; r['_idx']=i; rows.append(r)
+
+                r=dict(meta)
+                r['_bars']=bars
+                r['_idx']=len(bars)-1
+                r['_price']=f(current.get('close'))
+                r['_change_pct']=pct(f(current.get('close')),f(prev.get('close')))
+                rows.append(r)
             except Exception:
                 failed+=1
 
-    first_codes={str(r['code']) for r in rows}; current_zt=len(rows)+len(two_plus)
-    analysis_date_candidate=str(rows[0]['_bars'][rows[0]['_idx']].get('date','')) if rows else None
-    resolved_prev=resolve_market_context(state,analysis_date_candidate,two_plus,default_ctx) if analysis_date_candidate else {
-        'prev_market_first_count':default_ctx['prev_market_first_count'],
-        'prev_market_2plus_count':default_ctx['prev_market_2plus_count'],
-        'prev_market_1to2_rate':default_ctx['prev_market_1to2_rate'],
-        'context_source':'training_bootstrap'
+    first_codes={str(r['code']) for r in rows}
+    current_zt=len(rows)+len(two_plus)
+    resolved_prev=resolve_market_context(state,analysis_date,two_plus,default_ctx)
+    context={
+        'market_first_count':len(rows),
+        'market_2plus_count':len(two_plus),
+        'market_zt_count':current_zt,
+        'prev_market_first_count':f(resolved_prev.get('prev_market_first_count'),default_ctx['prev_market_first_count']),
+        'prev_market_2plus_count':f(resolved_prev.get('prev_market_2plus_count'),default_ctx['prev_market_2plus_count']),
+        'prev_market_1to2_rate':f(resolved_prev.get('prev_market_1to2_rate'),default_ctx['prev_market_1to2_rate']),
+        'context_source':resolved_prev.get('context_source','training_bootstrap')
     }
-    context={'market_first_count':len(rows),'market_2plus_count':len(two_plus),'market_zt_count':current_zt,
-             'prev_market_first_count':f(resolved_prev.get('prev_market_first_count'),default_ctx['prev_market_first_count']),
-             'prev_market_2plus_count':f(resolved_prev.get('prev_market_2plus_count'),default_ctx['prev_market_2plus_count']),
-             'prev_market_1to2_rate':f(resolved_prev.get('prev_market_1to2_rate'),default_ctx['prev_market_1to2_rate']),
-             'context_source':resolved_prev.get('context_source','training_bootstrap')}
 
-    # 同一分析日重复运行时，冻结第一次成功生成的 V1 评分/市场上下文；
-    # 只有首板股票集合发生变化（例如修复过滤 Bug 后）才重新计算。
-    frozen = state.get('frozen_v1') or {}
-    same_date = state.get('last_date') == (str(rows[0]['_bars'][rows[0]['_idx']].get('date','')) if rows else None)
-    frozen_codes=set(frozen.get('codes',[]))
-    current_codes={str(r['code']) for r in rows}
-    use_frozen = bool(same_date and frozen_codes == current_codes and frozen.get('scores'))
-    if use_frozen:
-        context=frozen.get('market_context',context)
-
+    # 同一交易日重复运行不冻结分数。每次都用本次运行时刻的数据重新计算与排序。
     if not rows:
-        payload={'status':'no_first_board','model_version':model.get('version'),'date':None,
-                 'data_source':'Sina','universe':'沪深主板','first_board_count':0,'failed':failed,
-                 'market_context':context,'market_context_source':context.get('context_source'),'two_plus_codes':sorted(two_plus),'rows':[]}
+        payload={
+            'status':'no_first_board',
+            'model_version':model.get('version'),
+            'reference_test_top1_precision':model.get('reference_test_top1_precision'),
+            'trained_through':model.get('trained_through'),
+            'analysis_date':analysis_date,
+            'prediction_date':prediction_date,
+            'date':analysis_date,
+            'information_cutoff':cutoff_iso,
+            'market_data_mode':market_data_mode,
+            'data_source':'Sina',
+            'universe':'沪深主板',
+            'first_board_count':0,
+            'two_plus_count':len(two_plus),
+            'failed':failed,
+            'market_context':context,
+            'market_context_source':context.get('context_source'),
+            'two_plus_codes':sorted(two_plus),
+            'rows':[]
+        }
         WEB_DATA_PATH.parent.mkdir(parents=True,exist_ok=True)
         WEB_DATA_PATH.write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
         print(json.dumps(payload,ensure_ascii=False,indent=2))
         return 0
 
-    analysis_date=max(str(x['_bars'][x['_idx']].get('date','')) for x in rows)
-    prediction_date=next_trading_day(datetime.date.fromisoformat(analysis_date)).isoformat()
     scored=[]
     for item in rows:
         bs=item['_bars']; i=item['_idx']
-        row={'date':analysis_date,'prediction_date':prediction_date,'code':str(item['code']),'name':str(item['name']),'price':f(item.get('price')),'change_pct':f(item.get('change_pct'))}
-        row.update(base_features(bs,i)); row.update(structure_features(bs,i)); row.update(context)
-        row['score']=frozen.get('scores',{}).get(row['code'], score(row,model)) if use_frozen else score(row,model)
+        row={
+            'date':analysis_date,
+            'prediction_date':prediction_date,
+            'code':str(item['code']),
+            'name':str(item['name']),
+            'price':item['_price'],
+            'change_pct':item['_change_pct']
+        }
+        row.update(base_features(bs,i))
+        row.update(structure_features(bs,i))
+        row.update(context)
+        row['score']=score(row,model)
         scored.append(row)
+
     scored.sort(key=lambda x:x['score'],reverse=True)
-    cutoff_iso=datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).isoformat()
-    event_map=collect_event_evidence(scored, analysis_date, cutoff_iso, workers=8)
+    event_map=collect_event_evidence(scored,analysis_date,cutoff_iso,workers=8)
 
     REPORT_DIR.mkdir(parents=True,exist_ok=True)
     model_fields=[x['name'] for x in model['features']]
@@ -262,33 +370,61 @@ def main():
     fields=['rank','date','prediction_date','code','name','price','change_pct','score']+extra_fields+model_fields
     out=REPORT_DIR/f'{analysis_date}_one_to_two_v1.csv'
     with out.open('w',encoding='utf-8-sig',newline='') as fh:
-        w=csv.DictWriter(fh,fieldnames=fields); w.writeheader()
+        w=csv.DictWriter(fh,fieldnames=fields)
+        w.writeheader()
         for rank,row in enumerate(scored,1):
-            x={k:row.get(k,0) for k in fields}; x['rank']=rank; w.writerow(x)
+            x={k:row.get(k,0) for k in fields}
+            x['rank']=rank
+            w.writerow(x)
 
     web_rows=[]
     for rank,row in enumerate(scored,1):
         row['rank']=rank
         web_rows.append({
-          'rank':rank,'date':analysis_date,'prediction_date':prediction_date,'code':row['code'],'name':row['name'],'price':row['price'],
-          'change_pct':row['change_pct'],'score':row['score'],
+          'rank':rank,
+          'date':analysis_date,
+          'prediction_date':prediction_date,
+          'code':row['code'],
+          'name':row['name'],
+          'price':row['price'],
+          'change_pct':row['change_pct'],
+          'score':row['score'],
           'event_reason':event_map.get(row['code'],{
-            'status':'no_verified_event','confidence':'低',
+            'status':'no_verified_event',
+            'confidence':'低',
             'summary':'未找到可验证的当日公告/新闻催化',
             'detail':'本次运行没有找到可验证的直接事件证据。',
-            'verified_evidence':[],'related_evidence':[],'categories':[],'sustainability':'未知','sources':[]
+            'verified_evidence':[],
+            'related_evidence':[],
+            'categories':[],
+            'sustainability':'未知',
+            'sources':[]
           }),
-          'structure_reason':structure_reason(row,context),
+          'structure_reason':structure_reason(row,context,market_data_mode),
           'model_explanation':model_explanation(row,model),
           'risk':risk_text(row),
           'factor_snapshot':{k:row.get(k) for k in [x['name'] for x in model.get('features',[])]}
         })
 
     payload={
-      'status':'ok','model_version':model.get('version'),'reference_test_top1_precision':model.get('reference_test_top1_precision'),
-      'trained_through':model.get('trained_through'),'analysis_date':analysis_date,'prediction_date':prediction_date,'date':analysis_date,'information_cutoff':cutoff_iso,'data_source':'Sina',
-      'universe':'沪深主板','first_board_count':len(scored),'two_plus_count':len(two_plus),'failed':failed,
-      'market_context':context,'market_context_source':context.get('context_source'),'two_plus_codes':sorted(two_plus),'rows':web_rows
+      'status':'ok',
+      'model_version':model.get('version'),
+      'reference_test_top1_precision':model.get('reference_test_top1_precision'),
+      'trained_through':model.get('trained_through'),
+      'analysis_date':analysis_date,
+      'prediction_date':prediction_date,
+      'date':analysis_date,
+      'information_cutoff':cutoff_iso,
+      'market_data_mode':market_data_mode,
+      'data_source':'Sina',
+      'universe':'沪深主板',
+      'first_board_count':len(scored),
+      'two_plus_count':len(two_plus),
+      'failed':failed,
+      'market_context':context,
+      'market_context_source':context.get('context_source'),
+      'two_plus_codes':sorted(two_plus),
+      'rows':web_rows
     }
     WEB_DATA_PATH.parent.mkdir(parents=True,exist_ok=True)
     WEB_DATA_PATH.write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
@@ -298,17 +434,31 @@ def main():
     snapshot_json=REPORT_DIR/f'{analysis_date}_one_to_two_v1_cutoff_{cutoff_key}.json'
     snapshot_json.write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
 
-    print(json.dumps({'version':model.get('version'),'analysis_date':analysis_date,'prediction_date':prediction_date,'universe':'沪深主板 only','first_board_count':len(scored),
-      'two_plus_count':len(two_plus),'failed':failed,
-      'top10':[{'rank':i+1,'code':r['code'],'name':r['name'],'score':round(r['score'],6)} for i,r in enumerate(scored[:10])]},ensure_ascii=False,indent=2))
+    print(json.dumps({
+        'version':model.get('version'),
+        'analysis_date':analysis_date,
+        'prediction_date':prediction_date,
+        'market_data_mode':market_data_mode,
+        'universe':'沪深主板 only',
+        'first_board_count':len(scored),
+        'two_plus_count':len(two_plus),
+        'failed':failed,
+        'top10':[{'rank':i+1,'code':r['code'],'name':r['name'],'score':round(r['score'],6)} for i,r in enumerate(scored[:10])]
+    },ensure_ascii=False,indent=2))
 
-    save={'schema_version':2,'last_date':analysis_date,'prediction_date':prediction_date,
-          'first_board_codes':sorted(first_codes),'market':context,
-          'context_source':context.get('context_source'),
-          'frozen_v1':{'codes':sorted(first_codes),'scores':{r['code']:r['score'] for r in scored},
-                        'market_context':context,
-                        'context_source':context.get('context_source')}}
-    STATE_PATH.parent.mkdir(parents=True,exist_ok=True); STATE_PATH.write_text(json.dumps(save,ensure_ascii=False,indent=2),encoding='utf-8')
+    save={
+        'schema_version':3,
+        'last_date':analysis_date,
+        'prediction_date':prediction_date,
+        'first_board_codes':sorted(first_codes),
+        'market':context,
+        'context_source':context.get('context_source'),
+        'last_run_mode':market_data_mode,
+        'last_information_cutoff':cutoff_iso
+    }
+    STATE_PATH.parent.mkdir(parents=True,exist_ok=True)
+    STATE_PATH.write_text(json.dumps(save,ensure_ascii=False,indent=2),encoding='utf-8')
     return 0
 
-if __name__=='__main__': raise SystemExit(main())
+if __name__=='__main__':
+    raise SystemExit(main())
