@@ -1,0 +1,167 @@
+{
+  "research_version": "two-position-policy-v2-20260920",
+  "v1_parameters_changed": false,
+  "score_gate": 0.4,
+  "development_period": {
+    "end": "2026-07-08",
+    "days": 74
+  },
+  "strict_oos_period": {
+    "start": "2026-07-09",
+    "days": 51
+  },
+  "selection_rule": "Choose the gap_max with highest development-period position precision; ties choose the smaller gap. Apply the selected rule once to strict OOS.",
+  "grid": [
+    {
+      "gap_max": 0.05,
+      "development": {
+        "days": 74,
+        "trade_days": 52,
+        "two_position_days": 17,
+        "selected_positions": 69,
+        "hits": 36,
+        "position_precision": 0.5217391304347826,
+        "any_hit_on_trade_days": 0.6538461538461539,
+        "average_positions_per_day": 0.9324324324324325
+      },
+      "strict_oos": {
+        "days": 51,
+        "trade_days": 34,
+        "two_position_days": 10,
+        "selected_positions": 44,
+        "hits": 22,
+        "position_precision": 0.5,
+        "any_hit_on_trade_days": 0.5588235294117647,
+        "average_positions_per_day": 0.8627450980392157
+      }
+    },
+    {
+      "gap_max": 0.1,
+      "development": {
+        "days": 74,
+        "trade_days": 52,
+        "two_position_days": 25,
+        "selected_positions": 77,
+        "hits": 40,
+        "position_precision": 0.5194805194805194,
+        "any_hit_on_trade_days": 0.6730769230769231,
+        "average_positions_per_day": 1.0405405405405406
+      },
+      "strict_oos": {
+        "days": 51,
+        "trade_days": 34,
+        "two_position_days": 13,
+        "selected_positions": 47,
+        "hits": 24,
+        "position_precision": 0.5106382978723404,
+        "any_hit_on_trade_days": 0.6176470588235294,
+        "average_positions_per_day": 0.9215686274509803
+      }
+    },
+    {
+      "gap_max": 0.15,
+      "development": {
+        "days": 74,
+        "trade_days": 52,
+        "two_position_days": 30,
+        "selected_positions": 82,
+        "hits": 43,
+        "position_precision": 0.524390243902439,
+        "any_hit_on_trade_days": 0.6730769230769231,
+        "average_positions_per_day": 1.1081081081081081
+      },
+      "strict_oos": {
+        "days": 51,
+        "trade_days": 34,
+        "two_position_days": 14,
+        "selected_positions": 48,
+        "hits": 24,
+        "position_precision": 0.5,
+        "any_hit_on_trade_days": 0.6176470588235294,
+        "average_positions_per_day": 0.9411764705882353
+      }
+    },
+    {
+      "gap_max": 0.2,
+      "development": {
+        "days": 74,
+        "trade_days": 52,
+        "two_position_days": 30,
+        "selected_positions": 82,
+        "hits": 43,
+        "position_precision": 0.524390243902439,
+        "any_hit_on_trade_days": 0.6730769230769231,
+        "average_positions_per_day": 1.1081081081081081
+      },
+      "strict_oos": {
+        "days": 51,
+        "trade_days": 34,
+        "two_position_days": 15,
+        "selected_positions": 49,
+        "hits": 24,
+        "position_precision": 0.4897959183673469,
+        "any_hit_on_trade_days": 0.6176470588235294,
+        "average_positions_per_day": 0.9607843137254902
+      }
+    },
+    {
+      "gap_max": 0.3,
+      "development": {
+        "days": 74,
+        "trade_days": 52,
+        "two_position_days": 30,
+        "selected_positions": 82,
+        "hits": 43,
+        "position_precision": 0.524390243902439,
+        "any_hit_on_trade_days": 0.6730769230769231,
+        "average_positions_per_day": 1.1081081081081081
+      },
+      "strict_oos": {
+        "days": 51,
+        "trade_days": 34,
+        "two_position_days": 15,
+        "selected_positions": 49,
+        "hits": 24,
+        "position_precision": 0.4897959183673469,
+        "any_hit_on_trade_days": 0.6176470588235294,
+        "average_positions_per_day": 0.9607843137254902
+      }
+    },
+    {
+      "gap_max": 999.0,
+      "development": {
+        "days": 74,
+        "trade_days": 52,
+        "two_position_days": 30,
+        "selected_positions": 82,
+        "hits": 43,
+        "position_precision": 0.524390243902439,
+        "any_hit_on_trade_days": 0.6730769230769231,
+        "average_positions_per_day": 1.1081081081081081
+      },
+      "strict_oos": {
+        "days": 51,
+        "trade_days": 34,
+        "two_position_days": 15,
+        "selected_positions": 49,
+        "hits": 24,
+        "position_precision": 0.4897959183673469,
+        "any_hit_on_trade_days": 0.6176470588235294,
+        "average_positions_per_day": 0.9607843137254902
+      }
+    }
+  ],
+  "selected_gap_max": 0.15,
+  "selected_rule": "Top1 score >= 0.40; add Top2 only when Top2 score >= 0.40 and Top1-Top2 score gap <= 0.15",
+  "result_strict_oos": {
+    "days": 51,
+    "trade_days": 34,
+    "two_position_days": 14,
+    "selected_positions": 48,
+    "hits": 24,
+    "position_precision": 0.5,
+    "any_hit_on_trade_days": 0.6176470588235294,
+    "average_positions_per_day": 0.9411764705882353
+  },
+  "interpretation": "This is a decision-layer experiment only. V1 score parameters are unchanged; the score is not interpreted as a calibrated probability."
+}
