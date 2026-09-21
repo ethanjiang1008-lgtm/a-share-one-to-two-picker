@@ -46,34 +46,41 @@ jobs:
           PY
 
       - name: Run V1 daily scan
-        if: steps.market_close.outputs.ready == 'true'
         run: python scripts/live_scan.py
 
-      - name: Validate analysis date
-        if: steps.market_close.outputs.ready == 'true'
+      - name: Validate runtime data date alignment
         run: |
           python - <<'PY'
           import json
           from datetime import datetime, time
           from pathlib import Path
           from zoneinfo import ZoneInfo
-          from scripts.trading_calendar import is_trading_day
+          from scripts.trading_calendar import is_trading_day, previous_trading_day
 
           p = Path("docs/data/latest.json")
           if not p.exists():
               raise SystemExit("latest.json not produced")
           data = json.loads(p.read_text(encoding="utf-8"))
           now = datetime.now(ZoneInfo("Asia/Shanghai"))
+          today = now.date()
+          if is_trading_day(today):
+              if now.time() < time(9, 25):
+                  expected = previous_trading_day(today).isoformat()
+              else:
+                  expected = today.isoformat()
+          else:
+              expected = previous_trading_day(today).isoformat()
           analysis_date = data.get("analysis_date")
-          if is_trading_day(now.date()) and now.time() >= time(15, 5):
-              if analysis_date != now.date().isoformat():
-                  raise SystemExit(
-                      f"stale analysis date: expected {now.date().isoformat()}, got {analysis_date}"
-                  )
-          print(f"validated analysis date: {analysis_date}")
+          if analysis_date != expected:
+              raise SystemExit(
+                  f"analysis date mismatch: runtime={now.isoformat()}, expected={expected}, got={analysis_date}"
+              )
+          print(
+              f"validated runtime alignment: mode={data.get('market_data_mode')}, "
+              f"analysis_date={analysis_date}, prediction_date={data.get('prediction_date')}"
+          )
 
       - name: Validate daily result universe
-        if: steps.market_close.outputs.ready == 'true'
         run: |
           python - <<'PY'
           import csv
@@ -90,19 +97,15 @@ jobs:
           print(f"validated {len(rows)} main-board first-board rows from {latest}")
 
       - name: Build web data
-        if: steps.market_close.outputs.ready == 'true'
         run: python scripts/build_web.py
 
       - name: Validate previous prediction TopK
-        if: steps.market_close.outputs.ready == 'true'
         run: python scripts/evaluate_topk.py
 
       - name: Build Excel review workbook
-        if: steps.market_close.outputs.ready == 'true'
         run: python scripts/build_excel.py
 
       - name: Commit prediction, state, evaluation and Excel
-        if: steps.market_close.outputs.ready == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -111,16 +114,13 @@ jobs:
           git push
 
       - name: Configure GitHub Pages
-        if: steps.market_close.outputs.ready == 'true'
         uses: actions/configure-pages@v5
 
       - name: Upload Pages artifact
-        if: steps.market_close.outputs.ready == 'true'
         uses: actions/upload-pages-artifact@v4
         with:
           path: "./docs"
 
       - name: Deploy to GitHub Pages
-        if: steps.market_close.outputs.ready == 'true'
         id: deployment
         uses: actions/deploy-pages@v4
