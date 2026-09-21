@@ -1,4 +1,5 @@
 name: V2 Top1 Top2 historical backtest
+# strict three-way validation
 
 on:
   workflow_dispatch:
