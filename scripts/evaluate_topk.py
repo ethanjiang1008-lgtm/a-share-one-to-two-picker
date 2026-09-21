@@ -52,8 +52,12 @@ def main():
         print("No daily reports for rolling TopK validation.")
         return 0
 
-    # Current run supplies the realized next-day market result.
+    # 只有收盘后的完整日K结果才能作为“已经发生”的下一交易日验证。
+    # 盘中运行只是预测快照，不能拿未收盘的二板名单做验证。
     _,current=reports[-1]
+    if current.get("market_data_mode") != "daily_close":
+        print(f"Latest report is {current.get('market_data_mode')}; skip TopK validation until daily_close.")
+        return 0
     verify_date=current.get("analysis_date") or current.get("date")
     actual_2plus={str(x) for x in (current.get("two_plus_codes") or [])}
     if not actual_2plus and current.get("two_plus_count",0):
