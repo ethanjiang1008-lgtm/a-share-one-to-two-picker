@@ -429,7 +429,7 @@ def main():
         "volume_price_confirm", "v1_score"
     ]
 
-    # Strict three-way design:
+    # Strict three-way design (isolated V2):
     #   1) fit period: 2026-03-20 .. 2026-05-31
     #   2) development validation: 2026-06-01 .. 2026-07-08
     #   3) strict OOS: 2026-07-09 .. 2026-09-18
