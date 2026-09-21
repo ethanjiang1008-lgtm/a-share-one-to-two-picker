@@ -1,0 +1,40 @@
+name: Two-position policy V2 research
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/evaluate_two_position_policy_v2.py"
+      - "reports/backtest_recent_six_months.csv"
+      - ".github/workflows/two-position-policy-v2.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: a-share-one-to-two-data-writer
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Evaluate policy V2
+        run: python scripts/evaluate_two_position_policy_v2.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: two-position-policy-v2
+          path: reports/evaluation/two_position_policy_v2.json
+      - name: Save policy report
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f reports/evaluation/two_position_policy_v2.json
+          git diff --cached --quiet || git commit -m "research: add two-position policy V2 evaluation"
+          git pull --rebase origin main
+          git push
