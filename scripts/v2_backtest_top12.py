@@ -459,7 +459,7 @@ def main():
 
     def matrix(rs, mu, sd):
         return np.array(
-            [[zscore_clip(np.array([f(r.get(name))]), mu[name], sd[name])[0] for name in feature_names] for r in rs],
+            [[zscore_clip(np.array([f(r.get(name))]), mu[name], sd[name]) for name in feature_names] for r in rs],
             dtype=float,
         )
 
