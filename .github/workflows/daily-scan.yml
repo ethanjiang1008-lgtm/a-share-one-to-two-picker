@@ -33,6 +33,32 @@ jobs:
       - name: Run V1 daily scan
         run: python scripts/live_scan.py
 
+      - name: Validate scan status
+        run: |
+          python - <<'PY'
+          import json
+          from datetime import datetime, time
+          from pathlib import Path
+          from zoneinfo import ZoneInfo
+          from scripts.trading_calendar import is_trading_day
+
+          p = Path("docs/data/latest.json")
+          data = json.loads(p.read_text(encoding="utf-8"))
+          now = datetime.now(ZoneInfo("Asia/Shanghai"))
+          if is_trading_day(now.date()) and now.time() >= time(15, 5):
+              status = data.get("status")
+              if status not in ("ok", "no_first_board"):
+                  raise SystemExit(
+                      f"daily scan did not produce a valid post-close state: "
+                      f"status={status}, analysis_date={data.get('analysis_date')}"
+                  )
+          print(
+              f"validated scan status: status={data.get('status')}, "
+              f"analysis_date={data.get('analysis_date')}, "
+              f"prediction_date={data.get('prediction_date')}"
+          )
+          PY
+
       - name: Validate runtime data date alignment
         run: |
           python - <<'PY'
