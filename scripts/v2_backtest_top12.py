@@ -323,7 +323,7 @@ def attach_scores(daily_rows, v2_w, v2_b, feature_names, means, stds, alpha):
         if not rs:
             continue
         X = np.array([
-            [zscore_clip(np.array([f(r.get(name))]), means[name], stds[name])[0] for name in feature_names]
+            [zscore_clip(np.array([f(r.get(name))]), means[name], stds[name]) for name in feature_names]
             for r in rs
         ], dtype=float)
         v2_prob = stable_sigmoid(X @ v2_w + v2_b)
