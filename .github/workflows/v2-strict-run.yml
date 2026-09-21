@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: v2-strict-run
+  group: v2-strict-run-v2
   cancel-in-progress: false
 
 jobs:
