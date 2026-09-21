@@ -1,0 +1,104 @@
+{
+  "model_version": "one-to-two-v1-daily-proxy",
+  "objective": "two-position decision layer; maximum two holdings per day",
+  "model_parameters_changed": false,
+  "top1_score_gate": 0.4,
+  "top2_score_gate": 0.4,
+  "development_period": {
+    "end": "2026-07-08",
+    "days": 74,
+    "metrics": {
+      "always_top1": {
+        "days": 74,
+        "trade_days": 74,
+        "two_position_days": 0,
+        "selected_positions": 74,
+        "hits": 39,
+        "position_precision": 0.527027027027027,
+        "day_any_hit_rate": 0.527027027027027,
+        "average_positions_per_trading_day": 1.0
+      },
+      "always_top1_top2": {
+        "days": 74,
+        "trade_days": 74,
+        "two_position_days": 74,
+        "selected_positions": 148,
+        "hits": 57,
+        "position_precision": 0.38513513513513514,
+        "day_any_hit_rate": 0.6351351351351351,
+        "average_positions_per_trading_day": 2.0
+      },
+      "top1_gate_0.40_then_top2_gate_0.40": {
+        "days": 74,
+        "trade_days": 74,
+        "two_position_days": 30,
+        "selected_positions": 104,
+        "hits": 49,
+        "position_precision": 0.47115384615384615,
+        "day_any_hit_rate": 0.5540540540540541,
+        "average_positions_per_trading_day": 1.4054054054054055
+      },
+      "top1_only_when_score1_ge_0.40": {
+        "days": 74,
+        "trade_days": 52,
+        "two_position_days": 0,
+        "selected_positions": 52,
+        "hits": 33,
+        "position_precision": 0.6346153846153846,
+        "day_any_hit_rate": 0.44594594594594594,
+        "average_positions_per_trading_day": 0.7027027027027027
+      }
+    }
+  },
+  "strict_oos_period": {
+    "start": "2026-07-09",
+    "days": 51,
+    "metrics": {
+      "always_top1": {
+        "days": 51,
+        "trade_days": 51,
+        "two_position_days": 0,
+        "selected_positions": 51,
+        "hits": 21,
+        "position_precision": 0.4117647058823529,
+        "day_any_hit_rate": 0.4117647058823529,
+        "average_positions_per_trading_day": 1.0
+      },
+      "always_top1_top2": {
+        "days": 51,
+        "trade_days": 51,
+        "two_position_days": 51,
+        "selected_positions": 102,
+        "hits": 34,
+        "position_precision": 0.3333333333333333,
+        "day_any_hit_rate": 0.5686274509803921,
+        "average_positions_per_trading_day": 2.0
+      },
+      "top1_gate_0.40_then_top2_gate_0.40": {
+        "days": 51,
+        "trade_days": 51,
+        "two_position_days": 15,
+        "selected_positions": 66,
+        "hits": 28,
+        "position_precision": 0.42424242424242425,
+        "day_any_hit_rate": 0.49019607843137253,
+        "average_positions_per_trading_day": 1.2941176470588236
+      },
+      "top1_only_when_score1_ge_0.40": {
+        "days": 51,
+        "trade_days": 34,
+        "two_position_days": 0,
+        "selected_positions": 34,
+        "hits": 17,
+        "position_precision": 0.5,
+        "day_any_hit_rate": 0.3333333333333333,
+        "average_positions_per_trading_day": 0.6666666666666666
+      }
+    }
+  },
+  "interpretation": {
+    "default_candidate": "Top1",
+    "secondary_candidate": "Top2 only when its V1 score >= 0.40",
+    "important": "The 0.40 gate is a research decision rule, not a calibrated probability threshold. Do not treat V1 scores as literal probabilities."
+  }
+}
