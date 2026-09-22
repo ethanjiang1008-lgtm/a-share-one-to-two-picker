@@ -44,7 +44,7 @@ def limit_up(bar,prev):
     pc=f(prev.get("close"))
     return pc>0 and f(bar.get("close"))/pc-1>=LIMIT_UP
 
-def make_features(bars,i,market,day,board_level):
+def make_features(bars,i,market,day,board_level,prev_day):
     if i<MIN_HISTORY or i<21 or i==0 or i>=len(bars):
         return None
     b,prev=bars[i],bars[i-1]
@@ -57,19 +57,15 @@ def make_features(bars,i,market,day,board_level):
     avg_amp20=statistics.fmean(amps) if amps else 1.0
     o,h,l,cl=f(b.get("open")),f(b.get("high")),f(b.get("low")),f(b.get("close"))
     pc=f(prev.get("close")); rng=max(h-l,1e-9); gap=pct(o,pc)
-    prev_day=day-datetime.timedelta(days=1)
-    # market passed in for exact previous actual trading day where available
-    cur=market.get(day,{"first":set(),"two":set(),"zt":set()})
-    pv=market.get(prev_day,{"first":set(),"two":set(),"zt":set()})
-    # For weekends/holidays, the caller remaps day keys; this fallback only affects sparse axes.
-    prev_first = len(pv["first"])
-    prev_two = len(pv["two"])
-    prev_rate = (len(pv["first"] & cur["two"])/prev_first) if prev_first else 0.16185320352130533
-    cur_max=max((max(len(s["first"]),0) for s in market.values()),default=0)
-    highest=max([len(cur["two"])] + [0])
-    highest_level=max((s.get("max_board",0) for s in market.values() if s),default=board_level)
-    levels=sorted((s.get("max_board",0) for s in market.values() if s), reverse=True)
-    second_level=levels[1] if len(levels)>1 else highest_level
+    # market contains only current/previous actual trading days supplied by the caller.
+    cur=market.get(day,{"first":set(),"two":set(),"zt":set(),"levels":{},"max_board":board_level})
+    pv=market.get(prev_day,{"first":set(),"two":set(),"zt":set(),"levels":{},"max_board":0})
+    prev_first=len(pv["first"])
+    prev_two=len(pv["two"])
+    prev_rate=(len(pv["first"] & cur["two"])/prev_first) if prev_first else 0.16185320352130533
+    today_levels=sorted(set(cur.get("levels",{}).values()), reverse=True)
+    highest_level=cur.get("max_board", board_level) or board_level
+    second_level=today_levels[1] if len(today_levels)>1 else -1
     return {
       "ret_1d":pct(cl,c[-2]),"ret_3d":pct(cl,c[-4]),"ret_5d":pct(cl,c[-6]),
       "ret_10d":pct(cl,c[-11]),"ret_20d":pct(cl,c[-21]),
@@ -182,7 +178,8 @@ def main():
             if j!=i+1: continue
             lv=board_level_for_day(bars,i)
             if lv not in LEVELS: continue
-            feat=make_features(bars,i,market,d,lv)
+            prev_day = dates[date_pos[d]-1] if date_pos[d] > 0 else None
+            feat=make_features(bars,i,market,d,lv,prev_day)
             if feat is None: continue
             y=int(board_level_for_day(bars,j)>=lv+1)
             s={"date":d.isoformat(),"prediction_date":next_date.isoformat(),"code":code,"name":name,"level":lv,"y":y,"features":feat}
