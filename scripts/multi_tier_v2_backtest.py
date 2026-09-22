@@ -345,6 +345,80 @@ def _daily_metrics(rows):
         }
     return result
 
+def _segment_metrics(rows, key_name, key_func, min_n=10):
+    groups=defaultdict(list)
+    for row in rows:
+        key=key_func(row)
+        if key is not None:
+            groups[str(key)].append(row)
+    out={}
+    for key,items in sorted(groups.items()):
+        if len(items)<min_n:
+            continue
+        m=_daily_metrics(items)
+        out[key]={
+            "n":len(items),
+            "days":len({x["date"] for x in items}),
+            "top1":m["top1"]["precision"],
+            "top2":m["top2"]["precision"],
+            "auc":_auc(items),
+        }
+    return out
+
+def _add_oos_diagnostics(metrics, scored, train_samples):
+    # Diagnostics only; they do not affect model fitting or hyperparameter selection.
+    monthly=_segment_metrics(
+        scored,"month",
+        lambda r:r["date"][:7],
+        min_n=20
+    )
+
+    # Use training-set medians for fixed, non-leaking regime bands.
+    train_zt=sorted(float(s["features"].get("market_zt_count",0)) for s in train_samples)
+    train_two=sorted(float(s["features"].get("market_2plus_count",0)) for s in train_samples)
+    train_relay=sorted(float(s["features"].get("prev_market_level_continuation_rate",BASELINE_CONTINUATION)) for s in train_samples)
+
+    def q(arr, frac):
+        if not arr:
+            return 0.0
+        pos=(len(arr)-1)*frac
+        lo=int(pos); hi=min(lo+1,len(arr)-1); w=pos-lo
+        return arr[lo]*(1-w)+arr[hi]*w
+
+    zt_q1,zt_q2=q(train_zt,1/3),q(train_zt,2/3)
+    two_q1,two_q2=q(train_two,1/3),q(train_two,2/3)
+    relay_q1,relay_q2=q(train_relay,1/3),q(train_relay,2/3)
+
+    def band(v,q1,q2):
+        if v<q1: return "low"
+        if v<q2: return "mid"
+        return "high"
+
+    diagnostics={
+        "monthly":monthly,
+        "market_zt_band":_segment_metrics(
+            scored,"market_zt_band",
+            lambda r:band(float(r.get("market_zt_count",0)) if "market_zt_count" in r else 0.0,zt_q1,zt_q2),
+            min_n=20
+        ),
+        "market_2plus_band":_segment_metrics(
+            scored,"market_2plus_band",
+            lambda r:band(float(r.get("market_2plus_count",0)) if "market_2plus_count" in r else 0.0,two_q1,two_q2),
+            min_n=20
+        ),
+        "prev_level_relay_band":_segment_metrics(
+            scored,"prev_level_relay_band",
+            lambda r:band(float(r.get("prev_market_level_continuation_rate",BASELINE_CONTINUATION)) if "prev_market_level_continuation_rate" in r else BASELINE_CONTINUATION,relay_q1,relay_q2),
+            min_n=20
+        ),
+        "train_band_thresholds":{
+            "market_zt_count":[zt_q1,zt_q2],
+            "market_2plus_count":[two_q1,two_q2],
+            "prev_market_level_continuation_rate":[relay_q1,relay_q2]
+        }
+    }
+    metrics["oos_diagnostics"]=diagnostics
+
 def _auc(rows):
     try:
         from sklearn.metrics import roc_auc_score
@@ -452,6 +526,8 @@ def fit_one_level(samples,level):
     }
     metrics.update(_daily_metrics(scored))
     metrics["oos_auc"]=_auc(scored)
+
+    _add_oos_diagnostics(metrics, scored, train)
 
     # Serialize the final standardized linear model so V2 remains directly deployable.
     model_json={
