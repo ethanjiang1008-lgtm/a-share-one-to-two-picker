@@ -541,7 +541,10 @@ def _rolling_oos_score(samples,level):
     for month in months:
         month_start=f"{month}-01"
         month_oos=[s for s in oos if s["date"][:7]==month]
-        train=[s for s in samples if s["date"]<month_start]
+        if month == OOS_START.isoformat()[:7]:
+            train=[s for s in samples if s["date"]<=TRAIN_END.isoformat()]
+        else:
+            train=[s for s in samples if s["date"]<month_start]
         if len(train)<50 or len({s["y"] for s in train})<2:
             continue
         model_json,params=_fit_serialized_model(train,level)
