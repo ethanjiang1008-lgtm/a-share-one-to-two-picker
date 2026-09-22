@@ -87,3 +87,7 @@ footer { display:flex; justify-content:space-between; gap:16px; margin-top:22px;
 
 .excel-link { display:inline-block; margin-top:8px; color:var(--text); text-decoration:none; font-size:12px; border:1px solid var(--line); background:rgba(23,34,56,.75); padding:8px 10px; border-radius:9px; }
 .excel-link:hover { text-decoration:underline; }
+.v2-row{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid #e6e9ee}
+.v2-row:last-child{border-bottom:0}
+.v2-row .code{margin-left:6px}
+.v2-row strong:last-child{white-space:nowrap}
