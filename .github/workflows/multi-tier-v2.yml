@@ -7,6 +7,8 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 concurrency:
   group: multi-tier-v2
@@ -34,3 +36,12 @@ jobs:
           git add -f config/models_v2.json reports/multi_tier_v2_backtest.json reports/multi_tier_v2_samples.csv docs/data/multi_tier_latest.json
           git diff --cached --quiet || git commit -m "data: V2 multi-tier continuation models"
           git push
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: "./docs"
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
