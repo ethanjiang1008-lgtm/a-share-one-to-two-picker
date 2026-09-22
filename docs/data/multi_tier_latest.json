@@ -1,0 +1,260 @@
+{
+  "status": "ok",
+  "analysis_date": "2026-09-22",
+  "prediction_date": "2026-09-23",
+  "model_version": "multi-tier-v2",
+  "universe": "沪深主板",
+  "market": {
+    "first_count": 36,
+    "two_plus_count": 23,
+    "zt_count": 59,
+    "max_board": 6
+  },
+  "levels": {
+    "1": [
+      {
+        "rank": 1,
+        "level": 1,
+        "code": "600770",
+        "name": "综艺股份",
+        "price": 6.63,
+        "score": 0.5215406976762607,
+        "prediction_date": "2026-09-23"
+      },
+      {
+        "rank": 2,
+        "level": 1,
+        "code": "002290",
+        "name": "禾盛新材",
+        "price": 77.85,
+        "score": 0.5185480554794681,
+        "prediction_date": "2026-09-23"
+      },
+      {
+        "rank": 3,
+        "level": 1,
+        "code": "600641",
+        "name": "先导基电",
+        "price": 43.74,
+        "score": 0.2754820624712206,
+        "prediction_date": "2026-09-23"
+      },
+      {
+        "rank": 4,
+        "level": 1,
+        "code": "000676",
+        "name": "智度股份",
+        "price": 7.45,
+        "score": 0.2077642311847816,
+        "prediction_date": "2026-09-23"
+      },
+      {
+        "rank": 5,
+        "level": 1,
+        "code": "605058",
+        "name": "澳弘电子",
+        "price": 53.27,
+        "score": 0.20689699592512725,
+        "prediction_date": "2026-09-23"
+      },
+      {
+        "rank": 6,
+        "level": 1,
+        "code": "605258",
+        "name": "协和电子",
+        "price": 42.16,
+        "score": 0.18617373738391946,
+        "prediction_date": "2026-09-23"
+      },
+      {
+        "rank": 7,
+        "level": 1,
+        "code": "603221",
+        "name": "爱丽家居",
+        "price": 33.55,
+        "score": 0.1471411652191559,
+        "prediction_date": "2026-09-23"
+      },
+      {
+        "rank": 8,
+        "level": 1,
+        "code": "002768",
+        "name": "国恩股份",
+        "price": 74.86,
+        "score": 0.1455166751803358,
+        "prediction_date": "2026-09-23"
+      },
+      {
+        "rank": 9,
+        "level": 1,
+        "code": "605218",
+        "name": "伟时电子",
+        "price": 15.94,
+        "score": 0.14533772913224596,
+        "prediction_date": "2026-09-23"
+      },
+      {
+        "rank": 10,
+        "level": 1,
+        "code": "603893",
+        "name": "瑞芯微",
+        "price": 217.8,
+        "score": 0.14384447992655114,
+        "prediction_date": "2026-09-23"
+      }
+    ],
+    "2": [
+      {
+        "rank": 1,
+        "level": 2,
+        "code": "600743",
+        "name": "华远控股",
+        "price": 2.56,
+        "score": 0.7005431400427634,
+        "prediction_date": "2026-09-23"
+      },
+      {
+        "rank": 2,
+        "level": 2,
+        "code": "600825",
+        "name": "新华传媒",
+        "price": 6.42,
+        "score": 0.6547280491897521,
+        "prediction_date": "2026-09-23"
+      },
+      {
+        "rank": 3,
+        "level": 2,
+        "code": "000607",
+        "name": "华媒控股",
+        "price": 4.98,
+        "score": 0.6369687616698043,
+        "prediction_date": "2026-09-23"
+      },
+      {
+        "rank": 4,
+        "level": 2,
+        "code": "002614",
+        "name": "奥佳华",
+        "price": 6.88,
+        "score": 0.6306905748675236,
+        "prediction_date": "2026-09-23"
+      },
+      {
+        "rank": 5,
+        "level": 2,
+        "code": "603636",
+        "name": "南威软件",
+        "price": 8.01,
+        "score": 0.5251647611889269,
+        "prediction_date": "2026-09-23"
+      },
+      {
+        "rank": 6,
+        "level": 2,
+        "code": "001234",
+        "name": "泰慕士",
+        "price": 29.25,
+        "score": 0.36173176121566114,
+        "prediction_date": "2026-09-23"
+      },
+      {
+        "rank": 7,
+        "level": 2,
+        "code": "600664",
+        "name": "哈药股份",
+        "price": 9.08,
+        "score": 0.3158525665628801,
+        "prediction_date": "2026-09-23"
+      },
+      {
+        "rank": 8,
+        "level": 2,
+        "code": "002303",
+        "name": "美盈森",
+        "price": 6.9,
+        "score": 0.27071887076975243,
+        "prediction_date": "2026-09-23"
+      },
+      {
+        "rank": 9,
+        "level": 2,
+        "code": "600503",
+        "name": "华丽家族",
+        "price": 2.67,
+        "score": 0.2585483874722489,
+        "prediction_date": "2026-09-23"
+      },
+      {
+        "rank": 10,
+        "level": 2,
+        "code": "002259",
+        "name": "升达林业",
+        "price": 4.97,
+        "score": 0.2583512659127206,
+        "prediction_date": "2026-09-23"
+      }
+    ],
+    "3": [
+      {
+        "rank": 1,
+        "level": 3,
+        "code": "601811",
+        "name": "新华文轩",
+        "price": 16.82,
+        "score": 0.7419546806050261,
+        "prediction_date": "2026-09-23"
+      },
+      {
+        "rank": 2,
+        "level": 3,
+        "code": "000910",
+        "name": "大亚圣象",
+        "price": 6.89,
+        "score": 0.5153313572488538,
+        "prediction_date": "2026-09-23"
+      },
+      {
+        "rank": 3,
+        "level": 3,
+        "code": "001317",
+        "name": "三羊马",
+        "price": 65.96,
+        "score": 0.36731328305398253,
+        "prediction_date": "2026-09-23"
+      },
+      {
+        "rank": 4,
+        "level": 3,
+        "code": "603068",
+        "name": "博通集成",
+        "price": 48.17,
+        "score": 0.2831042071907071,
+        "prediction_date": "2026-09-23"
+      }
+    ],
+    "4": [
+      {
+        "rank": 1,
+        "level": 4,
+        "code": "000504",
+        "name": "南华生物",
+        "price": 12.11,
+        "score": 0.49397533055232007,
+        "prediction_date": "2026-09-23"
+      }
+    ],
+    "5": [
+      {
+        "rank": 1,
+        "level": 5,
+        "code": "603230",
+        "name": "内蒙新华",
+        "price": 16.31,
+        "score": 0.4472981881151062,
+        "prediction_date": "2026-09-23"
+      }
+    ],
+    "6": []
+  }
+}

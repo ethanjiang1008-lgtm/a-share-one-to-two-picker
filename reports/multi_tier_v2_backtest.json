@@ -1,0 +1,566 @@
+{
+  "train_end": "2026-07-08",
+  "oos_start": "2026-07-09",
+  "data_source": "Sina daily K-line",
+  "universe": "沪深主板 only; exclude ST/STAR/ChiNext/Beijing",
+  "failed_kline_fetches": 7,
+  "levels": {
+    "1": {
+      "sample_n": 9257,
+      "baseline": 0.1567462460840445,
+      "train_n": 6564,
+      "oos_n": 2693,
+      "oos_days": 53,
+      "oos_baseline": 0.16078722614184923,
+      "top1": {
+        "selected": 53,
+        "hits": 21,
+        "precision": 0.39622641509433965,
+        "day_hit_days": 21,
+        "day_hit_rate": 0.39622641509433965
+      },
+      "top2": {
+        "selected": 106,
+        "hits": 36,
+        "precision": 0.33962264150943394,
+        "day_hit_days": 30,
+        "day_hit_rate": 0.5660377358490566
+      },
+      "top3": {
+        "selected": 159,
+        "hits": 44,
+        "precision": 0.27672955974842767,
+        "day_hit_days": 33,
+        "day_hit_rate": 0.6226415094339622
+      },
+      "top4": {
+        "selected": 212,
+        "hits": 51,
+        "precision": 0.24056603773584906,
+        "day_hit_days": 36,
+        "day_hit_rate": 0.6792452830188679
+      },
+      "top5": {
+        "selected": 265,
+        "hits": 58,
+        "precision": 0.2188679245283019,
+        "day_hit_days": 39,
+        "day_hit_rate": 0.7358490566037735
+      },
+      "top6": {
+        "selected": 318,
+        "hits": 70,
+        "precision": 0.22012578616352202,
+        "day_hit_days": 44,
+        "day_hit_rate": 0.8301886792452831
+      },
+      "top10": {
+        "selected": 530,
+        "hits": 106,
+        "precision": 0.2,
+        "day_hit_days": 52,
+        "day_hit_rate": 0.9811320754716981
+      },
+      "oos_auc": 0.5396196529665434
+    },
+    "2": {
+      "sample_n": 1454,
+      "baseline": 0.2874828060522696,
+      "train_n": 1032,
+      "oos_n": 422,
+      "oos_days": 53,
+      "oos_baseline": 0.3127962085308057,
+      "top1": {
+        "selected": 53,
+        "hits": 28,
+        "precision": 0.5283018867924528,
+        "day_hit_days": 28,
+        "day_hit_rate": 0.5283018867924528
+      },
+      "top2": {
+        "selected": 106,
+        "hits": 45,
+        "precision": 0.42452830188679247,
+        "day_hit_days": 34,
+        "day_hit_rate": 0.6415094339622641
+      },
+      "top3": {
+        "selected": 158,
+        "hits": 61,
+        "precision": 0.3860759493670886,
+        "day_hit_days": 41,
+        "day_hit_rate": 0.7735849056603774
+      },
+      "top4": {
+        "selected": 206,
+        "hits": 77,
+        "precision": 0.3737864077669903,
+        "day_hit_days": 45,
+        "day_hit_rate": 0.8490566037735849
+      },
+      "top5": {
+        "selected": 249,
+        "hits": 89,
+        "precision": 0.357429718875502,
+        "day_hit_days": 45,
+        "day_hit_rate": 0.8490566037735849
+      },
+      "top6": {
+        "selected": 289,
+        "hits": 99,
+        "precision": 0.34256055363321797,
+        "day_hit_days": 47,
+        "day_hit_rate": 0.8867924528301887
+      },
+      "top10": {
+        "selected": 380,
+        "hits": 121,
+        "precision": 0.31842105263157894,
+        "day_hit_days": 48,
+        "day_hit_rate": 0.9056603773584906
+      },
+      "oos_auc": 0.6126698014629048
+    },
+    "3": {
+      "sample_n": 424,
+      "baseline": 0.4481132075471698,
+      "train_n": 294,
+      "oos_n": 130,
+      "oos_days": 48,
+      "oos_baseline": 0.45384615384615384,
+      "top1": {
+        "selected": 48,
+        "hits": 30,
+        "precision": 0.625,
+        "day_hit_days": 30,
+        "day_hit_rate": 0.625
+      },
+      "top2": {
+        "selected": 83,
+        "hits": 42,
+        "precision": 0.5060240963855421,
+        "day_hit_days": 37,
+        "day_hit_rate": 0.7708333333333334
+      },
+      "top3": {
+        "selected": 105,
+        "hits": 51,
+        "precision": 0.4857142857142857,
+        "day_hit_days": 37,
+        "day_hit_rate": 0.7708333333333334
+      },
+      "top4": {
+        "selected": 117,
+        "hits": 54,
+        "precision": 0.46153846153846156,
+        "day_hit_days": 38,
+        "day_hit_rate": 0.7916666666666666
+      },
+      "top5": {
+        "selected": 124,
+        "hits": 56,
+        "precision": 0.45161290322580644,
+        "day_hit_days": 38,
+        "day_hit_rate": 0.7916666666666666
+      },
+      "top6": {
+        "selected": 127,
+        "hits": 58,
+        "precision": 0.4566929133858268,
+        "day_hit_days": 38,
+        "day_hit_rate": 0.7916666666666666
+      },
+      "top10": {
+        "selected": 130,
+        "hits": 59,
+        "precision": 0.45384615384615384,
+        "day_hit_days": 38,
+        "day_hit_rate": 0.7916666666666666
+      },
+      "oos_auc": 0.6457388398185724
+    },
+    "4": {
+      "sample_n": 190,
+      "baseline": 0.4,
+      "train_n": 132,
+      "oos_n": 58,
+      "oos_days": 37,
+      "oos_baseline": 0.4482758620689655,
+      "top1": {
+        "selected": 37,
+        "hits": 20,
+        "precision": 0.5405405405405406,
+        "day_hit_days": 20,
+        "day_hit_rate": 0.5405405405405406
+      },
+      "top2": {
+        "selected": 49,
+        "hits": 25,
+        "precision": 0.5102040816326531,
+        "day_hit_days": 23,
+        "day_hit_rate": 0.6216216216216216
+      },
+      "top3": {
+        "selected": 54,
+        "hits": 25,
+        "precision": 0.46296296296296297,
+        "day_hit_days": 23,
+        "day_hit_rate": 0.6216216216216216
+      },
+      "top4": {
+        "selected": 56,
+        "hits": 25,
+        "precision": 0.44642857142857145,
+        "day_hit_days": 23,
+        "day_hit_rate": 0.6216216216216216
+      },
+      "top5": {
+        "selected": 58,
+        "hits": 26,
+        "precision": 0.4482758620689655,
+        "day_hit_days": 23,
+        "day_hit_rate": 0.6216216216216216
+      },
+      "top6": {
+        "selected": 58,
+        "hits": 26,
+        "precision": 0.4482758620689655,
+        "day_hit_days": 23,
+        "day_hit_rate": 0.6216216216216216
+      },
+      "top10": {
+        "selected": 58,
+        "hits": 26,
+        "precision": 0.4482758620689655,
+        "day_hit_days": 23,
+        "day_hit_rate": 0.6216216216216216
+      },
+      "oos_auc": 0.5588942307692308
+    },
+    "5": {
+      "sample_n": 76,
+      "baseline": 0.42105263157894735,
+      "train_n": 51,
+      "oos_n": 25,
+      "oos_days": 22,
+      "oos_baseline": 0.44,
+      "top1": {
+        "selected": 22,
+        "hits": 9,
+        "precision": 0.4090909090909091,
+        "day_hit_days": 9,
+        "day_hit_rate": 0.4090909090909091
+      },
+      "top2": {
+        "selected": 25,
+        "hits": 11,
+        "precision": 0.44,
+        "day_hit_days": 10,
+        "day_hit_rate": 0.45454545454545453
+      },
+      "top3": {
+        "selected": 25,
+        "hits": 11,
+        "precision": 0.44,
+        "day_hit_days": 10,
+        "day_hit_rate": 0.45454545454545453
+      },
+      "top4": {
+        "selected": 25,
+        "hits": 11,
+        "precision": 0.44,
+        "day_hit_days": 10,
+        "day_hit_rate": 0.45454545454545453
+      },
+      "top5": {
+        "selected": 25,
+        "hits": 11,
+        "precision": 0.44,
+        "day_hit_days": 10,
+        "day_hit_rate": 0.45454545454545453
+      },
+      "top6": {
+        "selected": 25,
+        "hits": 11,
+        "precision": 0.44,
+        "day_hit_days": 10,
+        "day_hit_rate": 0.45454545454545453
+      },
+      "top10": {
+        "selected": 25,
+        "hits": 11,
+        "precision": 0.44,
+        "day_hit_days": 10,
+        "day_hit_rate": 0.45454545454545453
+      },
+      "oos_auc": 0.5
+    },
+    "6": {
+      "sample_n": 31,
+      "baseline": 0.5483870967741935,
+      "train_n": 21,
+      "oos_n": 10,
+      "model_status": "insufficient_samples"
+    }
+  },
+  "today_prediction": {
+    "status": "ok",
+    "analysis_date": "2026-09-22",
+    "prediction_date": "2026-09-23",
+    "model_version": "multi-tier-v2",
+    "universe": "沪深主板",
+    "market": {
+      "first_count": 36,
+      "two_plus_count": 23,
+      "zt_count": 59,
+      "max_board": 6
+    },
+    "levels": {
+      "1": [
+        {
+          "rank": 1,
+          "level": 1,
+          "code": "600770",
+          "name": "综艺股份",
+          "price": 6.63,
+          "score": 0.5215406976762607,
+          "prediction_date": "2026-09-23"
+        },
+        {
+          "rank": 2,
+          "level": 1,
+          "code": "002290",
+          "name": "禾盛新材",
+          "price": 77.85,
+          "score": 0.5185480554794681,
+          "prediction_date": "2026-09-23"
+        },
+        {
+          "rank": 3,
+          "level": 1,
+          "code": "600641",
+          "name": "先导基电",
+          "price": 43.74,
+          "score": 0.2754820624712206,
+          "prediction_date": "2026-09-23"
+        },
+        {
+          "rank": 4,
+          "level": 1,
+          "code": "000676",
+          "name": "智度股份",
+          "price": 7.45,
+          "score": 0.2077642311847816,
+          "prediction_date": "2026-09-23"
+        },
+        {
+          "rank": 5,
+          "level": 1,
+          "code": "605058",
+          "name": "澳弘电子",
+          "price": 53.27,
+          "score": 0.20689699592512725,
+          "prediction_date": "2026-09-23"
+        },
+        {
+          "rank": 6,
+          "level": 1,
+          "code": "605258",
+          "name": "协和电子",
+          "price": 42.16,
+          "score": 0.18617373738391946,
+          "prediction_date": "2026-09-23"
+        },
+        {
+          "rank": 7,
+          "level": 1,
+          "code": "603221",
+          "name": "爱丽家居",
+          "price": 33.55,
+          "score": 0.1471411652191559,
+          "prediction_date": "2026-09-23"
+        },
+        {
+          "rank": 8,
+          "level": 1,
+          "code": "002768",
+          "name": "国恩股份",
+          "price": 74.86,
+          "score": 0.1455166751803358,
+          "prediction_date": "2026-09-23"
+        },
+        {
+          "rank": 9,
+          "level": 1,
+          "code": "605218",
+          "name": "伟时电子",
+          "price": 15.94,
+          "score": 0.14533772913224596,
+          "prediction_date": "2026-09-23"
+        },
+        {
+          "rank": 10,
+          "level": 1,
+          "code": "603893",
+          "name": "瑞芯微",
+          "price": 217.8,
+          "score": 0.14384447992655114,
+          "prediction_date": "2026-09-23"
+        }
+      ],
+      "2": [
+        {
+          "rank": 1,
+          "level": 2,
+          "code": "600743",
+          "name": "华远控股",
+          "price": 2.56,
+          "score": 0.7005431400427634,
+          "prediction_date": "2026-09-23"
+        },
+        {
+          "rank": 2,
+          "level": 2,
+          "code": "600825",
+          "name": "新华传媒",
+          "price": 6.42,
+          "score": 0.6547280491897521,
+          "prediction_date": "2026-09-23"
+        },
+        {
+          "rank": 3,
+          "level": 2,
+          "code": "000607",
+          "name": "华媒控股",
+          "price": 4.98,
+          "score": 0.6369687616698043,
+          "prediction_date": "2026-09-23"
+        },
+        {
+          "rank": 4,
+          "level": 2,
+          "code": "002614",
+          "name": "奥佳华",
+          "price": 6.88,
+          "score": 0.6306905748675236,
+          "prediction_date": "2026-09-23"
+        },
+        {
+          "rank": 5,
+          "level": 2,
+          "code": "603636",
+          "name": "南威软件",
+          "price": 8.01,
+          "score": 0.5251647611889269,
+          "prediction_date": "2026-09-23"
+        },
+        {
+          "rank": 6,
+          "level": 2,
+          "code": "001234",
+          "name": "泰慕士",
+          "price": 29.25,
+          "score": 0.36173176121566114,
+          "prediction_date": "2026-09-23"
+        },
+        {
+          "rank": 7,
+          "level": 2,
+          "code": "600664",
+          "name": "哈药股份",
+          "price": 9.08,
+          "score": 0.3158525665628801,
+          "prediction_date": "2026-09-23"
+        },
+        {
+          "rank": 8,
+          "level": 2,
+          "code": "002303",
+          "name": "美盈森",
+          "price": 6.9,
+          "score": 0.27071887076975243,
+          "prediction_date": "2026-09-23"
+        },
+        {
+          "rank": 9,
+          "level": 2,
+          "code": "600503",
+          "name": "华丽家族",
+          "price": 2.67,
+          "score": 0.2585483874722489,
+          "prediction_date": "2026-09-23"
+        },
+        {
+          "rank": 10,
+          "level": 2,
+          "code": "002259",
+          "name": "升达林业",
+          "price": 4.97,
+          "score": 0.2583512659127206,
+          "prediction_date": "2026-09-23"
+        }
+      ],
+      "3": [
+        {
+          "rank": 1,
+          "level": 3,
+          "code": "601811",
+          "name": "新华文轩",
+          "price": 16.82,
+          "score": 0.7419546806050261,
+          "prediction_date": "2026-09-23"
+        },
+        {
+          "rank": 2,
+          "level": 3,
+          "code": "000910",
+          "name": "大亚圣象",
+          "price": 6.89,
+          "score": 0.5153313572488538,
+          "prediction_date": "2026-09-23"
+        },
+        {
+          "rank": 3,
+          "level": 3,
+          "code": "001317",
+          "name": "三羊马",
+          "price": 65.96,
+          "score": 0.36731328305398253,
+          "prediction_date": "2026-09-23"
+        },
+        {
+          "rank": 4,
+          "level": 3,
+          "code": "603068",
+          "name": "博通集成",
+          "price": 48.17,
+          "score": 0.2831042071907071,
+          "prediction_date": "2026-09-23"
+        }
+      ],
+      "4": [
+        {
+          "rank": 1,
+          "level": 4,
+          "code": "000504",
+          "name": "南华生物",
+          "price": 12.11,
+          "score": 0.49397533055232007,
+          "prediction_date": "2026-09-23"
+        }
+      ],
+      "5": [
+        {
+          "rank": 1,
+          "level": 5,
+          "code": "603230",
+          "name": "内蒙新华",
+          "price": 16.31,
+          "score": 0.4472981881151062,
+          "prediction_date": "2026-09-23"
+        }
+      ],
+      "6": []
+    }
+  }
+}
