@@ -147,6 +147,51 @@ def fit_one_level(samples,level):
         model_json["features"].append({"name":name,"coef":std_coefs[j],"mean":means[j],"std":stds[j]})
     return model_json,metrics
 
+
+def build_today_prediction(stock_data, models, dates, market):
+    if not dates:
+        return None
+    analysis_date=max(dates)
+    pos=dates.index(analysis_date)
+    from trading_calendar import next_trading_day
+    pred_date=(dates[pos+1] if pos+1<len(dates) else next_trading_day(analysis_date)).isoformat()
+    today_by_code={}
+    for code,(name,idx,bars) in stock_data.items():
+        i=idx.get(analysis_date.isoformat())
+        if i is None or i==0 or i<MIN_HISTORY or not limit_up(bars[i],bars[i-1]):
+            continue
+        lv=min(board_level_for_day(bars,i),6)
+        today_by_code[code]=(name,bars,i,lv)
+    levels_map={c:lv for c,(_,_,_,lv) in today_by_code.items()}
+    cur={"first":{c for c,lv in levels_map.items() if lv==1},
+         "two":{c for c,lv in levels_map.items() if lv>=2},
+         "zt":set(levels_map),"levels":levels_map,"max_board":max(levels_map.values(),default=0)}
+    pv=market.get(dates[pos-1],{"first":set(),"two":set(),"zt":set(),"levels":{},"max_board":0}) if pos>0 else {"first":set(),"two":set(),"zt":set(),"levels":{},"max_board":0}
+    buckets={str(k):[] for k in LEVELS}
+    for code,(name,bars,i,lv) in today_by_code.items():
+        model=models.get(str(lv))
+        if not model:
+            continue
+        feat=make_features(bars,i,{analysis_date:cur,dates[pos-1] if pos>0 else None:pv},analysis_date,lv,dates[pos-1] if pos>0 else None)
+        if feat is None:
+            continue
+        z=float(model["intercept"])
+        for item in model["features"]:
+            z += float(item["coef"])*((f(feat.get(item["name"]))-f(item["mean"]))/(f(item["std"]) or 1e-9))
+        p=1/(1+math.exp(max(-35,min(35,-z))))
+        buckets[str(lv)].append({"rank":0,"level":lv,"code":code,"name":name,"price":f(bars[i].get("close")),"score":p,"prediction_date":pred_date})
+    for k in buckets:
+        buckets[k].sort(key=lambda x:(-x["score"],x["code"]))
+        for rank,row in enumerate(buckets[k][:10],1):
+            row["rank"]=rank
+        buckets[k]=buckets[k][:10]
+    return {"status":"ok","analysis_date":analysis_date.isoformat(),"prediction_date":pred_date,
+            "model_version":"multi-tier-v2","universe":"沪深主板","market":{
+              "first_count":len(cur["first"]),"two_plus_count":len(cur["two"]),
+              "zt_count":len(cur["zt"]),"max_board":cur["max_board"]},
+            "levels":buckets}
+
+
 def main():
     universe={str(x["code"]):str(x["name"]) for x in fetch_all_stocks() if is_main_board(str(x.get("code","")),str(x.get("name",""))) and x.get("code")}
     print(f"Current main-board universe: {len(universe)}")
@@ -200,6 +245,12 @@ def main():
         else:
             results["levels"][str(lv)]["model_status"]="insufficient_samples"
     MODEL_OUT.parent.mkdir(parents=True,exist_ok=True); MODEL_OUT.write_text(json.dumps(models,ensure_ascii=False,indent=2),encoding="utf-8")
+    today_prediction=build_today_prediction(stock_data,models,dates,market)
+    latest_path=ROOT/"docs"/"data"/"multi_tier_latest.json"
+    if today_prediction:
+        latest_path.parent.mkdir(parents=True,exist_ok=True)
+        latest_path.write_text(json.dumps(today_prediction,ensure_ascii=False,indent=2),encoding="utf-8")
+        results["today_prediction"]=today_prediction
     OUT_JSON.parent.mkdir(parents=True,exist_ok=True); OUT_JSON.write_text(json.dumps(results,ensure_ascii=False,indent=2),encoding="utf-8")
     with OUT_CSV.open("w",encoding="utf-8-sig",newline="") as fh:
         w=csv.writer(fh); w.writerow(["date","prediction_date","level","code","name","label_next_level"])
