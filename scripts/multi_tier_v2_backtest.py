@@ -64,6 +64,9 @@ FEATURE_GROUPS={
               "prev_market_first_count","prev_market_2plus_count",
               "prev_market_same_level_count","prev_market_higher_level_count",
               "prev_market_1to2_rate","prev_market_level_continuation_rate"],
+    "regime":["market_heat_ratio","market_first_ratio","market_2plus_ratio",
+              "market_zt_change","market_2plus_change","market_first_change",
+              "same_level_ratio","higher_level_ratio"],
     "board":["board_level","board_run_3d","board_run_5d",
              "is_highest_board","is_second_highest_board"],
     "opening":["open_gap_pct","open_gap_band_high","open_gap_band_mid",
@@ -73,14 +76,16 @@ FEATURE_GROUPS={
 }
 
 FEATURE_PROFILES={
-    1:[("core",),("core","momentum"),("core","limitup"),("core","candle"),
-       ("core","market"),("core","limitup","candle","market"),
-       ("core","momentum","limitup","candle","market","board")],
-    2:[("core",),("core","momentum"),("core","limitup"),("core","candle"),
-       ("core","market"),("core","limitup","candle","market"),
-       ("core","momentum","limitup","candle","market","board")],
-    3:[("core",),("core","momentum"),("core","limitup"),("core","candle"),
-       ("core","market"),("core","limitup","candle","market")],
+    1:[("core",),("core","limitup"),("core","regime"),
+       ("core","market"),("core","limitup","regime"),
+       ("core","market","regime"),("core","limitup","candle","market"),
+       ("core","limitup","market","regime")],
+    2:[("core",),("core","regime"),("core","market"),
+       ("core","limitup","regime"),("core","market","regime"),
+       ("core","limitup","candle","market","regime")],
+    3:[("core",),("core","candle"),("core","regime"),
+       ("core","market"),("core","candle","regime"),
+       ("core","limitup","candle","market","regime")],
     4:[("core","candle","market","board")],
     5:[("core","candle","market","board")]
 }
@@ -200,6 +205,19 @@ def make_features(bars,i,market,day,board_level,prev_day):
     prev_higher_level=sum(1 for lv in pv.get("levels",{}).values() if lv>board_level)
     same_level_rate=market_transition_rate(pv,cur,board_level)
 
+    cur_first=len(cur.get("first",set()))
+    cur_two=len(cur.get("two",set()))
+    cur_zt=len(cur.get("zt",set()))
+    prev_zt=len(pv.get("zt",set()))
+    heat_ratio=cur_two/cur_zt if cur_zt else 0.0
+    first_ratio=cur_first/cur_zt if cur_zt else 0.0
+    two_ratio=cur_two/cur_zt if cur_zt else 0.0
+    zt_change=cur_zt-prev_zt
+    two_change=cur_two-prev_two
+    first_change=cur_first-prev_first
+    same_ratio=same_level/cur_zt if cur_zt else 0.0
+    higher_ratio=higher_level/cur_zt if cur_zt else 0.0
+
     today_levels=sorted(set(cur.get("levels",{}).values()), reverse=True)
     highest_level=cur.get("max_board",board_level) or board_level
     second_level=today_levels[1] if len(today_levels)>1 else -1
@@ -237,6 +255,14 @@ def make_features(bars,i,market,day,board_level,prev_day):
       "market_first_count":len(cur.get("first",set())),
       "market_2plus_count":len(cur.get("two",set())),
       "market_zt_count":len(cur.get("zt",set())),
+      "market_heat_ratio":heat_ratio,
+      "market_first_ratio":first_ratio,
+      "market_2plus_ratio":two_ratio,
+      "market_zt_change":zt_change,
+      "market_2plus_change":two_change,
+      "market_first_change":first_change,
+      "same_level_ratio":same_ratio,
+      "higher_level_ratio":higher_ratio,
       "market_same_level_count":same_level,
       "market_higher_level_count":higher_level,
       "prev_market_first_count":prev_first,
