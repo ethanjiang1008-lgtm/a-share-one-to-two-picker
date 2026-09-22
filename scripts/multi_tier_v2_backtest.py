@@ -500,47 +500,20 @@ def choose_hyperparams(train_samples,level):
         "validation_auc":key[2]
     }
 
-def fit_one_level(samples,level):
-    train=[s for s in samples if s["date"]<=TRAIN_END.isoformat()]
-    oos=[s for s in samples if s["date"]>=OOS_START.isoformat()]
-    if len(train)<50 or len({s["y"] for s in train})<2:
-        return None
-
-    params=choose_hyperparams(train,level)
+def _fit_serialized_model(train_samples, level):
+    params=choose_hyperparams(train_samples,level)
     feature_names=params["features"]
     model,means,stds=_fit_raw(
-        train,float(params["C"]),params["class_weight"],feature_names
+        train_samples,float(params["C"]),params["class_weight"],feature_names
     )
-    scored=[{
-        "date":s["date"],"code":s["code"],"y":s["y"],
-        "score":_score_model(model,means,stds,s,feature_names),
-        "market_zt_count":s["features"].get("market_zt_count",0),
-        "market_2plus_count":s["features"].get("market_2plus_count",0),
-        "prev_market_level_continuation_rate":s["features"].get("prev_market_level_continuation_rate",BASELINE_CONTINUATION)
-    } for s in oos]
-
-    baseline=(sum(s["y"] for s in oos)/len(oos)) if oos else None
-    metrics={
-        "train_n":len(train),
-        "oos_n":len(oos),
-        "oos_days":len({s["date"] for s in oos}),
-        "oos_baseline":baseline,
-        "selected_hyperparameters":params
-    }
-    metrics.update(_daily_metrics(scored))
-    metrics["oos_auc"]=_auc(scored)
-
-    _add_oos_diagnostics(metrics, scored, train)
-
-    # Serialize the final standardized linear model so V2 remains directly deployable.
     model_json={
         "version":f"multi-tier-v2-{level}to{level+1}",
         "level":level,
-        "trained_through":TRAIN_END.isoformat(),
+        "trained_through":max(s["date"] for s in train_samples),
         "features":[],
         "feature_groups":params["feature_groups"],
         "intercept":float(model.intercept_[0]),
-        "train_n":len(train),
+        "train_n":len(train_samples),
         "C":float(params["C"]),
         "class_weight":params["class_weight"],
         "hyperparameter_tuned":bool(params.get("tuned",False))
@@ -552,7 +525,140 @@ def fit_one_level(samples,level):
             "mean":means[j],
             "std":stds[j]
         })
-    return model_json,metrics
+    return model_json,params
+
+def _rolling_oos_score(samples,level):
+    oos=[s for s in samples if s["date"]>=OOS_START.isoformat()]
+    if not oos:
+        return [],[]
+
+    # Monthly expanding-window retraining. Each month's OOS scores only use
+    # samples available before that month starts, preventing look-ahead bias.
+    months=sorted({s["date"][:7] for s in oos})
+    scored=[]
+    model_history=[]
+
+    for month in months:
+        month_start=f"{month}-01"
+        month_oos=[s for s in oos if s["date"][:7]==month]
+        train=[s for s in samples if s["date"]<month_start]
+        if len(train)<50 or len({s["y"] for s in train})<2:
+            continue
+        model_json,params=_fit_serialized_model(train,level)
+        # Score using the exact serialized representation that would be deployed.
+        for s in month_oos:
+            scored.append({
+                "date":s["date"],
+                "code":s["code"],
+                "y":s["y"],
+                "score":_score_serialized(model_json,s),
+                "market_zt_count":s["features"].get("market_zt_count",0),
+                "market_2plus_count":s["features"].get("market_2plus_count",0),
+                "prev_market_level_continuation_rate":s["features"].get(
+                    "prev_market_level_continuation_rate",BASELINE_CONTINUATION
+                )
+            })
+        model_history.append({
+            "month":month,
+            "train_n":len(train),
+            "feature_groups":params["feature_groups"],
+            "features":params["features"],
+            "C":params["C"],
+            "class_weight":params["class_weight"],
+            "validation_top1":params.get("validation_top1"),
+            "validation_top2":params.get("validation_top2"),
+            "validation_auc":params.get("validation_auc")
+        })
+    return scored,model_history
+
+def fit_one_level(samples,level):
+    initial_train=[s for s in samples if s["date"]<=TRAIN_END.isoformat()]
+    oos=[s for s in samples if s["date"]>=OOS_START.isoformat()]
+    if len(initial_train)<50 or len({s["y"] for s in initial_train})<2:
+        return None
+
+    rolling_enabled=level in TUNE_LEVELS
+    if rolling_enabled:
+        scored,model_history=_rolling_oos_score(samples,level)
+        # Fallback to the original single model if any monthly period could not
+        # be trained, preserving robustness for sparse data.
+        if len(scored)<len(oos):
+            scored=[]
+            model_history=[]
+            model_json_initial,params_initial=_fit_serialized_model(
+                initial_train,level
+            )
+            for s in oos:
+                scored.append({
+                    "date":s["date"],
+                    "code":s["code"],
+                    "y":s["y"],
+                    "score":_score_serialized(model_json_initial,s),
+                    "market_zt_count":s["features"].get("market_zt_count",0),
+                    "market_2plus_count":s["features"].get("market_2plus_count",0),
+                    "prev_market_level_continuation_rate":s["features"].get(
+                        "prev_market_level_continuation_rate",BASELINE_CONTINUATION
+                    )
+                })
+            model_history=[{
+                "month":"initial_fixed_fallback",
+                "train_n":len(initial_train),
+                "feature_groups":params_initial["feature_groups"],
+                "features":params_initial["features"],
+                "C":params_initial["C"],
+                "class_weight":params_initial["class_weight"],
+                "validation_top1":params_initial.get("validation_top1"),
+                "validation_top2":params_initial.get("validation_top2"),
+                "validation_auc":params_initial.get("validation_auc")
+            }]
+    else:
+        model_json_initial,params_initial=_fit_serialized_model(initial_train,level)
+        model_history=[{
+            "month":"initial_fixed",
+            "train_n":len(initial_train),
+            "feature_groups":params_initial["feature_groups"],
+            "features":params_initial["features"],
+            "C":params_initial["C"],
+            "class_weight":params_initial["class_weight"],
+            "validation_top1":params_initial.get("validation_top1"),
+            "validation_top2":params_initial.get("validation_top2"),
+            "validation_auc":params_initial.get("validation_auc")
+        }]
+        scored=[{
+            "date":s["date"],
+            "code":s["code"],
+            "y":s["y"],
+            "score":_score_serialized(model_json_initial,s),
+            "market_zt_count":s["features"].get("market_zt_count",0),
+            "market_2plus_count":s["features"].get("market_2plus_count",0),
+            "prev_market_level_continuation_rate":s["features"].get(
+                "prev_market_level_continuation_rate",BASELINE_CONTINUATION
+            )
+        } for s in oos]
+
+    baseline=(sum(s["y"] for s in oos)/len(oos)) if oos else None
+    metrics={
+        "train_n":len(initial_train),
+        "oos_n":len(oos),
+        "oos_scored_n":len(scored),
+        "oos_days":len({s["date"] for s in oos}),
+        "oos_baseline":baseline,
+        "rolling_retrain":rolling_enabled,
+        "retrain_history":model_history
+    }
+    if model_history:
+        metrics["selected_hyperparameters"]=model_history[-1]
+    metrics.update(_daily_metrics(scored))
+    metrics["oos_auc"]=_auc(scored)
+    _add_oos_diagnostics(metrics,scored,initial_train)
+
+    # Final deployable model is always retrained on the latest available
+    # labeled sample, so the live prediction is not frozen at 2026-07-08.
+    final_train=[s for s in samples if s["date"]<=max(s["date"] for s in samples)]
+    final_model,final_params=_fit_serialized_model(final_train,level)
+    final_model["rolling_retrain"]=rolling_enabled
+    final_model["retrain_history"]=model_history
+    return final_model,metrics
 
 def build_today_prediction(stock_data, models, dates, market):
     if not dates:
