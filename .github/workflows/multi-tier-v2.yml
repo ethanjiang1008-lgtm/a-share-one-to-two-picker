@@ -1,0 +1,38 @@
+name: V2 多级连板晋级预测
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "20 7 * * 1-5"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: multi-tier-v2
+  cancel-in-progress: true
+
+jobs:
+  model_and_scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install scikit-learn
+        run: python -m pip install -U scikit-learn
+      - name: Build V2 models and historical backtest
+        run: python scripts/multi_tier_v2_backtest.py
+      - name: Run V2 daily multi-tier scan
+        run: python scripts/multi_tier_scan.py
+      - name: Commit V2 model, backtest and web data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f config/models_v2.json reports/multi_tier_v2_backtest.json reports/multi_tier_v2_samples.csv docs/data/multi_tier_latest.json
+          git diff --cached --quiet || git commit -m "data: V2 multi-tier continuation models"
+          git push
