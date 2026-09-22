@@ -128,7 +128,7 @@ def make_features(bars,i,market,day,board_level,prev_day):
     prev_amp=prev_candle["amplitude_1d"]
     prev_vol=f(prev_bar.get("volume"))
     prior_v20=statistics.fmean(v[-21:-1]) if len(v)>=21 else v20
-    prior_volume_vs_20=prev_vol/prior_v20 if prior_v20 else 1.0
+    prior_volume_vs_20d=prev_vol/prior_v20 if prior_v20 else 1.0
 
     recent_limit_5=sum(
         1 for z in range(max(1,i-4),i)
