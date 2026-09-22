@@ -46,7 +46,7 @@ FEATURES=[
 
 BASELINE_CONTINUATION=0.16185320352130533
 TUNE_LEVELS={1,2,3}
-TUNE_C=[0.05,0.1,0.3,1.0,3.0,10.0]
+TUNE_C=[0.1,1.0,10.0]
 TUNE_CLASS_WEIGHTS=(None,"balanced")
 
 FEATURE_GROUPS={
@@ -74,18 +74,13 @@ FEATURE_GROUPS={
 
 FEATURE_PROFILES={
     1:[("core",),("core","momentum"),("core","limitup"),("core","candle"),
-       ("core","market"),("core","board"),("core","limitup","candle"),
-       ("core","limitup","market","board"),
-       ("core","momentum","limitup","candle","market","board"),
-       ("core","momentum","limitup","candle","market","board","opening"),
-       ("core","momentum","limitup","candle","market","board","opening","risk")],
-    2:[("core",),("core","momentum"),("core","limitup"),("core","candle"),
-       ("core","market"),("core","board"),("core","limitup","candle","market"),
-       ("core","momentum","limitup","candle","market","board"),
-       ("core","momentum","limitup","candle","market","board","opening")],
-    3:[("core",),("core","momentum"),("core","limitup"),("core","candle"),
-       ("core","market"),("core","board"),("core","limitup","candle","market"),
+       ("core","market"),("core","limitup","candle","market"),
        ("core","momentum","limitup","candle","market","board")],
+    2:[("core",),("core","momentum"),("core","limitup"),("core","candle"),
+       ("core","market"),("core","limitup","candle","market"),
+       ("core","momentum","limitup","candle","market","board")],
+    3:[("core",),("core","momentum"),("core","limitup"),("core","candle"),
+       ("core","market"),("core","limitup","candle","market")],
     4:[("core","candle","market","board")],
     5:[("core","candle","market","board")]
 }
