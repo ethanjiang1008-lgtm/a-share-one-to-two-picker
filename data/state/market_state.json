@@ -44,12 +44,12 @@
     "market_first_count": 36,
     "market_2plus_count": 23,
     "market_zt_count": 59,
-    "prev_market_first_count": 73.0,
-    "prev_market_2plus_count": 21.0,
+    "prev_market_first_count": 36.0,
+    "prev_market_2plus_count": 23.0,
     "prev_market_1to2_rate": 0.2191780821917808,
-    "context_source": "previous_trading_day_state"
+    "context_source": "same_date_previous_context"
   },
-  "context_source": "previous_trading_day_state",
+  "context_source": "same_date_previous_context",
   "last_run_mode": "daily_close",
-  "last_information_cutoff": "2026-09-22T15:46:14.157526+08:00"
+  "last_information_cutoff": "2026-09-22T20:32:50.313011+08:00"
 }
