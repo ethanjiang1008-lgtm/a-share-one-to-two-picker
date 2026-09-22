@@ -2,6 +2,11 @@ name: V2 多级连板晋级预测
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - "scripts/multi_tier_v2_backtest.py"
+      - "scripts/multi_tier_scan.py"
+      - ".github/workflows/multi-tier-v2.yml"
   schedule:
     - cron: "20 7 * * 1-5"
 
