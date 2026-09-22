@@ -1,3 +1,30 @@
+async function renderMultiTier() {
+  const root = document.getElementById("multiTierList");
+  const meta = document.getElementById("multiTierMeta");
+  try {
+    const res = await fetch("./data/multi_tier_latest.json?t=" + Date.now(), { cache: "no-store" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    const labels = {"1":"一进二","2":"二进三","3":"三进四","4":"四进五","5":"五进六","6":"六进七+"};
+    meta.innerHTML = [
+      ["分析日期", data.analysis_date || "—"],
+      ["预测日期", data.prediction_date || "—"],
+      ["今日涨停", data.market?.zt_count ?? "—"],
+      ["今日最高板", data.market?.max_board ? data.market.max_board + "板" : "—"]
+    ].map(([n,v]) => '<div class="market-item"><div class="name">'+esc(n)+'</div><div class="value">'+esc(v)+'</div></div>').join("");
+    root.innerHTML = Object.keys(labels).map(k => {
+      const rows = data.levels?.[k] || [];
+      return '<article class="card"><div class="section-head" style="margin:0 0 12px"><div><div class="eyebrow">LEVEL '+esc(k)+'</div><h3>'+labels[k]+'</h3></div><div class="hint">'+rows.length+' 个候选</div></div>'+
+        (rows.length ? rows.map((r,i) => '<div class="v2-row"><div><strong>TOP '+(i+1)+'</strong>　'+esc(r.name)+' <span class="code">'+esc(r.code)+'</span></div><strong>'+fmtPct(r.score)+'</strong></div>').join("") :
+        '<div class="block-text muted">当前没有可用的该级别模型或候选。</div>')+
+      '</article>';
+    }).join("");
+  } catch (e) {
+    meta.innerHTML = "";
+    root.innerHTML = '<article class="card"><div class="block-text muted">V2 尚未完成首次模型回测与部署。</div></article>';
+  }
+}
+
 const DATA_URL = "./data/latest.json";
 let state = { rows: [] };
 
@@ -125,6 +152,7 @@ async function boot() {
     renderTop(data.rows);
     renderTable(data.rows);
     renderMarket(data);
+    renderMultiTier();
     document.getElementById("searchBox").addEventListener("input", () => renderTable(state.rows));
   } catch (e) {
     document.getElementById("emptyState").classList.remove("hidden");
