@@ -513,7 +513,10 @@ def fit_one_level(samples,level):
     )
     scored=[{
         "date":s["date"],"code":s["code"],"y":s["y"],
-        "score":_score_model(model,means,stds,s,feature_names)
+        "score":_score_model(model,means,stds,s,feature_names),
+        "market_zt_count":s["features"].get("market_zt_count",0),
+        "market_2plus_count":s["features"].get("market_2plus_count",0),
+        "prev_market_level_continuation_rate":s["features"].get("prev_market_level_continuation_rate",BASELINE_CONTINUATION)
     } for s in oos]
 
     baseline=(sum(s["y"] for s in oos)/len(oos)) if oos else None
