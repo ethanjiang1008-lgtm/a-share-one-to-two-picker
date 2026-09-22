@@ -49,6 +49,55 @@ TUNE_LEVELS={1,2,3}
 TUNE_C=[0.05,0.1,0.3,1.0,3.0,10.0]
 TUNE_CLASS_WEIGHTS=(None,"balanced")
 
+FEATURE_GROUPS={
+    "core":["ret_1d","ret_3d","ret_5d","volume_5_vs_20","volume_vs_20d",
+            "close_above_ma20","ma5_gt_ma10","ma10_gt_ma20","amplitude_1d"],
+    "momentum":["ret_10d","ret_20d","ma20_slope_pct","near_high20_pct",
+                "near_high60_pct","near_high120_pct","above_low20_pct","up_days_5"],
+    "limitup":["limit_up_count_5","limit_up_count_10","days_since_prev_limit_up"],
+    "candle":["body_ratio","upper_wick_ratio","lower_wick_ratio",
+              "open_position_in_day","close_position_in_day","close_near_high",
+              "intraday_pullback_pct","prior_amplitude_pct","prior_volume_vs_20d",
+              "prior_close_near_high"],
+    "market":["market_first_count","market_2plus_count","market_zt_count",
+              "market_same_level_count","market_higher_level_count",
+              "prev_market_first_count","prev_market_2plus_count",
+              "prev_market_same_level_count","prev_market_higher_level_count",
+              "prev_market_1to2_rate","prev_market_level_continuation_rate"],
+    "board":["board_level","board_run_3d","board_run_5d",
+             "is_highest_board","is_second_highest_board"],
+    "opening":["open_gap_pct","open_gap_band_high","open_gap_band_mid",
+               "open_gap_band_low","open_to_close_pct","near_limit_open",
+               "prior_open_gap_pct"],
+    "risk":["volatility_10d","amplitude_vs_20d","volume_vs_prev"]
+}
+
+FEATURE_PROFILES={
+    1:[("core",),("core","momentum"),("core","limitup"),("core","candle"),
+       ("core","market"),("core","board"),("core","limitup","candle"),
+       ("core","limitup","market","board"),
+       ("core","momentum","limitup","candle","market","board"),
+       ("core","momentum","limitup","candle","market","board","opening"),
+       ("core","momentum","limitup","candle","market","board","opening","risk")],
+    2:[("core",),("core","momentum"),("core","limitup"),("core","candle"),
+       ("core","market"),("core","board"),("core","limitup","candle","market"),
+       ("core","momentum","limitup","candle","market","board"),
+       ("core","momentum","limitup","candle","market","board","opening")],
+    3:[("core",),("core","momentum"),("core","limitup"),("core","candle"),
+       ("core","market"),("core","board"),("core","limitup","candle","market"),
+       ("core","momentum","limitup","candle","market","board")],
+    4:[("core","candle","market","board")],
+    5:[("core","candle","market","board")]
+}
+
+def expand_groups(groups):
+    out=[]; seen=set()
+    for g in groups:
+        for name in FEATURE_GROUPS[g]:
+            if name not in seen:
+                seen.add(name); out.append(name)
+    return out
+
 def f(x,d=0.0):
     try:
         v=float(x); return v if math.isfinite(v) else d
@@ -241,18 +290,18 @@ def market_states(stock_data,dates):
         }
     return out
 
-def _standardize_fit(samples):
-    X=[[float(s["features"].get(name,0)) for name in FEATURES] for s in samples]
+def _standardize_fit(samples,feature_names):
+    X=[[float(s["features"].get(name,0)) for name in feature_names] for s in samples]
     means=[]; stds=[]
-    for j in range(len(FEATURES)):
+    for j in range(len(feature_names)):
         vals=[row[j] for row in X]
         means.append(statistics.fmean(vals))
         stds.append(statistics.pstdev(vals) or 1e-9)
-    Xs=[[(row[j]-means[j])/stds[j] for j in range(len(FEATURES))] for row in X]
+    Xs=[[(row[j]-means[j])/stds[j] for j in range(len(feature_names))] for row in X]
     return X,Xs,means,stds
 
-def _fit_raw(samples,C,class_weight):
-    X,Xs,means,stds=_standardize_fit(samples)
+def _fit_raw(samples,C,class_weight,feature_names):
+    _,Xs,means,stds=_standardize_fit(samples,feature_names)
     y=[s["y"] for s in samples]
     model=LogisticRegression(
         max_iter=3000,
@@ -263,11 +312,13 @@ def _fit_raw(samples,C,class_weight):
     model.fit(Xs,y)
     return model,means,stds
 
-def _score_model(model,means,stds,s):
+def _score_model(model,means,stds,s,feature_names):
     z=float(model.intercept_[0])
     vals=s["features"]
-    for j,name in enumerate(FEATURES):
-        z+=float(model.coef_[0][j])*((float(vals.get(name,0))-means[j])/stds[j])
+    for j,name in enumerate(feature_names):
+        z+=float(model.coef_[0][j])*(
+            (float(vals.get(name,0))-means[j])/stds[j]
+        )
     return 1/(1+math.exp(max(-35,min(35,-z))))
 
 def _score_serialized(model_json,s):
@@ -317,7 +368,12 @@ def _split_by_date(samples,train_ratio):
     return [s for s in samples if s["date"] in train_days],[s for s in samples if s["date"] not in train_days]
 
 def choose_hyperparams(train_samples,level):
-    default={"C":1.0,"class_weight":None,"tuned":False}
+    default_profile=FEATURE_PROFILES.get(level,[("core",)])[0]
+    default={
+        "C":1.0,"class_weight":None,"tuned":False,
+        "feature_groups":list(default_profile),
+        "features":expand_groups(default_profile)
+    }
     if level not in TUNE_LEVELS or len(train_samples)<250:
         return default
 
@@ -325,7 +381,6 @@ def choose_hyperparams(train_samples,level):
     if len(dates)<30:
         return default
 
-    # Expanding-window validation preserves time order.
     folds=[]
     for train_ratio in (0.60,0.72,0.84):
         tr,va=_split_by_date(train_samples,train_ratio)
@@ -335,39 +390,46 @@ def choose_hyperparams(train_samples,level):
         return default
 
     candidates=[]
-    for C in TUNE_C:
-        for class_weight in TUNE_CLASS_WEIGHTS:
-            fold_scores=[]
-            for tr,va in folds:
-                try:
-                    model,means,stds=_fit_raw(tr,C,class_weight)
-                except Exception:
+    for profile in FEATURE_PROFILES.get(level,[("core",)]):
+        feature_names=expand_groups(profile)
+        for C in TUNE_C:
+            for class_weight in TUNE_CLASS_WEIGHTS:
+                fold_scores=[]
+                for tr,va in folds:
+                    try:
+                        model,means,stds=_fit_raw(tr,C,class_weight,feature_names)
+                    except Exception:
+                        continue
+                    scored=[{
+                        "date":s["date"],"code":s["code"],"y":s["y"],
+                        "score":_score_model(model,means,stds,s,feature_names)
+                    } for s in va]
+                    m=_daily_metrics(scored)
+                    auc=_auc(scored)
+                    fold_scores.append((
+                        m["top1"]["precision"] or 0.0,
+                        m["top2"]["precision"] or 0.0,
+                        auc if auc is not None else 0.5
+                    ))
+                if len(fold_scores)!=len(folds):
                     continue
-                scored=[{"date":s["date"],"code":s["code"],"y":s["y"],
-                         "score":_score_model(model,means,stds,s)} for s in va]
-                m=_daily_metrics(scored)
-                auc=_auc(scored)
-                fold_scores.append((
-                    m["top1"]["precision"] if m["top1"]["precision"] is not None else 0.0,
-                    m["top2"]["precision"] if m["top2"]["precision"] is not None else 0.0,
-                    auc if auc is not None else 0.5
-                ))
-            if len(fold_scores)!=len(folds):
-                continue
-            avg1=sum(x[0] for x in fold_scores)/len(fold_scores)
-            avg2=sum(x[1] for x in fold_scores)/len(fold_scores)
-            avga=sum(x[2] for x in fold_scores)/len(fold_scores)
-            # Primary objective is daily Top1 ranking; Top2/AUC break ties.
-            key=(round(avg1,8),round(avg2,8),round(avga,8))
-            candidates.append((key,C,class_weight))
+                avg1=sum(x[0] for x in fold_scores)/len(fold_scores)
+                avg2=sum(x[1] for x in fold_scores)/len(fold_scores)
+                avga=sum(x[2] for x in fold_scores)/len(fold_scores)
+                key=(round(avg1,8),round(avg2,8),round(avga,8))
+                candidates.append((key,profile,C,class_weight))
     if not candidates:
         return default
     candidates.sort(key=lambda x:x[0],reverse=True)
-    _,C,class_weight=candidates[0]
-    return {"C":C,"class_weight":class_weight,"tuned":True,
-            "validation_top1":candidates[0][0][0],
-            "validation_top2":candidates[0][0][1],
-            "validation_auc":candidates[0][0][2]}
+    key,profile,C,class_weight=candidates[0]
+    return {
+        "C":C,"class_weight":class_weight,"tuned":True,
+        "feature_groups":list(profile),
+        "features":expand_groups(profile),
+        "validation_top1":key[0],
+        "validation_top2":key[1],
+        "validation_auc":key[2]
+    }
 
 def fit_one_level(samples,level):
     train=[s for s in samples if s["date"]<=TRAIN_END.isoformat()]
@@ -376,10 +438,13 @@ def fit_one_level(samples,level):
         return None
 
     params=choose_hyperparams(train,level)
-    model,means,stds=_fit_raw(train,float(params["C"]),params["class_weight"])
+    feature_names=params["features"]
+    model,means,stds=_fit_raw(
+        train,float(params["C"]),params["class_weight"],feature_names
+    )
     scored=[{
         "date":s["date"],"code":s["code"],"y":s["y"],
-        "score":_score_model(model,means,stds,s)
+        "score":_score_model(model,means,stds,s,feature_names)
     } for s in oos]
 
     baseline=(sum(s["y"] for s in oos)/len(oos)) if oos else None
@@ -399,13 +464,14 @@ def fit_one_level(samples,level):
         "level":level,
         "trained_through":TRAIN_END.isoformat(),
         "features":[],
+        "feature_groups":params["feature_groups"],
         "intercept":float(model.intercept_[0]),
         "train_n":len(train),
         "C":float(params["C"]),
         "class_weight":params["class_weight"],
         "hyperparameter_tuned":bool(params.get("tuned",False))
     }
-    for j,name in enumerate(FEATURES):
+    for j,name in enumerate(feature_names):
         model_json["features"].append({
             "name":name,
             "coef":float(model.coef_[0][j]),
