@@ -130,12 +130,22 @@ def fit_one_level(samples,level):
     def score(s):
         z=intercept+sum(std_coefs[j]*((float(s["features"].get(FEATURES[j],0))-means[j])/stds[j]) for j in range(len(FEATURES)))
         return 1/(1+math.exp(max(-35,min(35,-z))))
-    rows=sorted([(score(s),s["y"]) for s in oos],reverse=True)
+    scored=[{"date":s["date"],"code":s["code"],"y":s["y"],"score":score(s)} for s in oos]
     baseline=(sum(s["y"] for s in oos)/len(oos)) if oos else None
-    metrics={"train_n":len(train),"oos_n":len(oos),"oos_baseline":baseline}
+    by_day=defaultdict(list)
+    for row in scored:
+        by_day[row["date"]].append(row)
+    for d in by_day:
+        by_day[d].sort(key=lambda x:(-x["score"],x["code"]))
+    metrics={"train_n":len(train),"oos_n":len(oos),"oos_days":len(by_day),"oos_baseline":baseline}
     for k in (1,2,3,4,5,6,10):
-        sel=rows[:k]; metrics[f"top{k}"]={"selected":len(sel),"hits":sum(y for _,y in sel),"precision":(sum(y for _,y in sel)/len(sel) if sel else None)}
-    # Overall OOS ranking precision for all events, not a threshold classifier.
+        daily_selected=sum(min(k,len(rows)) for rows in by_day.values())
+        daily_hits=sum(sum(r["y"] for r in rows[:k]) for rows in by_day.values())
+        precision=daily_hits/daily_selected if daily_selected else None
+        day_hit_days=sum(any(r["y"] for r in rows[:k]) for rows in by_day.values())
+        metrics[f"top{k}"]={"selected":daily_selected,"hits":daily_hits,
+                            "precision":precision,"day_hit_days":day_hit_days,
+                            "day_hit_rate":day_hit_days/len(by_day) if by_day else None}
     metrics["oos_auc"] = None
     try:
         from sklearn.metrics import roc_auc_score
