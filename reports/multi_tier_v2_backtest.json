@@ -7,21 +7,71 @@
   "failed_kline_fetches": 7,
   "levels": {
     "1": {
-      "sample_n": 9257,
-      "baseline": 0.1567462460840445,
-      "train_n": 6564,
-      "oos_n": 2693,
-      "oos_scored_n": 2693,
-      "oos_days": 53,
-      "oos_baseline": 0.16078722614184923,
+      "sample_n": 9247,
+      "baseline": 0.1566994700984103,
+      "train_n": 6518,
+      "oos_n": 2729,
+      "oos_scored_n": 2729,
+      "oos_days": 54,
+      "oos_baseline": 0.15976548186148773,
       "rolling_retrain": true,
       "retrain_history": [
         {
           "month": "2026-07",
-          "train_n": 6564,
+          "train_n": 6518,
+          "feature_groups": [
+            "core"
+          ],
+          "features": [
+            "ret_1d",
+            "ret_3d",
+            "ret_5d",
+            "volume_5_vs_20",
+            "volume_vs_20d",
+            "close_above_ma20",
+            "ma5_gt_ma10",
+            "ma10_gt_ma20",
+            "amplitude_1d"
+          ],
+          "C": 1.0,
+          "class_weight": null,
+          "recency_half_life": 180.0,
+          "validation_top1": 0.50897868,
+          "validation_top2": 0.41093685,
+          "validation_auc": 0.57607745
+        },
+        {
+          "month": "2026-08",
+          "train_n": 7413,
+          "feature_groups": [
+            "core"
+          ],
+          "features": [
+            "ret_1d",
+            "ret_3d",
+            "ret_5d",
+            "volume_5_vs_20",
+            "volume_vs_20d",
+            "close_above_ma20",
+            "ma5_gt_ma10",
+            "ma10_gt_ma20",
+            "amplitude_1d"
+          ],
+          "C": 10.0,
+          "class_weight": null,
+          "recency_half_life": 180.0,
+          "validation_top1": 0.59850553,
+          "validation_top2": 0.40554581,
+          "validation_auc": 0.57954617
+        },
+        {
+          "month": "2026-09",
+          "train_n": 8539,
           "feature_groups": [
             "core",
-            "limitup"
+            "limitup",
+            "candle",
+            "market"
           ],
           "features": [
             "ret_1d",
@@ -35,32 +85,17 @@
             "amplitude_1d",
             "limit_up_count_5",
             "limit_up_count_10",
-            "days_since_prev_limit_up"
-          ],
-          "C": 0.1,
-          "class_weight": null,
-          "validation_top1": 0.52672928,
-          "validation_top2": 0.39757221,
-          "validation_auc": 0.57840533
-        },
-        {
-          "month": "2026-08",
-          "train_n": 7459,
-          "feature_groups": [
-            "core",
-            "market",
-            "regime"
-          ],
-          "features": [
-            "ret_1d",
-            "ret_3d",
-            "ret_5d",
-            "volume_5_vs_20",
-            "volume_vs_20d",
-            "close_above_ma20",
-            "ma5_gt_ma10",
-            "ma10_gt_ma20",
-            "amplitude_1d",
+            "days_since_prev_limit_up",
+            "body_ratio",
+            "upper_wick_ratio",
+            "lower_wick_ratio",
+            "open_position_in_day",
+            "close_position_in_day",
+            "close_near_high",
+            "intraday_pullback_pct",
+            "prior_amplitude_pct",
+            "prior_volume_vs_20d",
+            "prior_close_near_high",
             "market_first_count",
             "market_2plus_count",
             "market_zt_count",
@@ -71,61 +106,24 @@
             "prev_market_same_level_count",
             "prev_market_higher_level_count",
             "prev_market_1to2_rate",
-            "prev_market_level_continuation_rate",
-            "market_heat_ratio",
-            "market_first_ratio",
-            "market_2plus_ratio",
-            "market_zt_change",
-            "market_2plus_change",
-            "market_first_change",
-            "same_level_ratio",
-            "higher_level_ratio"
+            "prev_market_level_continuation_rate"
           ],
-          "C": 10.0,
+          "C": 0.1,
           "class_weight": null,
-          "validation_top1": 0.59850553,
-          "validation_top2": 0.42548736,
-          "validation_auc": 0.57546008
-        },
-        {
-          "month": "2026-09",
-          "train_n": 8585,
-          "feature_groups": [
-            "core",
-            "regime"
-          ],
-          "features": [
-            "ret_1d",
-            "ret_3d",
-            "ret_5d",
-            "volume_5_vs_20",
-            "volume_vs_20d",
-            "close_above_ma20",
-            "ma5_gt_ma10",
-            "ma10_gt_ma20",
-            "amplitude_1d",
-            "market_heat_ratio",
-            "market_first_ratio",
-            "market_2plus_ratio",
-            "market_zt_change",
-            "market_2plus_change",
-            "market_first_change",
-            "same_level_ratio",
-            "higher_level_ratio"
-          ],
-          "C": 10.0,
-          "class_weight": null,
-          "validation_top1": 0.45136054,
-          "validation_top2": 0.33146259,
-          "validation_auc": 0.54792425
+          "recency_half_life": 180.0,
+          "validation_top1": 0.46751454,
+          "validation_top2": 0.36978705,
+          "validation_auc": 0.54853951
         }
       ],
       "selected_hyperparameters": {
         "month": "2026-09",
-        "train_n": 8585,
+        "train_n": 8539,
         "feature_groups": [
           "core",
-          "regime"
+          "limitup",
+          "candle",
+          "market"
         ],
         "features": [
           "ret_1d",
@@ -137,93 +135,110 @@
           "ma5_gt_ma10",
           "ma10_gt_ma20",
           "amplitude_1d",
-          "market_heat_ratio",
-          "market_first_ratio",
-          "market_2plus_ratio",
-          "market_zt_change",
-          "market_2plus_change",
-          "market_first_change",
-          "same_level_ratio",
-          "higher_level_ratio"
+          "limit_up_count_5",
+          "limit_up_count_10",
+          "days_since_prev_limit_up",
+          "body_ratio",
+          "upper_wick_ratio",
+          "lower_wick_ratio",
+          "open_position_in_day",
+          "close_position_in_day",
+          "close_near_high",
+          "intraday_pullback_pct",
+          "prior_amplitude_pct",
+          "prior_volume_vs_20d",
+          "prior_close_near_high",
+          "market_first_count",
+          "market_2plus_count",
+          "market_zt_count",
+          "market_same_level_count",
+          "market_higher_level_count",
+          "prev_market_first_count",
+          "prev_market_2plus_count",
+          "prev_market_same_level_count",
+          "prev_market_higher_level_count",
+          "prev_market_1to2_rate",
+          "prev_market_level_continuation_rate"
         ],
-        "C": 10.0,
+        "C": 0.1,
         "class_weight": null,
-        "validation_top1": 0.45136054,
-        "validation_top2": 0.33146259,
-        "validation_auc": 0.54792425
+        "recency_half_life": 180.0,
+        "validation_top1": 0.46751454,
+        "validation_top2": 0.36978705,
+        "validation_auc": 0.54853951
       },
       "top1": {
-        "selected": 53,
-        "hits": 21,
-        "precision": 0.39622641509433965,
-        "day_hit_days": 21,
-        "day_hit_rate": 0.39622641509433965
+        "selected": 54,
+        "hits": 20,
+        "precision": 0.37037037037037035,
+        "day_hit_days": 20,
+        "day_hit_rate": 0.37037037037037035
       },
       "top2": {
-        "selected": 106,
-        "hits": 33,
-        "precision": 0.3113207547169811,
+        "selected": 108,
+        "hits": 34,
+        "precision": 0.3148148148148148,
         "day_hit_days": 27,
-        "day_hit_rate": 0.5094339622641509
+        "day_hit_rate": 0.5
       },
       "top3": {
-        "selected": 159,
+        "selected": 162,
         "hits": 50,
-        "precision": 0.31446540880503143,
-        "day_hit_days": 36,
-        "day_hit_rate": 0.6792452830188679
+        "precision": 0.30864197530864196,
+        "day_hit_days": 34,
+        "day_hit_rate": 0.6296296296296297
       },
       "top4": {
-        "selected": 212,
-        "hits": 61,
-        "precision": 0.28773584905660377,
-        "day_hit_days": 40,
-        "day_hit_rate": 0.7547169811320755
+        "selected": 216,
+        "hits": 64,
+        "precision": 0.2962962962962963,
+        "day_hit_days": 42,
+        "day_hit_rate": 0.7777777777777778
       },
       "top5": {
-        "selected": 265,
-        "hits": 67,
-        "precision": 0.2528301886792453,
-        "day_hit_days": 41,
-        "day_hit_rate": 0.7735849056603774
+        "selected": 270,
+        "hits": 72,
+        "precision": 0.26666666666666666,
+        "day_hit_days": 45,
+        "day_hit_rate": 0.8333333333333334
       },
       "top6": {
-        "selected": 318,
-        "hits": 78,
-        "precision": 0.24528301886792453,
-        "day_hit_days": 44,
-        "day_hit_rate": 0.8301886792452831
+        "selected": 324,
+        "hits": 81,
+        "precision": 0.25,
+        "day_hit_days": 48,
+        "day_hit_rate": 0.8888888888888888
       },
       "top10": {
-        "selected": 530,
-        "hits": 115,
-        "precision": 0.2169811320754717,
-        "day_hit_days": 49,
-        "day_hit_rate": 0.9245283018867925
+        "selected": 540,
+        "hits": 121,
+        "precision": 0.22407407407407406,
+        "day_hit_days": 53,
+        "day_hit_rate": 0.9814814814814815
       },
-      "oos_auc": 0.5433342189703447,
+      "oos_auc": 0.549923580742347,
       "oos_diagnostics": {
         "monthly": {
           "2026-07": {
             "n": 895,
             "days": 17,
             "top1": 0.5294117647058824,
-            "top2": 0.38235294117647056,
-            "auc": 0.5808242340286832
+            "top2": 0.4117647058823529,
+            "auc": 0.588738591916558
           },
           "2026-08": {
             "n": 1126,
             "days": 21,
             "top1": 0.3333333333333333,
             "top2": 0.2857142857142857,
-            "auc": 0.5276330528190252
+            "auc": 0.5259269896889451
           },
           "2026-09": {
-            "n": 672,
-            "days": 15,
-            "top1": 0.3333333333333333,
-            "top2": 0.26666666666666666,
-            "auc": 0.510582729468599
+            "n": 708,
+            "days": 16,
+            "top1": 0.25,
+            "top2": 0.25,
+            "auc": 0.5310402334792579
           }
         },
         "market_zt_band": {
@@ -232,73 +247,73 @@
             "days": 12,
             "top1": 0.4166666666666667,
             "top2": 0.375,
-            "auc": 0.5509478099540212
+            "auc": 0.5487133984028394
           },
           "low": {
-            "n": 825,
-            "days": 25,
-            "top1": 0.32,
-            "top2": 0.24,
-            "auc": 0.49102225270845523
+            "n": 861,
+            "days": 26,
+            "top1": 0.2692307692307692,
+            "top2": 0.23076923076923078,
+            "auc": 0.5007069602594072
           },
           "mid": {
             "n": 909,
             "days": 16,
             "top1": 0.5,
-            "top2": 0.375,
-            "auc": 0.5923959382993567
+            "top2": 0.40625,
+            "auc": 0.60175567785443
           }
         },
         "market_2plus_band": {
           "high": {
-            "n": 916,
-            "days": 17,
-            "top1": 0.4117647058823529,
-            "top2": 0.38235294117647056,
-            "auc": 0.5496163791276334
+            "n": 952,
+            "days": 18,
+            "top1": 0.3888888888888889,
+            "top2": 0.3611111111111111,
+            "auc": 0.5442400280585403
           },
           "low": {
             "n": 925,
             "days": 20,
-            "top1": 0.45,
-            "top2": 0.35,
-            "auc": 0.5477718390413291
+            "top1": 0.4,
+            "top2": 0.375,
+            "auc": 0.552869884932253
           },
           "mid": {
             "n": 852,
             "days": 16,
             "top1": 0.3125,
             "top2": 0.1875,
-            "auc": 0.5314618041890768
+            "auc": 0.551018846473392
           }
         },
         "prev_level_relay_band": {
           "high": {
-            "n": 981,
-            "days": 16,
-            "top1": 0.3125,
-            "top2": 0.3125,
-            "auc": 0.5464713135562487
+            "n": 1017,
+            "days": 17,
+            "top1": 0.23529411764705882,
+            "top2": 0.29411764705882354,
+            "auc": 0.5518108100704052
           },
           "low": {
             "n": 589,
             "days": 14,
-            "top1": 0.42857142857142855,
-            "top2": 0.32142857142857145,
-            "auc": 0.5190780996716405
+            "top1": 0.35714285714285715,
+            "top2": 0.35714285714285715,
+            "auc": 0.541419011596492
           },
           "mid": {
             "n": 1123,
             "days": 23,
-            "top1": 0.43478260869565216,
+            "top1": 0.4782608695652174,
             "top2": 0.30434782608695654,
-            "auc": 0.5610362497627632
+            "auc": 0.5583665464667552
           }
         },
         "train_band_thresholds": {
           "market_zt_count": [
             60.0,
-            82.0
+            83.0
           ],
           "market_2plus_count": [
             10.0,
@@ -312,20 +327,21 @@
       }
     },
     "2": {
-      "sample_n": 1454,
-      "baseline": 0.2874828060522696,
-      "train_n": 1032,
-      "oos_n": 422,
-      "oos_scored_n": 422,
-      "oos_days": 53,
-      "oos_baseline": 0.3127962085308057,
+      "sample_n": 1463,
+      "baseline": 0.2884483937115516,
+      "train_n": 1025,
+      "oos_n": 438,
+      "oos_scored_n": 438,
+      "oos_days": 54,
+      "oos_baseline": 0.317351598173516,
       "rolling_retrain": true,
       "retrain_history": [
         {
           "month": "2026-07",
-          "train_n": 1032,
+          "train_n": 1025,
           "feature_groups": [
-            "core"
+            "core",
+            "regime"
           ],
           "features": [
             "ret_1d",
@@ -336,17 +352,26 @@
             "close_above_ma20",
             "ma5_gt_ma10",
             "ma10_gt_ma20",
-            "amplitude_1d"
+            "amplitude_1d",
+            "market_heat_ratio",
+            "market_first_ratio",
+            "market_2plus_ratio",
+            "market_zt_change",
+            "market_2plus_change",
+            "market_first_change",
+            "same_level_ratio",
+            "higher_level_ratio"
           ],
-          "C": 10.0,
-          "class_weight": "balanced",
-          "validation_top1": 0.45767196,
-          "validation_top2": 0.39112739,
-          "validation_auc": 0.6200184
+          "C": 0.1,
+          "class_weight": null,
+          "recency_half_life": null,
+          "validation_top1": 0.44506692,
+          "validation_top2": 0.36869748,
+          "validation_auc": 0.60959964
         },
         {
           "month": "2026-08",
-          "train_n": 1150,
+          "train_n": 1143,
           "feature_groups": [
             "core"
           ],
@@ -362,14 +387,15 @@
             "amplitude_1d"
           ],
           "C": 0.1,
-          "class_weight": "balanced",
-          "validation_top1": 0.49017615,
+          "class_weight": null,
+          "recency_half_life": null,
+          "validation_top1": 0.47629894,
           "validation_top2": 0.3681198,
-          "validation_auc": 0.61678196
+          "validation_auc": 0.6126342
         },
         {
           "month": "2026-09",
-          "train_n": 1342,
+          "train_n": 1335,
           "feature_groups": [
             "core",
             "limitup",
@@ -422,14 +448,15 @@
           ],
           "C": 0.1,
           "class_weight": null,
-          "validation_top1": 0.58839765,
-          "validation_top2": 0.44832379,
-          "validation_auc": 0.66583324
+          "recency_half_life": null,
+          "validation_top1": 0.59797741,
+          "validation_top2": 0.46732096,
+          "validation_auc": 0.66639085
         }
       ],
       "selected_hyperparameters": {
         "month": "2026-09",
-        "train_n": 1342,
+        "train_n": 1335,
         "feature_groups": [
           "core",
           "limitup",
@@ -482,82 +509,83 @@
         ],
         "C": 0.1,
         "class_weight": null,
-        "validation_top1": 0.58839765,
-        "validation_top2": 0.44832379,
-        "validation_auc": 0.66583324
+        "recency_half_life": null,
+        "validation_top1": 0.59797741,
+        "validation_top2": 0.46732096,
+        "validation_auc": 0.66639085
       },
       "top1": {
-        "selected": 53,
-        "hits": 27,
-        "precision": 0.5094339622641509,
-        "day_hit_days": 27,
-        "day_hit_rate": 0.5094339622641509
+        "selected": 54,
+        "hits": 29,
+        "precision": 0.5370370370370371,
+        "day_hit_days": 29,
+        "day_hit_rate": 0.5370370370370371
       },
       "top2": {
-        "selected": 106,
+        "selected": 108,
         "hits": 48,
-        "precision": 0.4528301886792453,
-        "day_hit_days": 37,
-        "day_hit_rate": 0.6981132075471698
+        "precision": 0.4444444444444444,
+        "day_hit_days": 36,
+        "day_hit_rate": 0.6666666666666666
       },
       "top3": {
-        "selected": 158,
-        "hits": 62,
-        "precision": 0.3924050632911392,
-        "day_hit_days": 40,
-        "day_hit_rate": 0.7547169811320755
+        "selected": 161,
+        "hits": 67,
+        "precision": 0.4161490683229814,
+        "day_hit_days": 41,
+        "day_hit_rate": 0.7592592592592593
       },
       "top4": {
-        "selected": 206,
-        "hits": 79,
-        "precision": 0.38349514563106796,
+        "selected": 210,
+        "hits": 82,
+        "precision": 0.3904761904761905,
         "day_hit_days": 46,
-        "day_hit_rate": 0.8679245283018868
+        "day_hit_rate": 0.8518518518518519
       },
       "top5": {
-        "selected": 249,
-        "hits": 88,
-        "precision": 0.3534136546184739,
+        "selected": 254,
+        "hits": 90,
+        "precision": 0.3543307086614173,
         "day_hit_days": 47,
-        "day_hit_rate": 0.8867924528301887
+        "day_hit_rate": 0.8703703703703703
       },
       "top6": {
-        "selected": 289,
-        "hits": 103,
-        "precision": 0.356401384083045,
+        "selected": 295,
+        "hits": 106,
+        "precision": 0.3593220338983051,
         "day_hit_days": 48,
-        "day_hit_rate": 0.9056603773584906
+        "day_hit_rate": 0.8888888888888888
       },
       "top10": {
-        "selected": 380,
-        "hits": 122,
-        "precision": 0.32105263157894737,
-        "day_hit_days": 48,
-        "day_hit_rate": 0.9056603773584906
+        "selected": 390,
+        "hits": 126,
+        "precision": 0.3230769230769231,
+        "day_hit_days": 49,
+        "day_hit_rate": 0.9074074074074074
       },
-      "oos_auc": 0.6070010449320794,
+      "oos_auc": 0.623348812588725,
       "oos_diagnostics": {
         "monthly": {
           "2026-07": {
             "n": 118,
             "days": 17,
             "top1": 0.47058823529411764,
-            "top2": 0.4117647058823529,
-            "auc": 0.6251526251526252
+            "top2": 0.35294117647058826,
+            "auc": 0.5934065934065934
           },
           "2026-08": {
             "n": 192,
             "days": 21,
-            "top1": 0.6190476190476191,
+            "top1": 0.6666666666666666,
             "top2": 0.5476190476190477,
-            "auc": 0.6516840607210627
+            "auc": 0.6531072106261859
           },
           "2026-09": {
-            "n": 112,
-            "days": 15,
-            "top1": 0.4,
-            "top2": 0.36666666666666664,
-            "auc": 0.5463063063063063
+            "n": 128,
+            "days": 16,
+            "top1": 0.4375,
+            "top2": 0.40625,
+            "auc": 0.5514069264069265
           }
         },
         "market_zt_band": {
@@ -565,102 +593,104 @@
             "n": 121,
             "days": 13,
             "top1": 0.6153846153846154,
-            "top2": 0.5,
-            "auc": 0.6132890365448506
+            "top2": 0.4230769230769231,
+            "auc": 0.6262458471760798
           },
           "low": {
             "n": 161,
             "days": 23,
-            "top1": 0.391304347826087,
+            "top1": 0.43478260869565216,
             "top2": 0.43478260869565216,
-            "auc": 0.6337463556851313
+            "auc": 0.6421282798833818
           },
           "mid": {
-            "n": 140,
-            "days": 17,
-            "top1": 0.5882352941176471,
-            "top2": 0.4411764705882353,
-            "auc": 0.5550271739130435
+            "n": 156,
+            "days": 18,
+            "top1": 0.6111111111111112,
+            "top2": 0.4722222222222222,
+            "auc": 0.5965796579657965
           }
         },
         "market_2plus_band": {
           "high": {
-            "n": 95,
-            "days": 7,
-            "top1": 0.42857142857142855,
-            "top2": 0.42857142857142855,
-            "auc": 0.5922379032258065
+            "n": 111,
+            "days": 8,
+            "top1": 0.5,
+            "top2": 0.5,
+            "auc": 0.613914924297044
           },
           "low": {
             "n": 118,
             "days": 23,
             "top1": 0.43478260869565216,
-            "top2": 0.391304347826087,
-            "auc": 0.5572192513368984
+            "top2": 0.34782608695652173,
+            "auc": 0.5540106951871657
           },
           "mid": {
             "n": 209,
             "days": 23,
-            "top1": 0.6086956521739131,
+            "top1": 0.6521739130434783,
             "top2": 0.5217391304347826,
-            "auc": 0.6396537338339591
+            "auc": 0.6589486858573217
           }
         },
         "prev_level_relay_band": {
           "high": {
             "n": 214,
             "days": 26,
-            "top1": 0.5384615384615384,
+            "top1": 0.6153846153846154,
             "top2": 0.5,
-            "auc": 0.5693452380952381
+            "auc": 0.592063492063492
           },
           "low": {
             "n": 76,
             "days": 12,
-            "top1": 0.6666666666666666,
-            "top2": 0.375,
-            "auc": 0.5589285714285714
+            "top1": 0.5833333333333334,
+            "top2": 0.2916666666666667,
+            "auc": 0.5776785714285714
           },
           "mid": {
-            "n": 132,
-            "days": 15,
-            "top1": 0.3333333333333333,
-            "top2": 0.43333333333333335,
-            "auc": 0.6955026455026455
+            "n": 148,
+            "days": 16,
+            "top1": 0.375,
+            "top2": 0.46875,
+            "auc": 0.6755308183879613
           }
         },
         "train_band_thresholds": {
           "market_zt_count": [
             56.0,
-            79.33333333333326
+            80.0
           ],
           "market_2plus_count": [
             11.0,
             18.0
           ],
           "prev_market_level_continuation_rate": [
-            0.2,
+            0.19047619047619047,
             0.3333333333333333
           ]
         }
       }
     },
     "3": {
-      "sample_n": 424,
-      "baseline": 0.4481132075471698,
-      "train_n": 294,
-      "oos_n": 130,
-      "oos_scored_n": 130,
-      "oos_days": 48,
-      "oos_baseline": 0.45384615384615384,
+      "sample_n": 420,
+      "baseline": 0.45,
+      "train_n": 286,
+      "oos_n": 134,
+      "oos_scored_n": 134,
+      "oos_days": 49,
+      "oos_baseline": 0.4552238805970149,
       "rolling_retrain": true,
       "retrain_history": [
         {
           "month": "2026-07",
-          "train_n": 294,
+          "train_n": 286,
           "feature_groups": [
             "core",
+            "limitup",
             "candle",
+            "market",
             "regime"
           ],
           "features": [
@@ -673,6 +703,9 @@
             "ma5_gt_ma10",
             "ma10_gt_ma20",
             "amplitude_1d",
+            "limit_up_count_5",
+            "limit_up_count_10",
+            "days_since_prev_limit_up",
             "body_ratio",
             "upper_wick_ratio",
             "lower_wick_ratio",
@@ -683,6 +716,17 @@
             "prior_amplitude_pct",
             "prior_volume_vs_20d",
             "prior_close_near_high",
+            "market_first_count",
+            "market_2plus_count",
+            "market_zt_count",
+            "market_same_level_count",
+            "market_higher_level_count",
+            "prev_market_first_count",
+            "prev_market_2plus_count",
+            "prev_market_same_level_count",
+            "prev_market_higher_level_count",
+            "prev_market_1to2_rate",
+            "prev_market_level_continuation_rate",
             "market_heat_ratio",
             "market_first_ratio",
             "market_2plus_ratio",
@@ -694,16 +738,16 @@
           ],
           "C": 10.0,
           "class_weight": "balanced",
-          "validation_top1": 0.46543826,
+          "recency_half_life": null,
+          "validation_top1": 0.4627801,
           "validation_top2": 0.4027744,
-          "validation_auc": 0.60695244
+          "validation_auc": 0.59757834
         },
         {
           "month": "2026-08",
-          "train_n": 322,
+          "train_n": 314,
           "feature_groups": [
             "core",
-            "candle",
             "regime"
           ],
           "features": [
@@ -716,16 +760,39 @@
             "ma5_gt_ma10",
             "ma10_gt_ma20",
             "amplitude_1d",
-            "body_ratio",
-            "upper_wick_ratio",
-            "lower_wick_ratio",
-            "open_position_in_day",
-            "close_position_in_day",
-            "close_near_high",
-            "intraday_pullback_pct",
-            "prior_amplitude_pct",
-            "prior_volume_vs_20d",
-            "prior_close_near_high",
+            "market_heat_ratio",
+            "market_first_ratio",
+            "market_2plus_ratio",
+            "market_zt_change",
+            "market_2plus_change",
+            "market_first_change",
+            "same_level_ratio",
+            "higher_level_ratio"
+          ],
+          "C": 0.1,
+          "class_weight": null,
+          "recency_half_life": null,
+          "validation_top1": 0.51515152,
+          "validation_top2": 0.42570932,
+          "validation_auc": 0.57688795
+        },
+        {
+          "month": "2026-09",
+          "train_n": 378,
+          "feature_groups": [
+            "core",
+            "regime"
+          ],
+          "features": [
+            "ret_1d",
+            "ret_3d",
+            "ret_5d",
+            "volume_5_vs_20",
+            "volume_vs_20d",
+            "close_above_ma20",
+            "ma5_gt_ma10",
+            "ma10_gt_ma20",
+            "amplitude_1d",
             "market_heat_ratio",
             "market_first_ratio",
             "market_2plus_ratio",
@@ -737,39 +804,18 @@
           ],
           "C": 1.0,
           "class_weight": "balanced",
-          "validation_top1": 0.52132435,
-          "validation_top2": 0.41786618,
-          "validation_auc": 0.62529767
-        },
-        {
-          "month": "2026-09",
-          "train_n": 386,
-          "feature_groups": [
-            "core"
-          ],
-          "features": [
-            "ret_1d",
-            "ret_3d",
-            "ret_5d",
-            "volume_5_vs_20",
-            "volume_vs_20d",
-            "close_above_ma20",
-            "ma5_gt_ma10",
-            "ma10_gt_ma20",
-            "amplitude_1d"
-          ],
-          "C": 0.1,
-          "class_weight": "balanced",
-          "validation_top1": 0.62414104,
-          "validation_top2": 0.4788318,
-          "validation_auc": 0.64620843
+          "recency_half_life": null,
+          "validation_top1": 0.62197049,
+          "validation_top2": 0.47400088,
+          "validation_auc": 0.65196068
         }
       ],
       "selected_hyperparameters": {
         "month": "2026-09",
-        "train_n": 386,
+        "train_n": 378,
         "feature_groups": [
-          "core"
+          "core",
+          "regime"
         ],
         "features": [
           "ret_1d",
@@ -780,64 +826,73 @@
           "close_above_ma20",
           "ma5_gt_ma10",
           "ma10_gt_ma20",
-          "amplitude_1d"
+          "amplitude_1d",
+          "market_heat_ratio",
+          "market_first_ratio",
+          "market_2plus_ratio",
+          "market_zt_change",
+          "market_2plus_change",
+          "market_first_change",
+          "same_level_ratio",
+          "higher_level_ratio"
         ],
-        "C": 0.1,
+        "C": 1.0,
         "class_weight": "balanced",
-        "validation_top1": 0.62414104,
-        "validation_top2": 0.4788318,
-        "validation_auc": 0.64620843
+        "recency_half_life": null,
+        "validation_top1": 0.62197049,
+        "validation_top2": 0.47400088,
+        "validation_auc": 0.65196068
       },
       "top1": {
-        "selected": 48,
-        "hits": 31,
-        "precision": 0.6458333333333334,
-        "day_hit_days": 31,
-        "day_hit_rate": 0.6458333333333334
+        "selected": 49,
+        "hits": 30,
+        "precision": 0.6122448979591837,
+        "day_hit_days": 30,
+        "day_hit_rate": 0.6122448979591837
       },
       "top2": {
-        "selected": 83,
+        "selected": 85,
         "hits": 41,
-        "precision": 0.4939759036144578,
+        "precision": 0.4823529411764706,
         "day_hit_days": 37,
-        "day_hit_rate": 0.7708333333333334
+        "day_hit_rate": 0.7551020408163265
       },
       "top3": {
-        "selected": 105,
-        "hits": 48,
-        "precision": 0.45714285714285713,
-        "day_hit_days": 37,
-        "day_hit_rate": 0.7708333333333334
+        "selected": 108,
+        "hits": 50,
+        "precision": 0.46296296296296297,
+        "day_hit_days": 38,
+        "day_hit_rate": 0.7755102040816326
       },
       "top4": {
-        "selected": 117,
+        "selected": 121,
         "hits": 54,
-        "precision": 0.46153846153846156,
-        "day_hit_days": 38,
-        "day_hit_rate": 0.7916666666666666
+        "precision": 0.4462809917355372,
+        "day_hit_days": 39,
+        "day_hit_rate": 0.7959183673469388
       },
       "top5": {
-        "selected": 124,
-        "hits": 56,
-        "precision": 0.45161290322580644,
-        "day_hit_days": 38,
-        "day_hit_rate": 0.7916666666666666
+        "selected": 128,
+        "hits": 58,
+        "precision": 0.453125,
+        "day_hit_days": 39,
+        "day_hit_rate": 0.7959183673469388
       },
       "top6": {
-        "selected": 127,
-        "hits": 57,
-        "precision": 0.44881889763779526,
-        "day_hit_days": 38,
-        "day_hit_rate": 0.7916666666666666
+        "selected": 131,
+        "hits": 60,
+        "precision": 0.4580152671755725,
+        "day_hit_days": 39,
+        "day_hit_rate": 0.7959183673469388
       },
       "top10": {
-        "selected": 130,
-        "hits": 59,
-        "precision": 0.45384615384615384,
-        "day_hit_days": 38,
-        "day_hit_rate": 0.7916666666666666
+        "selected": 134,
+        "hits": 61,
+        "precision": 0.4552238805970149,
+        "day_hit_days": 39,
+        "day_hit_rate": 0.7959183673469388
       },
-      "oos_auc": 0.6304607304846025,
+      "oos_auc": 0.5995957781271053,
       "oos_diagnostics": {
         "monthly": {
           "2026-07": {
@@ -845,100 +900,100 @@
             "days": 16,
             "top1": 0.5625,
             "top2": 0.45454545454545453,
-            "auc": 0.6145833333333333
+            "auc": 0.5833333333333333
           },
           "2026-08": {
             "n": 64,
             "days": 20,
-            "top1": 0.75,
-            "top2": 0.5135135135135135,
-            "auc": 0.7088235294117646
+            "top1": 0.7,
+            "top2": 0.4864864864864865,
+            "auc": 0.6823529411764706
           },
           "2026-09": {
-            "n": 38,
-            "days": 12,
-            "top1": 0.5833333333333334,
+            "n": 42,
+            "days": 13,
+            "top1": 0.5384615384615384,
             "top2": 0.5,
-            "auc": 0.49859943977591037
+            "auc": 0.5537757437070938
           }
         },
         "market_zt_band": {
           "high": {
             "n": 46,
             "days": 14,
-            "top1": 0.8571428571428571,
-            "top2": 0.6153846153846154,
-            "auc": 0.6843100189035917
+            "top1": 0.7142857142857143,
+            "top2": 0.5769230769230769,
+            "auc": 0.6465028355387523
           },
           "low": {
-            "n": 46,
-            "days": 20,
-            "top1": 0.55,
-            "top2": 0.45454545454545453,
-            "auc": 0.5826923076923076
+            "n": 43,
+            "days": 18,
+            "top1": 0.6111111111111112,
+            "top2": 0.4666666666666667,
+            "auc": 0.5065789473684211
           },
           "mid": {
-            "n": 38,
-            "days": 14,
-            "top1": 0.5714285714285714,
-            "top2": 0.4166666666666667,
-            "auc": 0.6448863636363636
+            "n": 45,
+            "days": 17,
+            "top1": 0.5294117647058824,
+            "top2": 0.41379310344827586,
+            "auc": 0.6578947368421052
           }
         },
         "market_2plus_band": {
           "high": {
-            "n": 31,
-            "days": 7,
-            "top1": 0.7142857142857143,
-            "top2": 0.35714285714285715,
-            "auc": 0.5714285714285714
+            "n": 60,
+            "days": 16,
+            "top1": 0.5,
+            "top2": 0.41379310344827586,
+            "auc": 0.6828703703703705
           },
           "low": {
-            "n": 38,
-            "days": 19,
-            "top1": 0.631578947368421,
-            "top2": 0.5333333333333333,
-            "auc": 0.5373961218836565
+            "n": 33,
+            "days": 16,
+            "top1": 0.625,
+            "top2": 0.5,
+            "auc": 0.3933823529411765
           },
           "mid": {
-            "n": 61,
-            "days": 22,
-            "top1": 0.6363636363636364,
-            "top2": 0.5128205128205128,
-            "auc": 0.6817204301075269
+            "n": 41,
+            "days": 17,
+            "top1": 0.7058823529411765,
+            "top2": 0.5333333333333333,
+            "auc": 0.6499999999999999
           }
         },
         "prev_level_relay_band": {
           "high": {
             "n": 75,
             "days": 27,
-            "top1": 0.6666666666666666,
-            "top2": 0.4782608695652174,
-            "auc": 0.6947674418604651
+            "top1": 0.5925925925925926,
+            "top2": 0.45652173913043476,
+            "auc": 0.6969476744186047
           },
           "low": {
             "n": 24,
             "days": 10,
-            "top1": 0.6,
+            "top1": 0.7,
             "top2": 0.5,
-            "auc": 0.513888888888889
+            "auc": 0.5486111111111112
           },
           "mid": {
-            "n": 31,
-            "days": 11,
-            "top1": 0.6363636363636364,
-            "top2": 0.5238095238095238,
-            "auc": 0.575
+            "n": 35,
+            "days": 12,
+            "top1": 0.5833333333333334,
+            "top2": 0.5217391304347826,
+            "auc": 0.45424836601307195
           }
         },
         "train_band_thresholds": {
           "market_zt_count": [
-            53.0,
+            52.0,
             76.0
           ],
           "market_2plus_count": [
-            11.0,
-            18.0
+            10.0,
+            16.0
           ],
           "prev_market_level_continuation_rate": [
             0.16185320352130533,
@@ -950,16 +1005,16 @@
     "4": {
       "sample_n": 190,
       "baseline": 0.4,
-      "train_n": 132,
-      "oos_n": 58,
-      "oos_scored_n": 58,
-      "oos_days": 37,
-      "oos_baseline": 0.4482758620689655,
+      "train_n": 131,
+      "oos_n": 59,
+      "oos_scored_n": 59,
+      "oos_days": 38,
+      "oos_baseline": 0.4406779661016949,
       "rolling_retrain": false,
       "retrain_history": [
         {
           "month": "initial_fixed",
-          "train_n": 132,
+          "train_n": 131,
           "feature_groups": [
             "core",
             "candle",
@@ -1012,7 +1067,7 @@
       ],
       "selected_hyperparameters": {
         "month": "initial_fixed",
-        "train_n": 132,
+        "train_n": 131,
         "feature_groups": [
           "core",
           "candle",
@@ -1063,55 +1118,55 @@
         "validation_auc": null
       },
       "top1": {
-        "selected": 37,
+        "selected": 38,
         "hits": 17,
-        "precision": 0.4594594594594595,
+        "precision": 0.4473684210526316,
         "day_hit_days": 17,
-        "day_hit_rate": 0.4594594594594595
+        "day_hit_rate": 0.4473684210526316
       },
       "top2": {
-        "selected": 49,
+        "selected": 50,
         "hits": 25,
-        "precision": 0.5102040816326531,
+        "precision": 0.5,
         "day_hit_days": 23,
-        "day_hit_rate": 0.6216216216216216
+        "day_hit_rate": 0.6052631578947368
       },
       "top3": {
-        "selected": 54,
+        "selected": 55,
         "hits": 25,
-        "precision": 0.46296296296296297,
+        "precision": 0.45454545454545453,
         "day_hit_days": 23,
-        "day_hit_rate": 0.6216216216216216
+        "day_hit_rate": 0.6052631578947368
       },
       "top4": {
-        "selected": 56,
+        "selected": 57,
         "hits": 26,
-        "precision": 0.4642857142857143,
+        "precision": 0.45614035087719296,
         "day_hit_days": 23,
-        "day_hit_rate": 0.6216216216216216
+        "day_hit_rate": 0.6052631578947368
       },
       "top5": {
-        "selected": 58,
+        "selected": 59,
         "hits": 26,
-        "precision": 0.4482758620689655,
+        "precision": 0.4406779661016949,
         "day_hit_days": 23,
-        "day_hit_rate": 0.6216216216216216
+        "day_hit_rate": 0.6052631578947368
       },
       "top6": {
-        "selected": 58,
+        "selected": 59,
         "hits": 26,
-        "precision": 0.4482758620689655,
+        "precision": 0.4406779661016949,
         "day_hit_days": 23,
-        "day_hit_rate": 0.6216216216216216
+        "day_hit_rate": 0.6052631578947368
       },
       "top10": {
-        "selected": 58,
+        "selected": 59,
         "hits": 26,
-        "precision": 0.4482758620689655,
+        "precision": 0.4406779661016949,
         "day_hit_days": 23,
-        "day_hit_rate": 0.6216216216216216
+        "day_hit_rate": 0.6052631578947368
       },
-      "oos_auc": 0.5384615384615384,
+      "oos_auc": 0.5372960372960373,
       "oos_diagnostics": {
         "monthly": {
           "2026-08": {
@@ -1119,7 +1174,7 @@
             "days": 17,
             "top1": 0.47058823529411764,
             "top2": 0.5,
-            "auc": 0.6018518518518519
+            "auc": 0.6203703703703703
           }
         },
         "market_zt_band": {
@@ -1128,39 +1183,39 @@
             "days": 14,
             "top1": 0.42857142857142855,
             "top2": 0.47368421052631576,
-            "auc": 0.3504273504273504
+            "auc": 0.36752136752136744
           },
           "mid": {
-            "n": 22,
-            "days": 13,
-            "top1": 0.46153846153846156,
-            "top2": 0.5882352941176471,
-            "auc": 0.7355371900826446
+            "n": 23,
+            "days": 14,
+            "top1": 0.42857142857142855,
+            "top2": 0.5555555555555556,
+            "auc": 0.6742424242424243
           }
         },
         "market_2plus_band": {
           "high": {
-            "n": 26,
-            "days": 15,
-            "top1": 0.4666666666666667,
-            "top2": 0.5238095238095238,
-            "auc": 0.7696969696969698
+            "n": 27,
+            "days": 16,
+            "top1": 0.4375,
+            "top2": 0.5,
+            "auc": 0.7556818181818181
           },
           "mid": {
             "n": 22,
             "days": 13,
             "top1": 0.5384615384615384,
             "top2": 0.5555555555555556,
-            "auc": 0.371900826446281
+            "auc": 0.38842975206611574
           }
         },
         "prev_level_relay_band": {
           "high": {
-            "n": 43,
-            "days": 28,
-            "top1": 0.4642857142857143,
-            "top2": 0.4864864864864865,
-            "auc": 0.5333333333333333
+            "n": 44,
+            "days": 29,
+            "top1": 0.4482758620689655,
+            "top2": 0.47368421052631576,
+            "auc": 0.532051282051282
           }
         },
         "train_band_thresholds": {
@@ -1182,16 +1237,16 @@
     "5": {
       "sample_n": 76,
       "baseline": 0.42105263157894735,
-      "train_n": 51,
-      "oos_n": 25,
-      "oos_scored_n": 25,
-      "oos_days": 22,
-      "oos_baseline": 0.44,
+      "train_n": 50,
+      "oos_n": 26,
+      "oos_scored_n": 26,
+      "oos_days": 23,
+      "oos_baseline": 0.4230769230769231,
       "rolling_retrain": false,
       "retrain_history": [
         {
           "month": "initial_fixed",
-          "train_n": 51,
+          "train_n": 50,
           "feature_groups": [
             "core",
             "candle",
@@ -1244,7 +1299,7 @@
       ],
       "selected_hyperparameters": {
         "month": "initial_fixed",
-        "train_n": 51,
+        "train_n": 50,
         "feature_groups": [
           "core",
           "candle",
@@ -1295,67 +1350,75 @@
         "validation_auc": null
       },
       "top1": {
-        "selected": 22,
+        "selected": 23,
         "hits": 10,
-        "precision": 0.45454545454545453,
+        "precision": 0.43478260869565216,
         "day_hit_days": 10,
-        "day_hit_rate": 0.45454545454545453
+        "day_hit_rate": 0.43478260869565216
       },
       "top2": {
-        "selected": 25,
+        "selected": 26,
         "hits": 11,
-        "precision": 0.44,
+        "precision": 0.4230769230769231,
         "day_hit_days": 10,
-        "day_hit_rate": 0.45454545454545453
+        "day_hit_rate": 0.43478260869565216
       },
       "top3": {
-        "selected": 25,
+        "selected": 26,
         "hits": 11,
-        "precision": 0.44,
+        "precision": 0.4230769230769231,
         "day_hit_days": 10,
-        "day_hit_rate": 0.45454545454545453
+        "day_hit_rate": 0.43478260869565216
       },
       "top4": {
-        "selected": 25,
+        "selected": 26,
         "hits": 11,
-        "precision": 0.44,
+        "precision": 0.4230769230769231,
         "day_hit_days": 10,
-        "day_hit_rate": 0.45454545454545453
+        "day_hit_rate": 0.43478260869565216
       },
       "top5": {
-        "selected": 25,
+        "selected": 26,
         "hits": 11,
-        "precision": 0.44,
+        "precision": 0.4230769230769231,
         "day_hit_days": 10,
-        "day_hit_rate": 0.45454545454545453
+        "day_hit_rate": 0.43478260869565216
       },
       "top6": {
-        "selected": 25,
+        "selected": 26,
         "hits": 11,
-        "precision": 0.44,
+        "precision": 0.4230769230769231,
         "day_hit_days": 10,
-        "day_hit_rate": 0.45454545454545453
+        "day_hit_rate": 0.43478260869565216
       },
       "top10": {
-        "selected": 25,
+        "selected": 26,
         "hits": 11,
-        "precision": 0.44,
+        "precision": 0.4230769230769231,
         "day_hit_days": 10,
-        "day_hit_rate": 0.45454545454545453
+        "day_hit_rate": 0.43478260869565216
       },
-      "oos_auc": 0.5974025974025974,
+      "oos_auc": 0.5272727272727273,
       "oos_diagnostics": {
         "monthly": {},
         "market_zt_band": {},
         "market_2plus_band": {},
-        "prev_level_relay_band": {},
+        "prev_level_relay_band": {
+          "high": {
+            "n": 20,
+            "days": 17,
+            "top1": 0.4117647058823529,
+            "top2": 0.4,
+            "auc": 0.40625
+          }
+        },
         "train_band_thresholds": {
           "market_zt_count": [
             50.0,
-            71.99999999999997
+            73.99999999999999
           ],
           "market_2plus_count": [
-            10.666666666666664,
+            10.333333333333332,
             18.0
           ],
           "prev_market_level_continuation_rate": [
@@ -1366,270 +1429,233 @@
       }
     },
     "6": {
-      "sample_n": 31,
-      "baseline": 0.5483870967741935,
+      "sample_n": 32,
+      "baseline": 0.53125,
       "train_n": 21,
-      "oos_n": 10,
+      "oos_n": 11,
       "model_status": "insufficient_samples"
     }
   },
   "today_prediction": {
     "status": "ok",
-    "analysis_date": "2026-09-22",
-    "prediction_date": "2026-09-23",
+    "analysis_date": "2026-09-23",
+    "prediction_date": "2026-09-24",
     "model_version": "multi-tier-v2",
     "universe": "沪深主板",
     "market": {
-      "first_count": 36,
-      "two_plus_count": 23,
-      "zt_count": 59,
-      "max_board": 6
+      "first_count": 32,
+      "two_plus_count": 12,
+      "zt_count": 44,
+      "max_board": 4
     },
     "levels": {
       "1": [
         {
           "rank": 1,
           "level": 1,
-          "code": "002290",
-          "name": "禾盛新材",
-          "price": 77.85,
-          "score": 0.5409004874428173,
-          "prediction_date": "2026-09-23"
+          "code": "600293",
+          "name": "三峡新材",
+          "price": 3.7,
+          "score": 0.21368406941341167,
+          "prediction_date": "2026-09-24"
         },
         {
           "rank": 2,
           "level": 1,
-          "code": "600770",
-          "name": "综艺股份",
-          "price": 6.63,
-          "score": 0.5026314230996084,
-          "prediction_date": "2026-09-23"
+          "code": "002989",
+          "name": "中天精装",
+          "price": 27.96,
+          "score": 0.20362430444744367,
+          "prediction_date": "2026-09-24"
         },
         {
           "rank": 3,
           "level": 1,
-          "code": "600641",
-          "name": "先导基电",
-          "price": 43.74,
-          "score": 0.21287724514637774,
-          "prediction_date": "2026-09-23"
+          "code": "603773",
+          "name": "沃格光电",
+          "price": 102.5,
+          "score": 0.1977606021851615,
+          "prediction_date": "2026-09-24"
         },
         {
           "rank": 4,
           "level": 1,
-          "code": "605058",
-          "name": "澳弘电子",
-          "price": 53.27,
-          "score": 0.18887615491132495,
-          "prediction_date": "2026-09-23"
+          "code": "002119",
+          "name": "康强电子",
+          "price": 26.92,
+          "score": 0.1887695564784444,
+          "prediction_date": "2026-09-24"
         },
         {
           "rank": 5,
           "level": 1,
-          "code": "603221",
-          "name": "爱丽家居",
-          "price": 33.55,
-          "score": 0.1854868422581066,
-          "prediction_date": "2026-09-23"
+          "code": "600371",
+          "name": "万向德农",
+          "price": 17.28,
+          "score": 0.18773946863655452,
+          "prediction_date": "2026-09-24"
         },
         {
           "rank": 6,
           "level": 1,
-          "code": "002564",
-          "name": "天沃科技",
-          "price": 5.45,
-          "score": 0.1729119893855229,
-          "prediction_date": "2026-09-23"
+          "code": "603373",
+          "name": "安邦护卫集团股份",
+          "price": 47.96,
+          "score": 0.18514460156328907,
+          "prediction_date": "2026-09-24"
         },
         {
           "rank": 7,
           "level": 1,
-          "code": "002141",
-          "name": "贤丰控股",
-          "price": 7.43,
-          "score": 0.15918458584572037,
-          "prediction_date": "2026-09-23"
+          "code": "002849",
+          "name": "威星智能",
+          "price": 23.0,
+          "score": 0.1842471426098597,
+          "prediction_date": "2026-09-24"
         },
         {
           "rank": 8,
           "level": 1,
-          "code": "605258",
-          "name": "协和电子",
-          "price": 42.16,
-          "score": 0.1588596840846479,
-          "prediction_date": "2026-09-23"
+          "code": "600802",
+          "name": "福建水泥",
+          "price": 6.02,
+          "score": 0.18373133356010862,
+          "prediction_date": "2026-09-24"
         },
         {
           "rank": 9,
           "level": 1,
-          "code": "000676",
-          "name": "智度股份",
-          "price": 7.45,
-          "score": 0.15436549666017724,
-          "prediction_date": "2026-09-23"
+          "code": "603124",
+          "name": "江南新材",
+          "price": 145.0,
+          "score": 0.1833833599706913,
+          "prediction_date": "2026-09-24"
         },
         {
           "rank": 10,
           "level": 1,
-          "code": "002301",
-          "name": "齐心集团",
-          "price": 9.27,
-          "score": 0.15178512811975448,
-          "prediction_date": "2026-09-23"
+          "code": "603328",
+          "name": "依顿电子",
+          "price": 15.2,
+          "score": 0.1833480669802083,
+          "prediction_date": "2026-09-24"
         }
       ],
       "2": [
         {
           "rank": 1,
           "level": 2,
-          "code": "603636",
-          "name": "南威软件",
-          "price": 8.01,
-          "score": 0.5446974872132453,
-          "prediction_date": "2026-09-23"
+          "code": "002238",
+          "name": "天威视讯",
+          "price": 7.66,
+          "score": 0.7921632207881429,
+          "prediction_date": "2026-09-24"
         },
         {
           "rank": 2,
           "level": 2,
-          "code": "600825",
-          "name": "新华传媒",
-          "price": 6.42,
-          "score": 0.49469007308141294,
-          "prediction_date": "2026-09-23"
+          "code": "605058",
+          "name": "澳弘电子",
+          "price": 58.6,
+          "score": 0.35221963441751486,
+          "prediction_date": "2026-09-24"
         },
         {
           "rank": 3,
           "level": 2,
-          "code": "002614",
-          "name": "奥佳华",
-          "price": 6.88,
-          "score": 0.4684962502826406,
-          "prediction_date": "2026-09-23"
-        },
-        {
-          "rank": 4,
-          "level": 2,
-          "code": "000607",
-          "name": "华媒控股",
-          "price": 4.98,
-          "score": 0.46313199092476615,
-          "prediction_date": "2026-09-23"
-        },
-        {
-          "rank": 5,
-          "level": 2,
-          "code": "002303",
-          "name": "美盈森",
-          "price": 6.9,
-          "score": 0.41196696033340346,
-          "prediction_date": "2026-09-23"
-        },
-        {
-          "rank": 6,
-          "level": 2,
-          "code": "600743",
-          "name": "华远控股",
-          "price": 2.56,
-          "score": 0.3775444341405141,
-          "prediction_date": "2026-09-23"
-        },
-        {
-          "rank": 7,
-          "level": 2,
-          "code": "001234",
-          "name": "泰慕士",
-          "price": 29.25,
-          "score": 0.3733814379132445,
-          "prediction_date": "2026-09-23"
-        },
-        {
-          "rank": 8,
-          "level": 2,
-          "code": "000756",
-          "name": "新华制药",
-          "price": 16.14,
-          "score": 0.34826777315966,
-          "prediction_date": "2026-09-23"
-        },
-        {
-          "rank": 9,
-          "level": 2,
-          "code": "600664",
-          "name": "哈药股份",
-          "price": 9.08,
-          "score": 0.3383584810623189,
-          "prediction_date": "2026-09-23"
-        },
-        {
-          "rank": 10,
-          "level": 2,
-          "code": "603020",
-          "name": "爱普股份",
-          "price": 13.83,
-          "score": 0.3138794571864177,
-          "prediction_date": "2026-09-23"
+          "code": "600418",
+          "name": "江淮汽车",
+          "price": 23.45,
+          "score": 0.34808276190974846,
+          "prediction_date": "2026-09-24"
         }
       ],
       "3": [
         {
           "rank": 1,
           "level": 3,
-          "code": "601811",
-          "name": "新华文轩",
-          "price": 16.82,
-          "score": 0.7062706758212584,
-          "prediction_date": "2026-09-23"
+          "code": "600825",
+          "name": "新华传媒",
+          "price": 7.06,
+          "score": 0.780888252415415,
+          "prediction_date": "2026-09-24"
         },
         {
           "rank": 2,
           "level": 3,
-          "code": "603068",
-          "name": "博通集成",
-          "price": 48.17,
-          "score": 0.258686673673032,
-          "prediction_date": "2026-09-23"
+          "code": "001234",
+          "name": "泰慕士",
+          "price": 32.18,
+          "score": 0.7801484859442694,
+          "prediction_date": "2026-09-24"
         },
         {
           "rank": 3,
           "level": 3,
-          "code": "001317",
-          "name": "三羊马",
-          "price": 65.96,
-          "score": 0.2574087886516922,
-          "prediction_date": "2026-09-23"
+          "code": "603636",
+          "name": "南威软件",
+          "price": 8.81,
+          "score": 0.4744896774641283,
+          "prediction_date": "2026-09-24"
         },
         {
           "rank": 4,
           "level": 3,
-          "code": "000910",
-          "name": "大亚圣象",
-          "price": 6.89,
-          "score": 0.22235268583492995,
-          "prediction_date": "2026-09-23"
+          "code": "002614",
+          "name": "奥佳华",
+          "price": 7.57,
+          "score": 0.4441207504552988,
+          "prediction_date": "2026-09-24"
+        },
+        {
+          "rank": 5,
+          "level": 3,
+          "code": "600503",
+          "name": "华丽家族",
+          "price": 2.94,
+          "score": 0.38988060062226976,
+          "prediction_date": "2026-09-24"
+        },
+        {
+          "rank": 6,
+          "level": 3,
+          "code": "600743",
+          "name": "华远控股",
+          "price": 2.82,
+          "score": 0.3559505640086312,
+          "prediction_date": "2026-09-24"
+        },
+        {
+          "rank": 7,
+          "level": 3,
+          "code": "000560",
+          "name": "我爱我家",
+          "price": 3.86,
+          "score": 0.3540827155321189,
+          "prediction_date": "2026-09-24"
         }
       ],
       "4": [
         {
           "rank": 1,
           "level": 4,
-          "code": "000504",
-          "name": "南华生物",
-          "price": 12.11,
-          "score": 0.6567091732276855,
-          "prediction_date": "2026-09-23"
-        }
-      ],
-      "5": [
+          "code": "601811",
+          "name": "新华文轩",
+          "price": 18.5,
+          "score": 0.296270968367006,
+          "prediction_date": "2026-09-24"
+        },
         {
-          "rank": 1,
-          "level": 5,
-          "code": "603230",
-          "name": "内蒙新华",
-          "price": 16.31,
-          "score": 0.50343264255226,
-          "prediction_date": "2026-09-23"
+          "rank": 2,
+          "level": 4,
+          "code": "000910",
+          "name": "大亚圣象",
+          "price": 7.58,
+          "score": 0.2141117111389159,
+          "prediction_date": "2026-09-24"
         }
       ],
+      "5": [],
       "6": []
     }
   }
