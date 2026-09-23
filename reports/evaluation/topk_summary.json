@@ -5,46 +5,46 @@
   "metrics": {
     "1": {
       "k": 1,
-      "days": 2,
-      "selected": 2,
+      "days": 3,
+      "selected": 3,
       "hits": 2,
-      "precision": 1.0,
-      "baseline_rate": 0.2191780821917808,
-      "lift": 4.5625,
+      "precision": 0.6666666666666666,
+      "baseline_rate": 0.08333333333333333,
+      "lift": 8.0,
       "day_hit_days": 2,
-      "day_hit_rate": 1.0
+      "day_hit_rate": 0.6666666666666666
     },
     "3": {
       "k": 3,
-      "days": 2,
-      "selected": 6,
+      "days": 3,
+      "selected": 9,
       "hits": 5,
-      "precision": 0.8333333333333334,
-      "baseline_rate": 0.2191780821917808,
-      "lift": 3.802083333333334,
+      "precision": 0.5555555555555556,
+      "baseline_rate": 0.08333333333333333,
+      "lift": 6.666666666666667,
       "day_hit_days": 2,
-      "day_hit_rate": 1.0
+      "day_hit_rate": 0.6666666666666666
     },
     "6": {
       "k": 6,
-      "days": 2,
-      "selected": 12,
-      "hits": 8,
-      "precision": 0.6666666666666666,
-      "baseline_rate": 0.2191780821917808,
-      "lift": 3.0416666666666665,
-      "day_hit_days": 2,
+      "days": 3,
+      "selected": 18,
+      "hits": 9,
+      "precision": 0.5,
+      "baseline_rate": 0.08333333333333333,
+      "lift": 6.0,
+      "day_hit_days": 3,
       "day_hit_rate": 1.0
     },
     "10": {
       "k": 10,
-      "days": 2,
-      "selected": 20,
-      "hits": 9,
-      "precision": 0.45,
-      "baseline_rate": 0.2191780821917808,
-      "lift": 2.053125,
-      "day_hit_days": 2,
+      "days": 3,
+      "selected": 30,
+      "hits": 10,
+      "precision": 0.3333333333333333,
+      "baseline_rate": 0.08333333333333333,
+      "lift": 4.0,
+      "day_hit_days": 3,
       "day_hit_rate": 1.0
     }
   }
