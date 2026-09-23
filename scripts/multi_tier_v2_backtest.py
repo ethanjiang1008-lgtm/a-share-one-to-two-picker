@@ -48,6 +48,8 @@ BASELINE_CONTINUATION=0.16185320352130533
 TUNE_LEVELS={1,2,3}
 TUNE_C=[0.1,1.0,10.0]
 TUNE_CLASS_WEIGHTS=(None,"balanced")
+# 1->2 is the most regime-sensitive tier, so test only causal recency weighting.
+TUNE_RECENCY_HALF_LIFE={1:(None,60.0,120.0,180.0)}
 
 FEATURE_GROUPS={
     "core":["ret_1d","ret_3d","ret_5d","volume_5_vs_20","volume_vs_20d",
@@ -321,7 +323,20 @@ def _standardize_fit(samples,feature_names):
     Xs=[[(row[j]-means[j])/stds[j] for j in range(len(feature_names))] for row in X]
     return X,Xs,means,stds
 
-def _fit_raw(samples,C,class_weight,feature_names):
+def _recency_weights(samples, half_life):
+    if half_life in (None, 0):
+        return None
+    end=datetime.date.fromisoformat(max(s["date"] for s in samples))
+    ln2=math.log(2.0)
+    weights=[]
+    for s in samples:
+        age=max(0,(end-datetime.date.fromisoformat(s["date"])).days)
+        w=math.exp(-ln2*age/float(half_life))
+        weights.append(w)
+    mean_w=statistics.fmean(weights) if weights else 1.0
+    return [w/mean_w for w in weights]
+
+def _fit_raw(samples,C,class_weight,feature_names,recency_half_life=None):
     _,Xs,means,stds=_standardize_fit(samples,feature_names)
     y=[s["y"] for s in samples]
     model=LogisticRegression(
@@ -330,7 +345,8 @@ def _fit_raw(samples,C,class_weight,feature_names):
         solver="liblinear",
         C=C
     )
-    model.fit(Xs,y)
+    weights=_recency_weights(samples,recency_half_life)
+    model.fit(Xs,y,sample_weight=weights)
     return model,means,stds
 
 def _score_model(model,means,stds,s,feature_names):
@@ -467,7 +483,8 @@ def choose_hyperparams(train_samples,level):
     default={
         "C":1.0,"class_weight":None,"tuned":False,
         "feature_groups":list(default_profile),
-        "features":expand_groups(default_profile)
+        "features":expand_groups(default_profile),
+        "recency_half_life":None
     }
     if level not in TUNE_LEVELS or len(train_samples)<250:
         return default
@@ -485,16 +502,20 @@ def choose_hyperparams(train_samples,level):
         return default
 
     candidates=[]
+    half_life_options=TUNE_RECENCY_HALF_LIFE.get(level,(None,))
     for profile in FEATURE_PROFILES.get(level,[("core",)]):
         feature_names=expand_groups(profile)
         for C in TUNE_C:
             for class_weight in TUNE_CLASS_WEIGHTS:
-                fold_scores=[]
-                for tr,va in folds:
-                    try:
-                        model,means,stds=_fit_raw(tr,C,class_weight,feature_names)
-                    except Exception:
-                        continue
+                for recency_half_life in half_life_options:
+                    fold_scores=[]
+                    for tr,va in folds:
+                        try:
+                            model,means,stds=_fit_raw(
+                                tr,C,class_weight,feature_names,recency_half_life
+                            )
+                        except Exception:
+                            continue
                     scored=[{
                         "date":s["date"],"code":s["code"],"y":s["y"],
                         "score":_score_model(model,means,stds,s,feature_names)
@@ -512,15 +533,16 @@ def choose_hyperparams(train_samples,level):
                 avg2=sum(x[1] for x in fold_scores)/len(fold_scores)
                 avga=sum(x[2] for x in fold_scores)/len(fold_scores)
                 key=(round(avg1,8),round(avg2,8),round(avga,8))
-                candidates.append((key,profile,C,class_weight))
+                candidates.append((key,profile,C,class_weight,recency_half_life))
     if not candidates:
         return default
     candidates.sort(key=lambda x:x[0],reverse=True)
-    key,profile,C,class_weight=candidates[0]
+    key,profile,C,class_weight,recency_half_life=candidates[0]
     return {
         "C":C,"class_weight":class_weight,"tuned":True,
         "feature_groups":list(profile),
         "features":expand_groups(profile),
+        "recency_half_life":recency_half_life,
         "validation_top1":key[0],
         "validation_top2":key[1],
         "validation_auc":key[2]
@@ -530,7 +552,11 @@ def _fit_serialized_model(train_samples, level):
     params=choose_hyperparams(train_samples,level)
     feature_names=params["features"]
     model,means,stds=_fit_raw(
-        train_samples,float(params["C"]),params["class_weight"],feature_names
+        train_samples,
+        float(params["C"]),
+        params["class_weight"],
+        feature_names,
+        params.get("recency_half_life")
     )
     model_json={
         "version":f"multi-tier-v2-{level}to{level+1}",
@@ -542,6 +568,7 @@ def _fit_serialized_model(train_samples, level):
         "train_n":len(train_samples),
         "C":float(params["C"]),
         "class_weight":params["class_weight"],
+        "recency_half_life":params.get("recency_half_life"),
         "hyperparameter_tuned":bool(params.get("tuned",False))
     }
     for j,name in enumerate(feature_names):
@@ -594,6 +621,7 @@ def _rolling_oos_score(samples,level):
             "features":params["features"],
             "C":params["C"],
             "class_weight":params["class_weight"],
+            "recency_half_life":params.get("recency_half_life"),
             "validation_top1":params.get("validation_top1"),
             "validation_top2":params.get("validation_top2"),
             "validation_auc":params.get("validation_auc")
@@ -636,6 +664,7 @@ def fit_one_level(samples,level):
                 "features":params_initial["features"],
                 "C":params_initial["C"],
                 "class_weight":params_initial["class_weight"],
+                "recency_half_life":params_initial.get("recency_half_life"),
                 "validation_top1":params_initial.get("validation_top1"),
                 "validation_top2":params_initial.get("validation_top2"),
                 "validation_auc":params_initial.get("validation_auc")
