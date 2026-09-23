@@ -516,17 +516,17 @@ def choose_hyperparams(train_samples,level):
                             )
                         except Exception:
                             continue
-                    scored=[{
-                        "date":s["date"],"code":s["code"],"y":s["y"],
-                        "score":_score_model(model,means,stds,s,feature_names)
-                    } for s in va]
-                    m=_daily_metrics(scored)
-                    auc=_auc(scored)
-                    fold_scores.append((
-                        m["top1"]["precision"] or 0.0,
-                        m["top2"]["precision"] or 0.0,
-                        auc if auc is not None else 0.5
-                    ))
+                        scored=[{
+                            "date":s["date"],"code":s["code"],"y":s["y"],
+                            "score":_score_model(model,means,stds,s,feature_names)
+                        } for s in va]
+                        m=_daily_metrics(scored)
+                        auc=_auc(scored)
+                        fold_scores.append((
+                            m["top1"]["precision"] or 0.0,
+                            m["top2"]["precision"] or 0.0,
+                            auc if auc is not None else 0.5
+                        ))
                 if len(fold_scores)!=len(folds):
                     continue
                 avg1=sum(x[0] for x in fold_scores)/len(fold_scores)
