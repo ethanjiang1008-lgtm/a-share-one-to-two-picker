@@ -7,20 +7,23 @@
   "failed_kline_fetches": 7,
   "levels": {
     "1": {
-      "sample_n": 9247,
-      "baseline": 0.1566994700984103,
-      "train_n": 6518,
-      "oos_n": 2729,
-      "oos_scored_n": 2729,
-      "oos_days": 54,
-      "oos_baseline": 0.15976548186148773,
+      "sample_n": 9233,
+      "baseline": 0.15661215206325138,
+      "train_n": 6472,
+      "oos_n": 2761,
+      "oos_scored_n": 2761,
+      "oos_days": 55,
+      "oos_baseline": 0.16081130025353133,
       "rolling_retrain": true,
       "retrain_history": [
         {
           "month": "2026-07",
-          "train_n": 6518,
+          "train_n": 6472,
           "feature_groups": [
-            "core"
+            "core",
+            "limitup",
+            "market",
+            "regime"
           ],
           "features": [
             "ret_1d",
@@ -31,18 +34,40 @@
             "close_above_ma20",
             "ma5_gt_ma10",
             "ma10_gt_ma20",
-            "amplitude_1d"
+            "amplitude_1d",
+            "limit_up_count_5",
+            "limit_up_count_10",
+            "days_since_prev_limit_up",
+            "market_first_count",
+            "market_2plus_count",
+            "market_zt_count",
+            "market_same_level_count",
+            "market_higher_level_count",
+            "prev_market_first_count",
+            "prev_market_2plus_count",
+            "prev_market_same_level_count",
+            "prev_market_higher_level_count",
+            "prev_market_1to2_rate",
+            "prev_market_level_continuation_rate",
+            "market_heat_ratio",
+            "market_first_ratio",
+            "market_2plus_ratio",
+            "market_zt_change",
+            "market_2plus_change",
+            "market_first_change",
+            "same_level_ratio",
+            "higher_level_ratio"
           ],
-          "C": 1.0,
+          "C": 0.1,
           "class_weight": null,
           "recency_half_life": 180.0,
-          "validation_top1": 0.50897868,
-          "validation_top2": 0.41093685,
-          "validation_auc": 0.57607745
+          "validation_top1": 0.51775061,
+          "validation_top2": 0.39448579,
+          "validation_auc": 0.5765129
         },
         {
           "month": "2026-08",
-          "train_n": 7413,
+          "train_n": 7367,
           "feature_groups": [
             "core"
           ],
@@ -60,13 +85,13 @@
           "C": 10.0,
           "class_weight": null,
           "recency_half_life": 180.0,
-          "validation_top1": 0.59850553,
-          "validation_top2": 0.40554581,
-          "validation_auc": 0.57954617
+          "validation_top1": 0.59304105,
+          "validation_top2": 0.41608845,
+          "validation_auc": 0.58003606
         },
         {
           "month": "2026-09",
-          "train_n": 8539,
+          "train_n": 8493,
           "feature_groups": [
             "core",
             "limitup",
@@ -112,13 +137,13 @@
           "class_weight": null,
           "recency_half_life": 180.0,
           "validation_top1": 0.46751454,
-          "validation_top2": 0.36978705,
-          "validation_auc": 0.54853951
+          "validation_top2": 0.3722025,
+          "validation_auc": 0.54893314
         }
       ],
       "selected_hyperparameters": {
         "month": "2026-09",
-        "train_n": 8539,
+        "train_n": 8493,
         "feature_groups": [
           "core",
           "limitup",
@@ -164,81 +189,81 @@
         "class_weight": null,
         "recency_half_life": 180.0,
         "validation_top1": 0.46751454,
-        "validation_top2": 0.36978705,
-        "validation_auc": 0.54853951
+        "validation_top2": 0.3722025,
+        "validation_auc": 0.54893314
       },
       "top1": {
-        "selected": 54,
+        "selected": 55,
         "hits": 20,
-        "precision": 0.37037037037037035,
+        "precision": 0.36363636363636365,
         "day_hit_days": 20,
-        "day_hit_rate": 0.37037037037037035
+        "day_hit_rate": 0.36363636363636365
       },
       "top2": {
-        "selected": 108,
-        "hits": 34,
-        "precision": 0.3148148148148148,
+        "selected": 110,
+        "hits": 33,
+        "precision": 0.3,
         "day_hit_days": 27,
-        "day_hit_rate": 0.5
+        "day_hit_rate": 0.4909090909090909
       },
       "top3": {
-        "selected": 162,
-        "hits": 50,
-        "precision": 0.30864197530864196,
+        "selected": 165,
+        "hits": 49,
+        "precision": 0.296969696969697,
         "day_hit_days": 34,
-        "day_hit_rate": 0.6296296296296297
+        "day_hit_rate": 0.6181818181818182
       },
       "top4": {
-        "selected": 216,
+        "selected": 220,
         "hits": 64,
-        "precision": 0.2962962962962963,
-        "day_hit_days": 42,
-        "day_hit_rate": 0.7777777777777778
+        "precision": 0.2909090909090909,
+        "day_hit_days": 41,
+        "day_hit_rate": 0.7454545454545455
       },
       "top5": {
-        "selected": 270,
-        "hits": 72,
-        "precision": 0.26666666666666666,
-        "day_hit_days": 45,
-        "day_hit_rate": 0.8333333333333334
+        "selected": 275,
+        "hits": 69,
+        "precision": 0.2509090909090909,
+        "day_hit_days": 42,
+        "day_hit_rate": 0.7636363636363637
       },
       "top6": {
-        "selected": 324,
-        "hits": 81,
-        "precision": 0.25,
+        "selected": 330,
+        "hits": 80,
+        "precision": 0.24242424242424243,
         "day_hit_days": 48,
-        "day_hit_rate": 0.8888888888888888
+        "day_hit_rate": 0.8727272727272727
       },
       "top10": {
-        "selected": 540,
-        "hits": 121,
-        "precision": 0.22407407407407406,
+        "selected": 550,
+        "hits": 120,
+        "precision": 0.21818181818181817,
         "day_hit_days": 53,
-        "day_hit_rate": 0.9814814814814815
+        "day_hit_rate": 0.9636363636363636
       },
-      "oos_auc": 0.549923580742347,
+      "oos_auc": 0.5485823544735933,
       "oos_diagnostics": {
         "monthly": {
           "2026-07": {
             "n": 895,
             "days": 17,
             "top1": 0.5294117647058824,
-            "top2": 0.4117647058823529,
-            "auc": 0.588738591916558
+            "top2": 0.38235294117647056,
+            "auc": 0.5853161668839635
           },
           "2026-08": {
             "n": 1126,
             "days": 21,
             "top1": 0.3333333333333333,
             "top2": 0.2857142857142857,
-            "auc": 0.5259269896889451
+            "auc": 0.5269724559841457
           },
           "2026-09": {
-            "n": 708,
-            "days": 16,
-            "top1": 0.25,
-            "top2": 0.25,
-            "auc": 0.5310402334792579
+            "n": 740,
+            "days": 17,
+            "top1": 0.23529411764705882,
+            "top2": 0.23529411764705882,
+            "auc": 0.5317439426415473
           }
         },
         "market_zt_band": {
@@ -247,44 +272,44 @@
             "days": 12,
             "top1": 0.4166666666666667,
             "top2": 0.375,
-            "auc": 0.5487133984028394
+            "auc": 0.5465677179962894
           },
           "low": {
-            "n": 861,
-            "days": 26,
-            "top1": 0.2692307692307692,
-            "top2": 0.23076923076923078,
-            "auc": 0.5007069602594072
+            "n": 803,
+            "days": 25,
+            "top1": 0.28,
+            "top2": 0.22,
+            "auc": 0.503565396884969
           },
           "mid": {
-            "n": 909,
-            "days": 16,
-            "top1": 0.5,
-            "top2": 0.40625,
-            "auc": 0.60175567785443
+            "n": 999,
+            "days": 18,
+            "top1": 0.4444444444444444,
+            "top2": 0.3611111111111111,
+            "auc": 0.5944282001299545
           }
         },
         "market_2plus_band": {
           "high": {
             "n": 952,
             "days": 18,
-            "top1": 0.3888888888888889,
+            "top1": 0.3333333333333333,
             "top2": 0.3611111111111111,
-            "auc": 0.5442400280585403
+            "auc": 0.5430044957433918
           },
           "low": {
             "n": 925,
             "days": 20,
-            "top1": 0.4,
-            "top2": 0.375,
-            "auc": 0.552869884932253
+            "top1": 0.45,
+            "top2": 0.35,
+            "auc": 0.5563508544971744
           },
           "mid": {
-            "n": 852,
-            "days": 16,
-            "top1": 0.3125,
-            "top2": 0.1875,
-            "auc": 0.551018846473392
+            "n": 884,
+            "days": 17,
+            "top1": 0.29411764705882354,
+            "top2": 0.17647058823529413,
+            "auc": 0.5444278606965174
           }
         },
         "prev_level_relay_band": {
@@ -293,26 +318,26 @@
             "days": 17,
             "top1": 0.23529411764705882,
             "top2": 0.29411764705882354,
-            "auc": 0.5518108100704052
+            "auc": 0.5586527134756047
           },
           "low": {
-            "n": 589,
-            "days": 14,
-            "top1": 0.35714285714285715,
-            "top2": 0.35714285714285715,
-            "auc": 0.541419011596492
+            "n": 621,
+            "days": 15,
+            "top1": 0.4,
+            "top2": 0.3,
+            "auc": 0.5318556512181718
           },
           "mid": {
             "n": 1123,
             "days": 23,
-            "top1": 0.4782608695652174,
+            "top1": 0.43478260869565216,
             "top2": 0.30434782608695654,
-            "auc": 0.5583665464667552
+            "auc": 0.5549819700132852
           }
         },
         "train_band_thresholds": {
           "market_zt_count": [
-            60.0,
+            58.0,
             83.0
           ],
           "market_2plus_count": [
@@ -327,51 +352,18 @@
       }
     },
     "2": {
-      "sample_n": 1463,
-      "baseline": 0.2884483937115516,
-      "train_n": 1025,
-      "oos_n": 438,
-      "oos_scored_n": 438,
-      "oos_days": 54,
-      "oos_baseline": 0.317351598173516,
+      "sample_n": 1461,
+      "baseline": 0.2888432580424367,
+      "train_n": 1020,
+      "oos_n": 441,
+      "oos_scored_n": 441,
+      "oos_days": 55,
+      "oos_baseline": 0.31746031746031744,
       "rolling_retrain": true,
       "retrain_history": [
         {
           "month": "2026-07",
-          "train_n": 1025,
-          "feature_groups": [
-            "core",
-            "regime"
-          ],
-          "features": [
-            "ret_1d",
-            "ret_3d",
-            "ret_5d",
-            "volume_5_vs_20",
-            "volume_vs_20d",
-            "close_above_ma20",
-            "ma5_gt_ma10",
-            "ma10_gt_ma20",
-            "amplitude_1d",
-            "market_heat_ratio",
-            "market_first_ratio",
-            "market_2plus_ratio",
-            "market_zt_change",
-            "market_2plus_change",
-            "market_first_change",
-            "same_level_ratio",
-            "higher_level_ratio"
-          ],
-          "C": 0.1,
-          "class_weight": null,
-          "recency_half_life": null,
-          "validation_top1": 0.44506692,
-          "validation_top2": 0.36869748,
-          "validation_auc": 0.60959964
-        },
-        {
-          "month": "2026-08",
-          "train_n": 1143,
+          "train_n": 1020,
           "feature_groups": [
             "core"
           ],
@@ -389,13 +381,37 @@
           "C": 0.1,
           "class_weight": null,
           "recency_half_life": null,
-          "validation_top1": 0.47629894,
-          "validation_top2": 0.3681198,
-          "validation_auc": 0.6126342
+          "validation_top1": 0.45160286,
+          "validation_top2": 0.38130252,
+          "validation_auc": 0.62696857
+        },
+        {
+          "month": "2026-08",
+          "train_n": 1138,
+          "feature_groups": [
+            "core"
+          ],
+          "features": [
+            "ret_1d",
+            "ret_3d",
+            "ret_5d",
+            "volume_5_vs_20",
+            "volume_vs_20d",
+            "close_above_ma20",
+            "ma5_gt_ma10",
+            "ma10_gt_ma20",
+            "amplitude_1d"
+          ],
+          "C": 0.1,
+          "class_weight": "balanced",
+          "recency_half_life": null,
+          "validation_top1": 0.46816886,
+          "validation_top2": 0.36643772,
+          "validation_auc": 0.61497655
         },
         {
           "month": "2026-09",
-          "train_n": 1335,
+          "train_n": 1330,
           "feature_groups": [
             "core",
             "limitup",
@@ -446,17 +462,17 @@
             "same_level_ratio",
             "higher_level_ratio"
           ],
-          "C": 0.1,
+          "C": 10.0,
           "class_weight": null,
           "recency_half_life": null,
-          "validation_top1": 0.59797741,
-          "validation_top2": 0.46732096,
-          "validation_auc": 0.66639085
+          "validation_top1": 0.59389402,
+          "validation_top2": 0.46227046,
+          "validation_auc": 0.67023138
         }
       ],
       "selected_hyperparameters": {
         "month": "2026-09",
-        "train_n": 1335,
+        "train_n": 1330,
         "feature_groups": [
           "core",
           "limitup",
@@ -507,108 +523,108 @@
           "same_level_ratio",
           "higher_level_ratio"
         ],
-        "C": 0.1,
+        "C": 10.0,
         "class_weight": null,
         "recency_half_life": null,
-        "validation_top1": 0.59797741,
-        "validation_top2": 0.46732096,
-        "validation_auc": 0.66639085
+        "validation_top1": 0.59389402,
+        "validation_top2": 0.46227046,
+        "validation_auc": 0.67023138
       },
       "top1": {
-        "selected": 54,
-        "hits": 29,
-        "precision": 0.5370370370370371,
-        "day_hit_days": 29,
-        "day_hit_rate": 0.5370370370370371
+        "selected": 55,
+        "hits": 30,
+        "precision": 0.5454545454545454,
+        "day_hit_days": 30,
+        "day_hit_rate": 0.5454545454545454
       },
       "top2": {
-        "selected": 108,
-        "hits": 48,
-        "precision": 0.4444444444444444,
-        "day_hit_days": 36,
-        "day_hit_rate": 0.6666666666666666
+        "selected": 110,
+        "hits": 49,
+        "precision": 0.44545454545454544,
+        "day_hit_days": 38,
+        "day_hit_rate": 0.6909090909090909
       },
       "top3": {
-        "selected": 161,
-        "hits": 67,
-        "precision": 0.4161490683229814,
-        "day_hit_days": 41,
-        "day_hit_rate": 0.7592592592592593
+        "selected": 164,
+        "hits": 65,
+        "precision": 0.39634146341463417,
+        "day_hit_days": 42,
+        "day_hit_rate": 0.7636363636363637
       },
       "top4": {
-        "selected": 210,
-        "hits": 82,
-        "precision": 0.3904761904761905,
-        "day_hit_days": 46,
-        "day_hit_rate": 0.8518518518518519
+        "selected": 213,
+        "hits": 83,
+        "precision": 0.38967136150234744,
+        "day_hit_days": 47,
+        "day_hit_rate": 0.8545454545454545
       },
       "top5": {
-        "selected": 254,
-        "hits": 90,
-        "precision": 0.3543307086614173,
-        "day_hit_days": 47,
-        "day_hit_rate": 0.8703703703703703
+        "selected": 257,
+        "hits": 91,
+        "precision": 0.3540856031128405,
+        "day_hit_days": 48,
+        "day_hit_rate": 0.8727272727272727
       },
       "top6": {
-        "selected": 295,
+        "selected": 298,
         "hits": 106,
-        "precision": 0.3593220338983051,
-        "day_hit_days": 48,
-        "day_hit_rate": 0.8888888888888888
+        "precision": 0.35570469798657717,
+        "day_hit_days": 49,
+        "day_hit_rate": 0.8909090909090909
       },
       "top10": {
-        "selected": 390,
-        "hits": 126,
-        "precision": 0.3230769230769231,
-        "day_hit_days": 49,
-        "day_hit_rate": 0.9074074074074074
+        "selected": 393,
+        "hits": 127,
+        "precision": 0.3231552162849873,
+        "day_hit_days": 50,
+        "day_hit_rate": 0.9090909090909091
       },
-      "oos_auc": 0.623348812588725,
+      "oos_auc": 0.6225439012814429,
       "oos_diagnostics": {
         "monthly": {
           "2026-07": {
             "n": 118,
             "days": 17,
-            "top1": 0.47058823529411764,
-            "top2": 0.35294117647058826,
-            "auc": 0.5934065934065934
+            "top1": 0.5294117647058824,
+            "top2": 0.38235294117647056,
+            "auc": 0.6125356125356125
           },
           "2026-08": {
             "n": 192,
             "days": 21,
-            "top1": 0.6666666666666666,
+            "top1": 0.6190476190476191,
             "top2": 0.5476190476190477,
-            "auc": 0.6531072106261859
+            "auc": 0.6513282732447818
           },
           "2026-09": {
-            "n": 128,
-            "days": 16,
-            "top1": 0.4375,
-            "top2": 0.40625,
-            "auc": 0.5514069264069265
+            "n": 131,
+            "days": 17,
+            "top1": 0.47058823529411764,
+            "top2": 0.38235294117647056,
+            "auc": 0.5478036175710594
           }
         },
         "market_zt_band": {
           "high": {
             "n": 121,
             "days": 13,
-            "top1": 0.6153846153846154,
-            "top2": 0.4230769230769231,
-            "auc": 0.6262458471760798
+            "top1": 0.6923076923076923,
+            "top2": 0.46153846153846156,
+            "auc": 0.6083056478405315
           },
           "low": {
-            "n": 161,
-            "days": 23,
-            "top1": 0.43478260869565216,
-            "top2": 0.43478260869565216,
-            "auc": 0.6421282798833818
+            "n": 164,
+            "days": 24,
+            "top1": 0.4166666666666667,
+            "top2": 0.4166666666666667,
+            "auc": 0.641578947368421
           },
           "mid": {
             "n": 156,
             "days": 18,
             "top1": 0.6111111111111112,
             "top2": 0.4722222222222222,
-            "auc": 0.5965796579657965
+            "auc": 0.6037803780378038
           }
         },
         "market_2plus_band": {
@@ -617,44 +633,44 @@
             "days": 8,
             "top1": 0.5,
             "top2": 0.5,
-            "auc": 0.613914924297044
+            "auc": 0.6031002162941601
           },
           "low": {
             "n": 118,
             "days": 23,
             "top1": 0.43478260869565216,
             "top2": 0.34782608695652173,
-            "auc": 0.5540106951871657
+            "auc": 0.5679144385026739
           },
           "mid": {
-            "n": 209,
-            "days": 23,
-            "top1": 0.6521739130434783,
-            "top2": 0.5217391304347826,
-            "auc": 0.6589486858573217
+            "n": 212,
+            "days": 24,
+            "top1": 0.6666666666666666,
+            "top2": 0.5208333333333334,
+            "auc": 0.6614979223674875
           }
         },
         "prev_level_relay_band": {
           "high": {
-            "n": 214,
-            "days": 26,
-            "top1": 0.6153846153846154,
-            "top2": 0.5,
-            "auc": 0.592063492063492
+            "n": 217,
+            "days": 27,
+            "top1": 0.5925925925925926,
+            "top2": 0.48148148148148145,
+            "auc": 0.5871117113640748
           },
           "low": {
             "n": 76,
             "days": 12,
-            "top1": 0.5833333333333334,
-            "top2": 0.2916666666666667,
-            "auc": 0.5776785714285714
+            "top1": 0.6666666666666666,
+            "top2": 0.3333333333333333,
+            "auc": 0.55625
           },
           "mid": {
             "n": 148,
             "days": 16,
             "top1": 0.375,
             "top2": 0.46875,
-            "auc": 0.6755308183879613
+            "auc": 0.6998556998556998
           }
         },
         "train_band_thresholds": {
@@ -674,18 +690,18 @@
       }
     },
     "3": {
-      "sample_n": 420,
-      "baseline": 0.45,
-      "train_n": 286,
-      "oos_n": 134,
-      "oos_scored_n": 134,
-      "oos_days": 49,
-      "oos_baseline": 0.4552238805970149,
+      "sample_n": 424,
+      "baseline": 0.4481132075471698,
+      "train_n": 283,
+      "oos_n": 141,
+      "oos_scored_n": 141,
+      "oos_days": 50,
+      "oos_baseline": 0.45390070921985815,
       "rolling_retrain": true,
       "retrain_history": [
         {
           "month": "2026-07",
-          "train_n": 286,
+          "train_n": 283,
           "feature_groups": [
             "core",
             "limitup",
@@ -737,17 +753,18 @@
             "higher_level_ratio"
           ],
           "C": 10.0,
-          "class_weight": "balanced",
+          "class_weight": null,
           "recency_half_life": null,
           "validation_top1": 0.4627801,
           "validation_top2": 0.4027744,
-          "validation_auc": 0.59757834
+          "validation_auc": 0.58933182
         },
         {
           "month": "2026-08",
-          "train_n": 314,
+          "train_n": 311,
           "feature_groups": [
             "core",
+            "candle",
             "regime"
           ],
           "features": [
@@ -760,39 +777,16 @@
             "ma5_gt_ma10",
             "ma10_gt_ma20",
             "amplitude_1d",
-            "market_heat_ratio",
-            "market_first_ratio",
-            "market_2plus_ratio",
-            "market_zt_change",
-            "market_2plus_change",
-            "market_first_change",
-            "same_level_ratio",
-            "higher_level_ratio"
-          ],
-          "C": 0.1,
-          "class_weight": null,
-          "recency_half_life": null,
-          "validation_top1": 0.51515152,
-          "validation_top2": 0.42570932,
-          "validation_auc": 0.57688795
-        },
-        {
-          "month": "2026-09",
-          "train_n": 378,
-          "feature_groups": [
-            "core",
-            "regime"
-          ],
-          "features": [
-            "ret_1d",
-            "ret_3d",
-            "ret_5d",
-            "volume_5_vs_20",
-            "volume_vs_20d",
-            "close_above_ma20",
-            "ma5_gt_ma10",
-            "ma10_gt_ma20",
-            "amplitude_1d",
+            "body_ratio",
+            "upper_wick_ratio",
+            "lower_wick_ratio",
+            "open_position_in_day",
+            "close_position_in_day",
+            "close_near_high",
+            "intraday_pullback_pct",
+            "prior_amplitude_pct",
+            "prior_volume_vs_20d",
+            "prior_close_near_high",
             "market_heat_ratio",
             "market_first_ratio",
             "market_2plus_ratio",
@@ -805,17 +799,53 @@
           "C": 1.0,
           "class_weight": "balanced",
           "recency_half_life": null,
-          "validation_top1": 0.62197049,
-          "validation_top2": 0.47400088,
-          "validation_auc": 0.65196068
+          "validation_top1": 0.51651137,
+          "validation_top2": 0.43049382,
+          "validation_auc": 0.59336293
+        },
+        {
+          "month": "2026-09",
+          "train_n": 375,
+          "feature_groups": [
+            "core",
+            "market"
+          ],
+          "features": [
+            "ret_1d",
+            "ret_3d",
+            "ret_5d",
+            "volume_5_vs_20",
+            "volume_vs_20d",
+            "close_above_ma20",
+            "ma5_gt_ma10",
+            "ma10_gt_ma20",
+            "amplitude_1d",
+            "market_first_count",
+            "market_2plus_count",
+            "market_zt_count",
+            "market_same_level_count",
+            "market_higher_level_count",
+            "prev_market_first_count",
+            "prev_market_2plus_count",
+            "prev_market_same_level_count",
+            "prev_market_higher_level_count",
+            "prev_market_1to2_rate",
+            "prev_market_level_continuation_rate"
+          ],
+          "C": 0.1,
+          "class_weight": null,
+          "recency_half_life": null,
+          "validation_top1": 0.61629686,
+          "validation_top2": 0.48606742,
+          "validation_auc": 0.6313792
         }
       ],
       "selected_hyperparameters": {
         "month": "2026-09",
-        "train_n": 378,
+        "train_n": 375,
         "feature_groups": [
           "core",
-          "regime"
+          "market"
         ],
         "features": [
           "ret_1d",
@@ -827,72 +857,75 @@
           "ma5_gt_ma10",
           "ma10_gt_ma20",
           "amplitude_1d",
-          "market_heat_ratio",
-          "market_first_ratio",
-          "market_2plus_ratio",
-          "market_zt_change",
-          "market_2plus_change",
-          "market_first_change",
-          "same_level_ratio",
-          "higher_level_ratio"
+          "market_first_count",
+          "market_2plus_count",
+          "market_zt_count",
+          "market_same_level_count",
+          "market_higher_level_count",
+          "prev_market_first_count",
+          "prev_market_2plus_count",
+          "prev_market_same_level_count",
+          "prev_market_higher_level_count",
+          "prev_market_1to2_rate",
+          "prev_market_level_continuation_rate"
         ],
-        "C": 1.0,
-        "class_weight": "balanced",
+        "C": 0.1,
+        "class_weight": null,
         "recency_half_life": null,
-        "validation_top1": 0.62197049,
-        "validation_top2": 0.47400088,
-        "validation_auc": 0.65196068
+        "validation_top1": 0.61629686,
+        "validation_top2": 0.48606742,
+        "validation_auc": 0.6313792
       },
       "top1": {
-        "selected": 49,
-        "hits": 30,
-        "precision": 0.6122448979591837,
-        "day_hit_days": 30,
-        "day_hit_rate": 0.6122448979591837
+        "selected": 50,
+        "hits": 32,
+        "precision": 0.64,
+        "day_hit_days": 32,
+        "day_hit_rate": 0.64
       },
       "top2": {
-        "selected": 85,
-        "hits": 41,
-        "precision": 0.4823529411764706,
-        "day_hit_days": 37,
-        "day_hit_rate": 0.7551020408163265
+        "selected": 87,
+        "hits": 43,
+        "precision": 0.4942528735632184,
+        "day_hit_days": 39,
+        "day_hit_rate": 0.78
       },
       "top3": {
-        "selected": 108,
-        "hits": 50,
-        "precision": 0.46296296296296297,
-        "day_hit_days": 38,
-        "day_hit_rate": 0.7755102040816326
+        "selected": 111,
+        "hits": 51,
+        "precision": 0.4594594594594595,
+        "day_hit_days": 39,
+        "day_hit_rate": 0.78
       },
       "top4": {
-        "selected": 121,
-        "hits": 54,
-        "precision": 0.4462809917355372,
-        "day_hit_days": 39,
-        "day_hit_rate": 0.7959183673469388
+        "selected": 125,
+        "hits": 58,
+        "precision": 0.464,
+        "day_hit_days": 40,
+        "day_hit_rate": 0.8
       },
       "top5": {
-        "selected": 128,
-        "hits": 58,
-        "precision": 0.453125,
-        "day_hit_days": 39,
-        "day_hit_rate": 0.7959183673469388
+        "selected": 133,
+        "hits": 60,
+        "precision": 0.45112781954887216,
+        "day_hit_days": 40,
+        "day_hit_rate": 0.8
       },
       "top6": {
-        "selected": 131,
-        "hits": 60,
-        "precision": 0.4580152671755725,
-        "day_hit_days": 39,
-        "day_hit_rate": 0.7959183673469388
+        "selected": 137,
+        "hits": 62,
+        "precision": 0.45255474452554745,
+        "day_hit_days": 40,
+        "day_hit_rate": 0.8
       },
       "top10": {
-        "selected": 134,
-        "hits": 61,
-        "precision": 0.4552238805970149,
-        "day_hit_days": 39,
-        "day_hit_rate": 0.7959183673469388
+        "selected": 141,
+        "hits": 64,
+        "precision": 0.45390070921985815,
+        "day_hit_days": 40,
+        "day_hit_rate": 0.8
       },
-      "oos_auc": 0.5995957781271053,
+      "oos_auc": 0.6304788961038961,
       "oos_diagnostics": {
         "monthly": {
           "2026-07": {
@@ -900,90 +933,90 @@
             "days": 16,
             "top1": 0.5625,
             "top2": 0.45454545454545453,
-            "auc": 0.5833333333333333
+            "auc": 0.5625
           },
           "2026-08": {
             "n": 64,
             "days": 20,
             "top1": 0.7,
-            "top2": 0.4864864864864865,
-            "auc": 0.6823529411764706
+            "top2": 0.5135135135135135,
+            "auc": 0.7058823529411765
           },
           "2026-09": {
-            "n": 42,
-            "days": 13,
-            "top1": 0.5384615384615384,
+            "n": 49,
+            "days": 14,
+            "top1": 0.6428571428571429,
             "top2": 0.5,
-            "auc": 0.5537757437070938
+            "auc": 0.5808080808080808
           }
         },
         "market_zt_band": {
           "high": {
             "n": 46,
             "days": 14,
-            "top1": 0.7142857142857143,
-            "top2": 0.5769230769230769,
-            "auc": 0.6465028355387523
+            "top1": 0.8571428571428571,
+            "top2": 0.6153846153846154,
+            "auc": 0.6937618147448015
           },
           "low": {
-            "n": 43,
-            "days": 18,
-            "top1": 0.6111111111111112,
-            "top2": 0.4666666666666667,
-            "auc": 0.5065789473684211
+            "n": 50,
+            "days": 19,
+            "top1": 0.5789473684210527,
+            "top2": 0.46875,
+            "auc": 0.5422077922077922
           },
           "mid": {
             "n": 45,
             "days": 17,
             "top1": 0.5294117647058824,
             "top2": 0.41379310344827586,
-            "auc": 0.6578947368421052
+            "auc": 0.688259109311741
           }
         },
         "market_2plus_band": {
           "high": {
-            "n": 60,
-            "days": 16,
-            "top1": 0.5,
-            "top2": 0.41379310344827586,
-            "auc": 0.6828703703703705
+            "n": 48,
+            "days": 13,
+            "top1": 0.6923076923076923,
+            "top2": 0.375,
+            "auc": 0.6640625
           },
           "low": {
             "n": 33,
             "days": 16,
-            "top1": 0.625,
+            "top1": 0.5,
             "top2": 0.5,
-            "auc": 0.3933823529411765
+            "auc": 0.36764705882352944
           },
           "mid": {
-            "n": 41,
-            "days": 17,
-            "top1": 0.7058823529411765,
-            "top2": 0.5333333333333333,
-            "auc": 0.6499999999999999
+            "n": 60,
+            "days": 21,
+            "top1": 0.7142857142857143,
+            "top2": 0.5675675675675675,
+            "auc": 0.7265625
           }
         },
         "prev_level_relay_band": {
           "high": {
-            "n": 75,
-            "days": 27,
-            "top1": 0.5925925925925926,
-            "top2": 0.45652173913043476,
-            "auc": 0.6969476744186047
+            "n": 82,
+            "days": 28,
+            "top1": 0.6785714285714286,
+            "top2": 0.4791666666666667,
+            "auc": 0.7264437689969605
           },
           "low": {
             "n": 24,
             "days": 10,
-            "top1": 0.7,
+            "top1": 0.6,
             "top2": 0.5,
-            "auc": 0.5486111111111112
+            "auc": 0.5555555555555556
           },
           "mid": {
             "n": 35,
             "days": 12,
             "top1": 0.5833333333333334,
             "top2": 0.5217391304347826,
-            "auc": 0.45424836601307195
+            "auc": 0.49673202614379086
           }
         },
         "train_band_thresholds": {
@@ -993,7 +1026,7 @@
           ],
           "market_2plus_count": [
             10.0,
-            16.0
+            17.0
           ],
           "prev_market_level_continuation_rate": [
             0.16185320352130533,
@@ -1003,18 +1036,18 @@
       }
     },
     "4": {
-      "sample_n": 190,
-      "baseline": 0.4,
-      "train_n": 131,
-      "oos_n": 59,
-      "oos_scored_n": 59,
-      "oos_days": 38,
-      "oos_baseline": 0.4406779661016949,
+      "sample_n": 189,
+      "baseline": 0.4021164021164021,
+      "train_n": 128,
+      "oos_n": 61,
+      "oos_scored_n": 61,
+      "oos_days": 39,
+      "oos_baseline": 0.4426229508196721,
       "rolling_retrain": false,
       "retrain_history": [
         {
           "month": "initial_fixed",
-          "train_n": 131,
+          "train_n": 128,
           "feature_groups": [
             "core",
             "candle",
@@ -1067,7 +1100,7 @@
       ],
       "selected_hyperparameters": {
         "month": "initial_fixed",
-        "train_n": 131,
+        "train_n": 128,
         "feature_groups": [
           "core",
           "candle",
@@ -1118,55 +1151,55 @@
         "validation_auc": null
       },
       "top1": {
-        "selected": 38,
-        "hits": 17,
-        "precision": 0.4473684210526316,
-        "day_hit_days": 17,
-        "day_hit_rate": 0.4473684210526316
+        "selected": 39,
+        "hits": 18,
+        "precision": 0.46153846153846156,
+        "day_hit_days": 18,
+        "day_hit_rate": 0.46153846153846156
       },
       "top2": {
-        "selected": 50,
-        "hits": 25,
+        "selected": 52,
+        "hits": 26,
         "precision": 0.5,
-        "day_hit_days": 23,
-        "day_hit_rate": 0.6052631578947368
+        "day_hit_days": 24,
+        "day_hit_rate": 0.6153846153846154
       },
       "top3": {
-        "selected": 55,
-        "hits": 25,
-        "precision": 0.45454545454545453,
-        "day_hit_days": 23,
-        "day_hit_rate": 0.6052631578947368
-      },
-      "top4": {
         "selected": 57,
         "hits": 26,
         "precision": 0.45614035087719296,
-        "day_hit_days": 23,
-        "day_hit_rate": 0.6052631578947368
+        "day_hit_days": 24,
+        "day_hit_rate": 0.6153846153846154
+      },
+      "top4": {
+        "selected": 59,
+        "hits": 27,
+        "precision": 0.4576271186440678,
+        "day_hit_days": 24,
+        "day_hit_rate": 0.6153846153846154
       },
       "top5": {
-        "selected": 59,
-        "hits": 26,
-        "precision": 0.4406779661016949,
-        "day_hit_days": 23,
-        "day_hit_rate": 0.6052631578947368
+        "selected": 61,
+        "hits": 27,
+        "precision": 0.4426229508196721,
+        "day_hit_days": 24,
+        "day_hit_rate": 0.6153846153846154
       },
       "top6": {
-        "selected": 59,
-        "hits": 26,
-        "precision": 0.4406779661016949,
-        "day_hit_days": 23,
-        "day_hit_rate": 0.6052631578947368
+        "selected": 61,
+        "hits": 27,
+        "precision": 0.4426229508196721,
+        "day_hit_days": 24,
+        "day_hit_rate": 0.6153846153846154
       },
       "top10": {
-        "selected": 59,
-        "hits": 26,
-        "precision": 0.4406779661016949,
-        "day_hit_days": 23,
-        "day_hit_rate": 0.6052631578947368
+        "selected": 61,
+        "hits": 27,
+        "precision": 0.4426229508196721,
+        "day_hit_days": 24,
+        "day_hit_rate": 0.6153846153846154
       },
-      "oos_auc": 0.5372960372960373,
+      "oos_auc": 0.5620915032679739,
       "oos_diagnostics": {
         "monthly": {
           "2026-08": {
@@ -1174,23 +1207,30 @@
             "days": 17,
             "top1": 0.47058823529411764,
             "top2": 0.5,
-            "auc": 0.6203703703703703
+            "auc": 0.6481481481481481
+          },
+          "2026-09": {
+            "n": 20,
+            "days": 13,
+            "top1": 0.46153846153846156,
+            "top2": 0.47368421052631576,
+            "auc": 0.4949494949494949
           }
         },
         "market_zt_band": {
           "low": {
-            "n": 22,
-            "days": 14,
-            "top1": 0.42857142857142855,
-            "top2": 0.47368421052631576,
-            "auc": 0.36752136752136744
+            "n": 24,
+            "days": 15,
+            "top1": 0.4666666666666667,
+            "top2": 0.47619047619047616,
+            "auc": 0.3785714285714286
           },
           "mid": {
             "n": 23,
             "days": 14,
             "top1": 0.42857142857142855,
             "top2": 0.5555555555555556,
-            "auc": 0.6742424242424243
+            "auc": 0.6818181818181819
           }
         },
         "market_2plus_band": {
@@ -1199,14 +1239,14 @@
             "days": 16,
             "top1": 0.4375,
             "top2": 0.5,
-            "auc": 0.7556818181818181
+            "auc": 0.7897727272727273
           },
           "mid": {
-            "n": 22,
-            "days": 13,
-            "top1": 0.5384615384615384,
-            "top2": 0.5555555555555556,
-            "auc": 0.38842975206611574
+            "n": 24,
+            "days": 14,
+            "top1": 0.5714285714285714,
+            "top2": 0.55,
+            "auc": 0.41666666666666663
           }
         },
         "prev_level_relay_band": {
@@ -1215,12 +1255,12 @@
             "days": 29,
             "top1": 0.4482758620689655,
             "top2": 0.47368421052631576,
-            "auc": 0.532051282051282
+            "auc": 0.5427350427350428
           }
         },
         "train_band_thresholds": {
           "market_zt_count": [
-            57.0,
+            55.66666666666666,
             79.0
           ],
           "market_2plus_count": [
@@ -1438,224 +1478,234 @@
   },
   "today_prediction": {
     "status": "ok",
-    "analysis_date": "2026-09-23",
-    "prediction_date": "2026-09-24",
+    "analysis_date": "2026-09-24",
+    "prediction_date": "2026-09-28",
     "model_version": "multi-tier-v2",
     "universe": "沪深主板",
     "market": {
-      "first_count": 32,
-      "two_plus_count": 12,
-      "zt_count": 44,
-      "max_board": 4
+      "first_count": 33,
+      "two_plus_count": 13,
+      "zt_count": 46,
+      "max_board": 5
     },
     "levels": {
       "1": [
         {
           "rank": 1,
           "level": 1,
-          "code": "600293",
-          "name": "三峡新材",
-          "price": 3.7,
-          "score": 0.21368406677183382,
-          "prediction_date": "2026-09-24"
+          "code": "601567",
+          "name": "三星电气",
+          "price": 16.25,
+          "score": 0.4496214049886951,
+          "prediction_date": "2026-09-28"
         },
         {
           "rank": 2,
           "level": 1,
-          "code": "002989",
-          "name": "中天精装",
-          "price": 27.96,
-          "score": 0.2036243035814464,
-          "prediction_date": "2026-09-24"
+          "code": "603230",
+          "name": "内蒙新华",
+          "price": 18.47,
+          "score": 0.20979431193264364,
+          "prediction_date": "2026-09-28"
         },
         {
           "rank": 3,
           "level": 1,
-          "code": "603773",
-          "name": "沃格光电",
-          "price": 102.5,
-          "score": 0.19776060290600467,
-          "prediction_date": "2026-09-24"
+          "code": "002321",
+          "name": "华英农业",
+          "price": 2.27,
+          "score": 0.18778562994135337,
+          "prediction_date": "2026-09-28"
         },
         {
           "rank": 4,
           "level": 1,
-          "code": "002119",
-          "name": "康强电子",
-          "price": 26.92,
-          "score": 0.18876955395313416,
-          "prediction_date": "2026-09-24"
+          "code": "002622",
+          "name": "皓宸医疗",
+          "price": 2.72,
+          "score": 0.17744649645546248,
+          "prediction_date": "2026-09-28"
         },
         {
           "rank": 5,
           "level": 1,
-          "code": "600371",
-          "name": "万向德农",
-          "price": 17.28,
-          "score": 0.18773946336225267,
-          "prediction_date": "2026-09-24"
+          "code": "000710",
+          "name": "贝瑞基因",
+          "price": 11.01,
+          "score": 0.1751161745081801,
+          "prediction_date": "2026-09-28"
         },
         {
           "rank": 6,
           "level": 1,
-          "code": "603373",
-          "name": "安邦护卫集团股份",
-          "price": 47.96,
-          "score": 0.18514460238207156,
-          "prediction_date": "2026-09-24"
+          "code": "000790",
+          "name": "华神科技",
+          "price": 4.68,
+          "score": 0.1543495135530952,
+          "prediction_date": "2026-09-28"
         },
         {
           "rank": 7,
           "level": 1,
-          "code": "002849",
-          "name": "威星智能",
-          "price": 23.0,
-          "score": 0.1842471382777697,
-          "prediction_date": "2026-09-24"
+          "code": "002164",
+          "name": "宁波东力",
+          "price": 13.06,
+          "score": 0.15249499564488805,
+          "prediction_date": "2026-09-28"
         },
         {
           "rank": 8,
           "level": 1,
-          "code": "600802",
-          "name": "福建水泥",
-          "price": 6.02,
-          "score": 0.18373133249726606,
-          "prediction_date": "2026-09-24"
+          "code": "002836",
+          "name": "新宏泽",
+          "price": 12.27,
+          "score": 0.15226613527951963,
+          "prediction_date": "2026-09-28"
         },
         {
           "rank": 9,
           "level": 1,
-          "code": "603124",
-          "name": "江南新材",
-          "price": 145.0,
-          "score": 0.1833833605050589,
-          "prediction_date": "2026-09-24"
+          "code": "000592",
+          "name": "平潭发展",
+          "price": 8.78,
+          "score": 0.15106579778596413,
+          "prediction_date": "2026-09-28"
         },
         {
           "rank": 10,
           "level": 1,
-          "code": "603328",
-          "name": "依顿电子",
-          "price": 15.2,
-          "score": 0.18334806675995916,
-          "prediction_date": "2026-09-24"
+          "code": "001317",
+          "name": "三羊马",
+          "price": 65.3,
+          "score": 0.14916406784322755,
+          "prediction_date": "2026-09-28"
         }
       ],
       "2": [
         {
           "rank": 1,
           "level": 2,
-          "code": "002238",
-          "name": "天威视讯",
-          "price": 7.66,
-          "score": 0.792163244067568,
-          "prediction_date": "2026-09-24"
+          "code": "000850",
+          "name": "华茂股份",
+          "price": 5.12,
+          "score": 0.8966029068511214,
+          "prediction_date": "2026-09-28"
         },
         {
           "rank": 2,
           "level": 2,
-          "code": "605058",
-          "name": "澳弘电子",
-          "price": 58.6,
-          "score": 0.35221965833897806,
-          "prediction_date": "2026-09-24"
+          "code": "603949",
+          "name": "雪龙集团",
+          "price": 16.9,
+          "score": 0.6256041176938059,
+          "prediction_date": "2026-09-28"
         },
         {
           "rank": 3,
           "level": 2,
-          "code": "600418",
-          "name": "江淮汽车",
-          "price": 23.45,
-          "score": 0.34808278531974,
-          "prediction_date": "2026-09-24"
+          "code": "600843",
+          "name": "上工申贝",
+          "price": 8.37,
+          "score": 0.5348116695051858,
+          "prediction_date": "2026-09-28"
+        },
+        {
+          "rank": 4,
+          "level": 2,
+          "code": "002119",
+          "name": "康强电子",
+          "price": 29.61,
+          "score": 0.5067604923878904,
+          "prediction_date": "2026-09-28"
+        },
+        {
+          "rank": 5,
+          "level": 2,
+          "code": "002819",
+          "name": "东方中科",
+          "price": 26.66,
+          "score": 0.49866470006836805,
+          "prediction_date": "2026-09-28"
+        },
+        {
+          "rank": 6,
+          "level": 2,
+          "code": "600802",
+          "name": "福建水泥",
+          "price": 6.62,
+          "score": 0.4943250304029695,
+          "prediction_date": "2026-09-28"
+        },
+        {
+          "rank": 7,
+          "level": 2,
+          "code": "002909",
+          "name": "集泰股份",
+          "price": 8.29,
+          "score": 0.40283618004838906,
+          "prediction_date": "2026-09-28"
+        },
+        {
+          "rank": 8,
+          "level": 2,
+          "code": "603396",
+          "name": "金辰股份",
+          "price": 35.64,
+          "score": 0.3825828142919737,
+          "prediction_date": "2026-09-28"
         }
       ],
       "3": [
         {
           "rank": 1,
           "level": 3,
-          "code": "600825",
-          "name": "新华传媒",
-          "price": 7.06,
-          "score": 0.7808882524154153,
-          "prediction_date": "2026-09-24"
-        },
-        {
-          "rank": 2,
-          "level": 3,
-          "code": "001234",
-          "name": "泰慕士",
-          "price": 32.18,
-          "score": 0.7801484859442696,
-          "prediction_date": "2026-09-24"
-        },
-        {
-          "rank": 3,
-          "level": 3,
-          "code": "603636",
-          "name": "南威软件",
-          "price": 8.81,
-          "score": 0.4744896774641283,
-          "prediction_date": "2026-09-24"
-        },
-        {
-          "rank": 4,
-          "level": 3,
-          "code": "002614",
-          "name": "奥佳华",
-          "price": 7.57,
-          "score": 0.4441207504552988,
-          "prediction_date": "2026-09-24"
-        },
-        {
-          "rank": 5,
-          "level": 3,
-          "code": "600503",
-          "name": "华丽家族",
-          "price": 2.94,
-          "score": 0.38988060062226965,
-          "prediction_date": "2026-09-24"
-        },
-        {
-          "rank": 6,
-          "level": 3,
-          "code": "600743",
-          "name": "华远控股",
-          "price": 2.82,
-          "score": 0.35595056400863134,
-          "prediction_date": "2026-09-24"
-        },
-        {
-          "rank": 7,
-          "level": 3,
-          "code": "000560",
-          "name": "我爱我家",
-          "price": 3.86,
-          "score": 0.354082715532119,
-          "prediction_date": "2026-09-24"
+          "code": "002238",
+          "name": "天威视讯",
+          "price": 8.43,
+          "score": 0.3198000625822935,
+          "prediction_date": "2026-09-28"
         }
       ],
       "4": [
         {
           "rank": 1,
           "level": 4,
-          "code": "601811",
-          "name": "新华文轩",
-          "price": 18.5,
-          "score": 0.296270968367006,
-          "prediction_date": "2026-09-24"
+          "code": "001234",
+          "name": "泰慕士",
+          "price": 35.4,
+          "score": 0.621792312500729,
+          "prediction_date": "2026-09-28"
         },
         {
           "rank": 2,
           "level": 4,
-          "code": "000910",
-          "name": "大亚圣象",
-          "price": 7.58,
-          "score": 0.2141117111389159,
-          "prediction_date": "2026-09-24"
+          "code": "600825",
+          "name": "新华传媒",
+          "price": 7.77,
+          "score": 0.5341806338907306,
+          "prediction_date": "2026-09-28"
+        },
+        {
+          "rank": 3,
+          "level": 4,
+          "code": "002614",
+          "name": "奥佳华",
+          "price": 8.33,
+          "score": 0.31776252237395997,
+          "prediction_date": "2026-09-28"
         }
       ],
-      "5": [],
+      "5": [
+        {
+          "rank": 1,
+          "level": 5,
+          "code": "601811",
+          "name": "新华文轩",
+          "price": 20.35,
+          "score": 0.32542839677840885,
+          "prediction_date": "2026-09-28"
+        }
+      ],
       "6": []
     }
   }
