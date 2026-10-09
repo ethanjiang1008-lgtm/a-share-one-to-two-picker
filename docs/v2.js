@@ -1,7 +1,7 @@
 const TIER_LABELS = {"1":"一进二","2":"二进三","3":"三进四","4":"四进五","5":"五进六","6":"六进七+"};
-const fmtPct = v => Number.isFinite(Number(v)) ? (Number(v) * 100).toFixed(2) + "%" : "—";
-const fmtNum = v => Number.isFinite(Number(v)) ? Number(v).toLocaleString("zh-CN") : "—";
-const fmtAuc = v => Number.isFinite(Number(v)) ? Number(v).toFixed(3) : "—";
+const fmtPct = v => v === null || v === undefined || v === "" ? "—" : (Number.isFinite(Number(v)) ? (Number(v) * 100).toFixed(2) + "%" : "—");
+const fmtNum = v => v === null || v === undefined || v === "" ? "—" : (Number.isFinite(Number(v)) ? Number(v).toLocaleString("zh-CN") : "—");
+const fmtAuc = v => v === null || v === undefined || v === "" ? "—" : (Number.isFinite(Number(v)) ? Number(v).toFixed(3) : "—");
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 function metricPct(level, key) {
