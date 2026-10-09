@@ -212,10 +212,14 @@ V2 工作流：V2 多级连板晋级预测（.github/workflows/multi-tier-v2.yml
 注意：V2 当前仍属于样本外研究基线。高板级别的历史样本数量明显较少，尤其 6→7+，因此暂不把极小样本结果当作稳定模型结论。当前历史数据基于现有主板股票池，仍存在当前股票池回看历史的生存者偏差，需要后续接入历史成分股数据后再进一步校正。
 
 
-### V2 可视化结果网页
+### V2 独立网页
 
-每次 V2 工作流运行完成后，会把历史样本外回测报告同步到 docs/data/multi_tier_v2_backtest.json，并与最近一次预测一起发布到 GitHub Pages。
+V2 网页已迁移到独立仓库和独立的 GitHub Pages 发布流程，不再与 V1 共用网页部署目标：
 
-- V2 独立结果页：https://ethanjiang1008-lgtm.github.io/a-share-one-to-two-picker/v2.html
-- 页面包含各板级总样本、训练样本、样本外样本、基准晋级率、Top1/Top2/Top3 命中率、Top1 每日命中率、AUC、分月表现，以及最新候选股票。
-- 页面上的候选分数用于板级内排序；在独立完成概率校准前，不将其视为精确的实际晋级概率。
+- V2 独立结果页：https://ethanjiang1008-lgtm.github.io/a-share-multi-tier-v2/
+- V2 网页仓库：https://github.com/ethanjiang1008-lgtm/a-share-multi-tier-v2
+- V1 网页仍由本仓库的 V1 工作流发布：https://ethanjiang1008-lgtm.github.io/a-share-one-to-two-picker/
+
+V2 模型回测仍在本仓库运行，输出 `reports/multi_tier_v2_backtest.json` 和 `docs/data/multi_tier_latest.json`。独立 V2 网页仓库每个工作日北京时间 16:00 同步这两份输出，并只部署自己的 `site/` 目录。网页包含各板级历史样本外回测、TopK 命中率、分月表现与最新候选。
+
+页面候选分数用于板级内排序；未完成独立概率校准前，不应当作精确的实际晋级概率。
