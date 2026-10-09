@@ -2,6 +2,12 @@ name: A股首板一进二 V1 每日预测与网页发布
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - "docs/index.html"
+      - "docs/app.js"
+      - "docs/styles.css"
+      - ".github/workflows/daily-scan.yml"
   schedule:
     - cron: "10 7 * * 1-5"
 
