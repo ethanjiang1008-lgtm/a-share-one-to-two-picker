@@ -91,3 +91,13 @@ footer { display:flex; justify-content:space-between; gap:16px; margin-top:22px;
 .v2-row:last-child{border-bottom:0}
 .v2-row .code{margin-left:6px}
 .v2-row strong:last-child{white-space:nowrap}
+
+.v2-nav{display:flex;flex-direction:column;align-items:flex-end;gap:8px;min-width:205px}
+.v2-table{min-width:1050px}
+.v2-table td,.v2-table th{white-space:nowrap}
+.v2-table td:first-child{white-space:normal}
+.v2-explainer p{font-size:13px;line-height:1.75;margin:8px 0}
+.v2-explainer .muted{white-space:normal;line-height:1.7}
+.v2-row{border-bottom:1px solid var(--line)}
+.v2-row .muted{margin-left:0}
+@media(max-width:640px){.v2-nav{align-items:flex-start;width:100%}}
