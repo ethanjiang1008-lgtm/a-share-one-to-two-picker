@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>A股多级连板晋级预测 · V2</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">A-SHARE · MULTI-TIER V2</div>
+        <h1>A股多级连板晋级预测</h1>
+        <p class="sub">独立于 V1 的多级模型，展示历史样本外回测与最近一次候选结果。</p>
+      </div>
+      <div class="v2-nav">
+        <div class="model-badge">V2 · 多级独立模型</div>
+        <a class="excel-link" href="./index.html">← 返回 V1 首板一进二</a>
+      </div>
+    </header>
+
+    <section id="v2Status" class="status-card">
+      <div><span class="label">训练截止</span><strong>读取中…</strong></div>
+      <div><span class="label">样本外起始</span><strong>读取中…</strong></div>
+      <div><span class="label">最近分析日</span><strong>读取中…</strong></div>
+      <div><span class="label">下一预测日</span><strong>读取中…</strong></div>
+    </section>
+
+    <section class="section-head">
+      <div><div class="eyebrow">OUT-OF-SAMPLE BACKTEST</div><h2>历史样本外回测</h2></div>
+      <div class="hint">TopK 按每个预测日分别排序后汇总。晋级率是历史统计，不代表未来收益或单只股票的确定概率。</div>
+    </section>
+    <section id="v2BacktestSummary" class="stats-grid"></section>
+    <section class="table-wrap">
+      <table class="v2-table">
+        <thead><tr>
+          <th>板级</th><th>总样本</th><th>训练样本</th><th>样本外样本</th><th>样本外基准晋级率</th>
+          <th>Top1 命中率</th><th>Top2 命中率</th><th>Top3 命中率</th><th>Top1 每日命中率</th><th>AUC</th>
+        </tr></thead>
+        <tbody id="v2BacktestRows"><tr><td colspan="10">正在读取回测结果…</td></tr></tbody>
+      </table>
+    </section>
+
+    <section class="section-head">
+      <div><div class="eyebrow">MONTHLY ROBUSTNESS</div><h2>分月表现</h2></div>
+      <div class="hint">用于观察市场风格变化下的稳定性；小样本月份需要谨慎解释。</div>
+    </section>
+    <section class="table-wrap">
+      <table class="v2-table">
+        <thead><tr><th>板级</th><th>月份</th><th>样本数</th><th>交易日</th><th>Top1 命中率</th><th>Top2 命中率</th><th>AUC</th></tr></thead>
+        <tbody id="v2MonthlyRows"><tr><td colspan="7">正在读取分月结果…</td></tr></tbody>
+      </table>
+    </section>
+
+    <section class="section-head">
+      <div><div class="eyebrow">LATEST PREDICTION</div><h2>最近一次预测候选</h2></div>
+      <div class="hint">按各板级分别排序。模型评分用于同一板级内排序；未独立完成概率校准前，不应当作精准概率。</div>
+    </section>
+    <section id="v2PredictionMeta" class="market-grid"></section>
+    <section id="v2PredictionCards" class="cards"></section>
+
+    <section class="section-head"><div><div class="eyebrow">HOW TO READ</div><h2>结果说明</h2></div></section>
+    <section class="card v2-explainer">
+      <p><strong>样本外基准晋级率：</strong>该板级全部样本直接晋级的比例，用来判断模型是否优于不排序的基准。</p>
+      <p><strong>Top1 / Top2 / Top3 命中率：</strong>每个交易日按模型评分选出的前 1、2、3 只股票中，实际晋级股票所占比例。</p>
+      <p><strong>Top1 每日命中率：</strong>样本外交易日中，Top1 实际晋级的天数比例。</p>
+      <p><strong>AUC：</strong>衡量整体排序区分度的指标，不能替代 TopK 实际命中率。</p>
+      <p class="muted">范围：沪深主板，排除 ST、创业板、科创板及北交所。V2 不会修改 V1 冻结模型；各级别样本量不同，尤其高板级别的结果可能存在较大波动。</p>
+    </section>
+
+    <footer><span>模型：multi-tier-v2</span><span>数据源：新浪财经公开日线 · 页面随 V2 工作流自动更新</span></footer>
+  </div>
+  <script src="./v2.js"></script>
+</body>
+</html>
