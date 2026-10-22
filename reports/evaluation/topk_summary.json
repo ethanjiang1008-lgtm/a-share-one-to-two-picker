@@ -5,47 +5,47 @@
   "metrics": {
     "1": {
       "k": 1,
-      "days": 15,
-      "selected": 15,
+      "days": 16,
+      "selected": 16,
       "hits": 7,
-      "precision": 0.4666666666666667,
-      "baseline_rate": 0.36363636363636365,
-      "lift": 1.2833333333333332,
+      "precision": 0.4375,
+      "baseline_rate": 0.17857142857142858,
+      "lift": 2.4499999999999997,
       "day_hit_days": 7,
-      "day_hit_rate": 0.4666666666666667
+      "day_hit_rate": 0.4375
     },
     "3": {
       "k": 3,
-      "days": 15,
-      "selected": 45,
-      "hits": 14,
-      "precision": 0.3111111111111111,
-      "baseline_rate": 0.36363636363636365,
-      "lift": 0.8555555555555555,
-      "day_hit_days": 9,
-      "day_hit_rate": 0.6
+      "days": 16,
+      "selected": 48,
+      "hits": 15,
+      "precision": 0.3125,
+      "baseline_rate": 0.17857142857142858,
+      "lift": 1.75,
+      "day_hit_days": 10,
+      "day_hit_rate": 0.625
     },
     "6": {
       "k": 6,
-      "days": 15,
-      "selected": 90,
-      "hits": 24,
-      "precision": 0.26666666666666666,
-      "baseline_rate": 0.36363636363636365,
-      "lift": 0.7333333333333333,
-      "day_hit_days": 11,
-      "day_hit_rate": 0.7333333333333333
+      "days": 16,
+      "selected": 96,
+      "hits": 25,
+      "precision": 0.2604166666666667,
+      "baseline_rate": 0.17857142857142858,
+      "lift": 1.4583333333333335,
+      "day_hit_days": 12,
+      "day_hit_rate": 0.75
     },
     "10": {
       "k": 10,
-      "days": 15,
-      "selected": 150,
-      "hits": 37,
-      "precision": 0.24666666666666667,
-      "baseline_rate": 0.36363636363636365,
-      "lift": 0.6783333333333333,
-      "day_hit_days": 14,
-      "day_hit_rate": 0.9333333333333333
+      "days": 16,
+      "selected": 160,
+      "hits": 38,
+      "precision": 0.2375,
+      "baseline_rate": 0.17857142857142858,
+      "lift": 1.3299999999999998,
+      "day_hit_days": 15,
+      "day_hit_rate": 0.9375
     }
   }
 }
