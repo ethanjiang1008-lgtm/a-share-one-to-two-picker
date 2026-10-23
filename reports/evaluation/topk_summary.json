@@ -5,47 +5,47 @@
   "metrics": {
     "1": {
       "k": 1,
-      "days": 16,
-      "selected": 16,
+      "days": 17,
+      "selected": 17,
       "hits": 7,
-      "precision": 0.4375,
-      "baseline_rate": 0.17857142857142858,
-      "lift": 2.4499999999999997,
+      "precision": 0.4117647058823529,
+      "baseline_rate": 0.45,
+      "lift": 0.9150326797385621,
       "day_hit_days": 7,
-      "day_hit_rate": 0.4375
+      "day_hit_rate": 0.4117647058823529
     },
     "3": {
       "k": 3,
-      "days": 16,
-      "selected": 48,
+      "days": 17,
+      "selected": 51,
       "hits": 15,
-      "precision": 0.3125,
-      "baseline_rate": 0.17857142857142858,
-      "lift": 1.75,
+      "precision": 0.29411764705882354,
+      "baseline_rate": 0.45,
+      "lift": 0.6535947712418301,
       "day_hit_days": 10,
-      "day_hit_rate": 0.625
+      "day_hit_rate": 0.5882352941176471
     },
     "6": {
       "k": 6,
-      "days": 16,
-      "selected": 96,
-      "hits": 25,
-      "precision": 0.2604166666666667,
-      "baseline_rate": 0.17857142857142858,
-      "lift": 1.4583333333333335,
-      "day_hit_days": 12,
-      "day_hit_rate": 0.75
+      "days": 17,
+      "selected": 102,
+      "hits": 28,
+      "precision": 0.27450980392156865,
+      "baseline_rate": 0.45,
+      "lift": 0.6100217864923748,
+      "day_hit_days": 13,
+      "day_hit_rate": 0.7647058823529411
     },
     "10": {
       "k": 10,
-      "days": 16,
-      "selected": 160,
-      "hits": 38,
-      "precision": 0.2375,
-      "baseline_rate": 0.17857142857142858,
-      "lift": 1.3299999999999998,
-      "day_hit_days": 15,
-      "day_hit_rate": 0.9375
+      "days": 17,
+      "selected": 170,
+      "hits": 43,
+      "precision": 0.2529411764705882,
+      "baseline_rate": 0.45,
+      "lift": 0.5620915032679739,
+      "day_hit_days": 16,
+      "day_hit_rate": 0.9411764705882353
     }
   }
 }
