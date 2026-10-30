@@ -5,47 +5,47 @@
   "metrics": {
     "1": {
       "k": 1,
-      "days": 21,
-      "selected": 21,
+      "days": 22,
+      "selected": 22,
       "hits": 8,
-      "precision": 0.38095238095238093,
-      "baseline_rate": 0.1111111111111111,
-      "lift": 3.4285714285714284,
+      "precision": 0.36363636363636365,
+      "baseline_rate": 0.21428571428571427,
+      "lift": 1.696969696969697,
       "day_hit_days": 8,
-      "day_hit_rate": 0.38095238095238093
+      "day_hit_rate": 0.36363636363636365
     },
     "3": {
       "k": 3,
-      "days": 21,
-      "selected": 63,
+      "days": 22,
+      "selected": 66,
       "hits": 16,
-      "precision": 0.25396825396825395,
-      "baseline_rate": 0.1111111111111111,
-      "lift": 2.2857142857142856,
+      "precision": 0.24242424242424243,
+      "baseline_rate": 0.21428571428571427,
+      "lift": 1.1313131313131315,
       "day_hit_days": 11,
-      "day_hit_rate": 0.5238095238095238
+      "day_hit_rate": 0.5
     },
     "6": {
       "k": 6,
-      "days": 21,
-      "selected": 126,
-      "hits": 30,
-      "precision": 0.23809523809523808,
-      "baseline_rate": 0.1111111111111111,
-      "lift": 2.142857142857143,
-      "day_hit_days": 15,
-      "day_hit_rate": 0.7142857142857143
+      "days": 22,
+      "selected": 132,
+      "hits": 32,
+      "precision": 0.24242424242424243,
+      "baseline_rate": 0.21428571428571427,
+      "lift": 1.1313131313131315,
+      "day_hit_days": 16,
+      "day_hit_rate": 0.7272727272727273
     },
     "10": {
       "k": 10,
-      "days": 21,
-      "selected": 210,
-      "hits": 50,
-      "precision": 0.23809523809523808,
-      "baseline_rate": 0.1111111111111111,
-      "lift": 2.142857142857143,
-      "day_hit_days": 20,
-      "day_hit_rate": 0.9523809523809523
+      "days": 22,
+      "selected": 220,
+      "hits": 52,
+      "precision": 0.23636363636363636,
+      "baseline_rate": 0.21428571428571427,
+      "lift": 1.103030303030303,
+      "day_hit_days": 21,
+      "day_hit_rate": 0.9545454545454546
     }
   }
 }
