@@ -5,47 +5,47 @@
   "metrics": {
     "1": {
       "k": 1,
-      "days": 26,
-      "selected": 26,
-      "hits": 8,
-      "precision": 0.3076923076923077,
-      "baseline_rate": 0.1875,
-      "lift": 1.6410256410256412,
-      "day_hit_days": 8,
-      "day_hit_rate": 0.3076923076923077
+      "days": 27,
+      "selected": 27,
+      "hits": 9,
+      "precision": 0.3333333333333333,
+      "baseline_rate": 0.08771929824561403,
+      "lift": 3.8,
+      "day_hit_days": 9,
+      "day_hit_rate": 0.3333333333333333
     },
     "3": {
       "k": 3,
-      "days": 26,
-      "selected": 78,
-      "hits": 18,
-      "precision": 0.23076923076923078,
-      "baseline_rate": 0.1875,
-      "lift": 1.2307692307692308,
-      "day_hit_days": 13,
-      "day_hit_rate": 0.5
+      "days": 27,
+      "selected": 81,
+      "hits": 19,
+      "precision": 0.2345679012345679,
+      "baseline_rate": 0.08771929824561403,
+      "lift": 2.674074074074074,
+      "day_hit_days": 14,
+      "day_hit_rate": 0.5185185185185185
     },
     "6": {
       "k": 6,
-      "days": 26,
-      "selected": 156,
-      "hits": 35,
-      "precision": 0.22435897435897437,
-      "baseline_rate": 0.1875,
-      "lift": 1.1965811965811965,
-      "day_hit_days": 18,
-      "day_hit_rate": 0.6923076923076923
+      "days": 27,
+      "selected": 162,
+      "hits": 36,
+      "precision": 0.2222222222222222,
+      "baseline_rate": 0.08771929824561403,
+      "lift": 2.533333333333333,
+      "day_hit_days": 19,
+      "day_hit_rate": 0.7037037037037037
     },
     "10": {
       "k": 10,
-      "days": 26,
-      "selected": 260,
-      "hits": 58,
-      "precision": 0.2230769230769231,
-      "baseline_rate": 0.1875,
-      "lift": 1.1897435897435897,
-      "day_hit_days": 24,
-      "day_hit_rate": 0.9230769230769231
+      "days": 27,
+      "selected": 270,
+      "hits": 59,
+      "precision": 0.21851851851851853,
+      "baseline_rate": 0.08771929824561403,
+      "lift": 2.4911111111111115,
+      "day_hit_days": 25,
+      "day_hit_rate": 0.9259259259259259
     }
   }
 }
